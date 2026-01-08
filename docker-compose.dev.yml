@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: sistema_mes_mysql_dev
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: mes_system
+      MYSQL_USER: mes_user
+      MYSQL_PASSWORD: mes123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - mes_dev_network
+
+  adminer:
+    image: adminer:latest
+    container_name: sistema_mes_adminer_dev
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql
+    networks:
+      - mes_dev_network
+
+volumes:
+  mysql_dev_data:
+
+networks:
+  mes_dev_network:
+    driver: bridge

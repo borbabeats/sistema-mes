@@ -1,0 +1,154 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Setor {
+  id   Int     @id @default(autoincrement())
+  nome String  @unique @db.VarChar(100)
+  deleted_at DateTime? @db.Timestamp
+  
+  usuarios Usuario[]
+  maquinas Maquina[]
+  
+  @@map("setores")
+}
+
+model Usuario {
+  id            Int      @id @default(autoincrement())
+  nome          String   @db.VarChar(100)
+  email         String?  @unique @db.VarChar(100)
+  telefone      String?  @db.VarChar(20)
+  senha         String   @db.VarChar(255)
+  cargo         Cargo    @default(OPERADOR)
+  photo_profile  String?  @db.VarChar(255) // URL da imagem de perfil no CDN
+  setor_id      Int?     @map("setor_id")
+  deleted_at    DateTime? @db.Timestamp
+  
+  setor               Setor?           @relation(fields: [setor_id], references: [id])
+  apontamentos        Apontamento[]
+  notificacaoDestinatarios NotificacaoDestinatario[]
+  logNotificacoes     LogNotificacao[]
+  
+  @@map("usuarios")
+}
+
+model Maquina {
+  id     Int           @id @default(autoincrement())
+  nome   String        @db.VarChar(100)
+  setor_id Int?
+  status StatusMaquina @default(PARADA)
+  deleted_at DateTime? @db.Timestamp
+  
+  setor        Setor?         @relation(fields: [setor_id], references: [id])
+  apontamentos Apontamento[]
+  
+  @@map("maquinas")
+}
+
+model OrdemProducao {
+  id                   Int                @id @default(autoincrement())
+  codigo               String             @unique @db.VarChar(50)
+  produto              String             @db.VarChar(150)
+  quantidadePlanejada  Int
+  status               StatusOP           @default(PENDENTE)
+  dataCriacao          DateTime           @default(now())
+  
+  apontamentos Apontamento[]
+  
+  @@map("ordens_producao")
+}
+
+model Apontamento {
+  id                   Int      @id @default(autoincrement())
+  opId                 Int
+  maquinaId            Int
+  usuarioId            Int
+  quantidadeProduzida  Int      @default(0)
+  quantidadeDefeito    Int      @default(0)
+  dataInicio           DateTime
+  dataFim              DateTime?
+  
+  op      OrdemProducao @relation(fields: [opId], references: [id])
+  maquina Maquina       @relation(fields: [maquinaId], references: [id])
+  usuario Usuario       @relation(fields: [usuarioId], references: [id])
+  
+  @@map("apontamentos")
+}
+
+model ConfigNotificacao {
+  id                Int                    @id @default(autoincrement())
+  nome              String                 @db.VarChar(100)
+  tipoEvento        TipoEventoNotificacao
+  valorCritico      Decimal?                @db.Decimal(10, 2)
+  enviarWhatsapp    Boolean                 @default(false)
+  enviarWebSocket   Boolean                 @default(true)
+  ativo             Boolean                 @default(true)
+  
+  notificacaoDestinatarios NotificacaoDestinatario[]
+  logNotificacoes          LogNotificacao[]
+  
+  @@map("config_notificacoes")
+}
+
+model NotificacaoDestinatario {
+  configId Int
+  usuarioId Int
+  
+  config   ConfigNotificacao @relation(fields: [configId], references: [id])
+  usuario  Usuario           @relation(fields: [usuarioId], references: [id])
+  
+  @@id([configId, usuarioId])
+  @@map("notificacao_destinatarios")
+}
+
+model LogNotificacao {
+  id         Int                   @id @default(autoincrement())
+  configId   Int
+  usuarioId  Int
+  mensagem   String?
+  dataEnvio  DateTime              @default(now())
+  statusEnvio StatusEnvioNotificacao
+  
+  config  ConfigNotificacao @relation(fields: [configId], references: [id])
+  usuario Usuario           @relation(fields: [usuarioId], references: [id])
+  
+  @@map("log_notificacoes")
+}
+
+enum Cargo {
+  ADMIN
+  GERENTE
+  OPERADOR
+}
+
+enum StatusMaquina {
+  OPERANDO
+  PARADA
+  MANUTENCAO
+}
+
+enum StatusOP {
+  PENDENTE
+  EM_CURSO
+  FINALIZADA
+  CANCELADA
+}
+
+enum TipoEventoNotificacao {
+  MAQUINA_PARADA
+  OP_ATRASADA
+  DEFEITO_ALTO
+  OP_FINALIZADA
+}
+
+enum StatusEnvioNotificacao {
+  SUCESSO
+  FALHA
+}
