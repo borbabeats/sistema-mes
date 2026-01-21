@@ -58,7 +58,7 @@ export class MaquinasController {
   @ApiQuery({ name: 'setorId', required: false, type: Number })
   async findAll(
     @Query('status') status?: StatusMaquina,
-    @Query('setorId', ParseIntPipe) setorId?: number,
+    @Query('setorId') setorId?: string,
   ) {
     // Filtra por status e/ou setor, se fornecidos
     const where: any = { deletedAt: null };
@@ -68,10 +68,10 @@ export class MaquinasController {
     }
     
     if (setorId) {
-      where.setorId = setorId;
+      where.setorId = parseInt(setorId, 10);
     }
 
-    return this.maquinasService.findAll();
+    return this.maquinasService.findAll(where);
   }
 
   @Get(':id')

@@ -96,7 +96,12 @@ export class UsersService {
         cargo: true,
         telefone: true,
         photo_profile: true,
-        setor_id: true,
+        setor: {
+          select: {
+            id: true,
+            nome: true,
+          }
+        }
       },
     });
   }

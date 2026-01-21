@@ -33,16 +33,22 @@ export class MaquinasService {
       }
     }
 
+    const { setorId, ...maquinaData } = createMaquinaDto;
+    
     return this.prisma.maquina.create({
       data: {
-        ...createMaquinaDto,
-        setor: createMaquinaDto.setorId ? { connect: { id: createMaquinaDto.setorId } } : undefined,
+        ...maquinaData,
+        setor_id: setorId,
       },
+      include: {
+        setor: true
+      }
     });
   }
 
-  async findAll() {
+  async findAll(fiter?: any) {
     return this.prisma.maquina.findMany({
+      where: fiter,
       include: { setor: true },
     });
   }
