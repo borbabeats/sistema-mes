@@ -12,9 +12,9 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { SetoresService } from './setores.service';
-import { CreateSetorDto } from '../presentation/dto/setores/create-setor.dto';
-import { UpdateSetorDto } from '../presentation/dto/setores/update-setor.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateSetorDto } from '../../presentation/dto/setores/create-setor.dto';
+import { UpdateSetorDto } from '../../presentation/dto/setores/update-setor.dto';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('setores')
 @UseGuards(JwtAuthGuard)

@@ -6,8 +6,8 @@ import { IOrdensProducaoRepository } from '../../../domain/repositories/ordens-p
 import { IUsuariosRepository } from '../../../domain/repositories/usuarios.repository.interface';
 import { StatusMaquina } from '../../../domain/entities/maquina.entity';
 import { StatusOP } from '../../../domain/entities/ordem-producao.entity';
-import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../ordens-producao/constants';
-import { USUARIOS_REPOSITORY_TOKEN } from '../../../users/constants';
+import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../modules/ordens-producao/constants';
+import { USUARIOS_REPOSITORY_TOKEN } from '../../../modules/users/constants';
 
 @Injectable()
 export class CreateApontamentoUseCase {

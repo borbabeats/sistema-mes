@@ -12,14 +12,14 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ApontamentosService } from './apontamentos.service';
-import { CreateApontamentoDto } from '../presentation/dto/apontamentos/create-apontamento.dto';
-import { UpdateApontamentoDto } from '../presentation/dto/apontamentos/update-apontamento.dto';
-import { FinalizeApontamentoDto } from '../presentation/dto/apontamentos/finalize-apontamento.dto';
-import { Apontamento } from '../domain/entities/apontamento.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/roles.decorator';
-import { Role } from '../auth/role.enum';
+import { CreateApontamentoDto } from '../../presentation/dto/apontamentos/create-apontamento.dto';
+import { UpdateApontamentoDto } from '../../presentation/dto/apontamentos/update-apontamento.dto';
+import { FinalizeApontamentoDto } from '../../presentation/dto/apontamentos/finalize-apontamento.dto';
+import { Apontamento } from '../../domain/entities/apontamento.entity';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/roles.decorator';
+import { Role } from '../../auth/role.enum';
 
 @ApiTags('apontamentos')
 @ApiBearerAuth()

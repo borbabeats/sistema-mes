@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, ConflictException, Inject } from '@nestjs/common';
-import { ISetoresRepository } from '../domain/repositories/setores.repository.interface';
-import { CreateSetorDto } from '../presentation/dto/setores/create-setor.dto';
-import { UpdateSetorDto } from '../presentation/dto/setores/update-setor.dto';
-import { Setor } from '../domain/entities/setor.entity';
+import { ISetoresRepository } from '../../domain/repositories/setores.repository.interface';
+import { CreateSetorDto } from '../../presentation/dto/setores/create-setor.dto';
+import { UpdateSetorDto } from '../../presentation/dto/setores/update-setor.dto';
+import { Setor } from '../../domain/entities/setor.entity';
 import { SETORES_REPOSITORY_TOKEN } from './constants';
 
 @Injectable()

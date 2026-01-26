@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { IMaquinasRepository, CreateMaquinaData, MAQUINAS_REPOSITORY_TOKEN } from '../../../domain/repositories/maquinas.repository.interface';
 import { ISetoresRepository } from '../../../domain/repositories/setores.repository.interface';
 import { Maquina, StatusMaquina } from '../../../domain/entities/maquina.entity';
-import { SETORES_REPOSITORY_TOKEN } from '../../../setores/constants';
+import { SETORES_REPOSITORY_TOKEN } from '../../../modules/setores/constants';
 
 @Injectable()
 export class CreateMaquinaUseCase {

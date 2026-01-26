@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { IUsuariosRepository, CreateUsuarioData } from '../domain/repositories/usuarios.repository.interface';
-import { CreateUsuarioDto } from '../presentation/dto/usuarios/create-usuario.dto';
-import { UpdateUsuarioDto } from '../presentation/dto/usuarios/update-usuario.dto';
-import { UsuarioResponseDto } from '../presentation/dto/usuarios/usuario-response.dto';
-import { Usuario, Cargo } from '../domain/entities/usuario.entity';
+import { IUsuariosRepository, CreateUsuarioData } from '../../domain/repositories/usuarios.repository.interface';
+import { CreateUsuarioDto } from '../../presentation/dto/usuarios/create-usuario.dto';
+import { UpdateUsuarioDto } from '../../presentation/dto/usuarios/update-usuario.dto';
+import { UsuarioResponseDto } from '../../presentation/dto/usuarios/usuario-response.dto';
+import { Usuario, Cargo } from '../../domain/entities/usuario.entity';
 import { USUARIOS_REPOSITORY_TOKEN } from './constants';
 import * as bcrypt from 'bcrypt';
 

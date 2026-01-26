@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { IMaquinasRepository, MAQUINAS_REPOSITORY_TOKEN } from '../domain/repositories/maquinas.repository.interface';
-import { CreateMaquinaUseCase } from '../application/use-cases/maquinas/create-maquina.use-case';
-import { Maquina } from '../domain/entities/maquina.entity';
-import { CreateMaquinaData } from '../domain/repositories/maquinas.repository.interface';
+import { IMaquinasRepository, MAQUINAS_REPOSITORY_TOKEN } from '../../domain/repositories/maquinas.repository.interface';
+import { CreateMaquinaUseCase } from '../../application/use-cases/maquinas/create-maquina.use-case';
+import { Maquina } from '../../domain/entities/maquina.entity';
+import { CreateMaquinaData } from '../../domain/repositories/maquinas.repository.interface';
 
 @Injectable()
 export class MaquinasService {

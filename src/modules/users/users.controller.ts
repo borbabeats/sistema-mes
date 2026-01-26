@@ -13,10 +13,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUsuarioDto } from '../presentation/dto/usuarios/create-usuario.dto';
-import { UpdateUsuarioDto } from '../presentation/dto/usuarios/update-usuario.dto';
-import { UsuarioResponseDto } from '../presentation/dto/usuarios/usuario-response.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateUsuarioDto } from '../../presentation/dto/usuarios/create-usuario.dto';
+import { UpdateUsuarioDto } from '../../presentation/dto/usuarios/update-usuario.dto';
+import { UsuarioResponseDto } from '../../presentation/dto/usuarios/usuario-response.dto';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('usuarios')
 @UseGuards(JwtAuthGuard)

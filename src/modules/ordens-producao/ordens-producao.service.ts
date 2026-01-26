@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { IOrdensProducaoRepository } from '../domain/repositories/ordens-producao.repository.interface';
-import { CreateOrdemProducaoUseCase } from '../application/use-cases/ordens-producao/create-ordem-producao.use-case';
-import { OrdemProducao, StatusOP, PrioridadeOP } from '../domain/entities/ordem-producao.entity';
-import { CreateOrdemProducaoData } from '../domain/repositories/ordens-producao.repository.interface';
+import { IOrdensProducaoRepository } from '../../domain/repositories/ordens-producao.repository.interface';
+import { CreateOrdemProducaoUseCase } from '../../application/use-cases/ordens-producao/create-ordem-producao.use-case';
+import { OrdemProducao, StatusOP, PrioridadeOP } from '../../domain/entities/ordem-producao.entity';
+import { CreateOrdemProducaoData } from '../../domain/repositories/ordens-producao.repository.interface';
 import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from './constants';
-import { CreateOrdemProducaoDto } from '../presentation/dto/ordens-producao/create-ordem-producao.dto';
+import { CreateOrdemProducaoDto } from '../../presentation/dto/ordens-producao/create-ordem-producao.dto';
 
 @Injectable()
 export class OrdensProducaoService {

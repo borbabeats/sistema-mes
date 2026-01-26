@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { IApontamentosRepository, APONTAMENTOS_REPOSITORY_TOKEN } from '../domain/repositories/apontamentos.repository.interface';
-import { CreateApontamentoUseCase } from '../application/use-cases/apontamentos/create-apontamento.use-case';
-import { FinalizeApontamentoUseCase } from '../application/use-cases/apontamentos/finalize-apontamento.use-case';
-import { Apontamento } from '../domain/entities/apontamento.entity';
-import { CreateApontamentoData } from '../domain/repositories/apontamentos.repository.interface';
+import { IApontamentosRepository, APONTAMENTOS_REPOSITORY_TOKEN } from '../../domain/repositories/apontamentos.repository.interface';
+import { CreateApontamentoUseCase } from '../../application/use-cases/apontamentos/create-apontamento.use-case';
+import { FinalizeApontamentoUseCase } from '../../application/use-cases/apontamentos/finalize-apontamento.use-case';
+import { Apontamento } from '../../domain/entities/apontamento.entity';
+import { CreateApontamentoData } from '../../domain/repositories/apontamentos.repository.interface';
 
 @Injectable()
 export class ApontamentosService {

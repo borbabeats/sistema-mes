@@ -3,9 +3,9 @@ import { IOrdensProducaoRepository, CreateOrdemProducaoData } from '../../../dom
 import { ISetoresRepository } from '../../../domain/repositories/setores.repository.interface';
 import { IUsuariosRepository } from '../../../domain/repositories/usuarios.repository.interface';
 import { OrdemProducao, StatusOP, PrioridadeOP } from '../../../domain/entities/ordem-producao.entity';
-import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../ordens-producao/constants';
-import { SETORES_REPOSITORY_TOKEN } from '../../../setores/constants';
-import { USUARIOS_REPOSITORY_TOKEN } from '../../../users/constants';
+import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../modules/ordens-producao/constants';
+import { SETORES_REPOSITORY_TOKEN } from '../../../modules/setores/constants';
+import { USUARIOS_REPOSITORY_TOKEN } from '../../../modules/users/constants';
 
 @Injectable()
 export class CreateOrdemProducaoUseCase {

@@ -2,8 +2,8 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { PrismaModule } from '../prisma/prisma.module';
-import { UsuariosRepository } from '../infrastructure/repositories/usuarios/usuarios.repository';
+import { PrismaModule } from '../../prisma/prisma.module';
+import { UsuariosRepository } from '../../infrastructure/repositories/usuarios/usuarios.repository';
 import { USUARIOS_REPOSITORY_TOKEN } from './constants';
 
 @Module({

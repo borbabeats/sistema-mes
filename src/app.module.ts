@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { SetoresModule } from './setores/setores.module';
-import { OrdensProducaoModule } from './ordens-producao/ordens-producao.module';
-import { ApontamentosModule } from './apontamentos/apontamentos.module';
-import { MaquinasModule } from './maquinas/maquinas.module';
+import { SetoresModule } from './modules/setores/setores.module';
+import { OrdensProducaoModule } from './modules/ordens-producao/ordens-producao.module';
+import { ApontamentosModule } from './modules/apontamentos/apontamentos.module';
+import { MaquinasModule } from './modules/maquinas/maquinas.module';
 import { LoggerModule } from './logger/logger.module';
 
 @Module({

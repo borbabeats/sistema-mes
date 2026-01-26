@@ -20,15 +20,15 @@ import {
   ApiQuery,
   ApiBody
 } from '@nestjs/swagger';
-import { CreateMaquinaUseCase } from '../application/use-cases/maquinas/create-maquina.use-case';
+import { CreateMaquinaUseCase } from '../../application/use-cases/maquinas/create-maquina.use-case';
 import { MaquinasService } from './maquinas.service';
-import { CreateMaquinaDto } from '../presentation/dto/maquinas/create-maquina.dto';
-import { UpdateMaquinaDto } from '../presentation/dto/maquinas/update-maquina.dto';
-import { StatusMaquina } from '../domain/entities/maquina.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Cargo } from '../domain/entities/usuario.entity';
+import { CreateMaquinaDto } from '../../presentation/dto/maquinas/create-maquina.dto';
+import { UpdateMaquinaDto } from '../../presentation/dto/maquinas/update-maquina.dto';
+import { StatusMaquina } from '../../domain/entities/maquina.entity';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { Cargo } from '../../domain/entities/usuario.entity';
 
 @ApiBearerAuth()
 @ApiTags('máquinas')

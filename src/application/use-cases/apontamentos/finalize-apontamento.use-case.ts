@@ -5,7 +5,7 @@ import { IOrdensProducaoRepository } from '../../../domain/repositories/ordens-p
 import { Apontamento } from '../../../domain/entities/apontamento.entity';
 import { StatusMaquina } from '../../../domain/entities/maquina.entity';
 import { StatusOP } from '../../../domain/entities/ordem-producao.entity';
-import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../ordens-producao/constants';
+import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../modules/ordens-producao/constants';
 
 @Injectable()
 export class FinalizeApontamentoUseCase {
