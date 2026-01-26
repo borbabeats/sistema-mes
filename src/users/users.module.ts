@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { PrismaModule } from '../prisma/prisma.module';
-import { UserRepository } from './repositories/user.repository';
-import { IUserRepository } from './interfaces/user.repository.interface';
+import { UsuariosRepository } from '../infrastructure/repositories/usuarios/usuarios.repository';
+import { USUARIOS_REPOSITORY_TOKEN } from './constants';
 
 @Module({
   imports: [PrismaModule],
@@ -12,10 +12,11 @@ import { IUserRepository } from './interfaces/user.repository.interface';
   providers: [
     UsersService,
     {
-      provide: IUserRepository,
-      useClass: UserRepository,
+      provide: USUARIOS_REPOSITORY_TOKEN,
+      useClass: UsuariosRepository,
     },
   ],
-  exports: [UsersService, IUserRepository],
+  exports: [UsersService, USUARIOS_REPOSITORY_TOKEN],
 })
 export class UsersModule {}
+export { USUARIOS_REPOSITORY_TOKEN };

@@ -12,10 +12,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { OrdensProducaoService } from './ordens-producao.service';
-import { CreateOrdemProducaoDto } from './dto/create-ordem-producao.dto';
-import { UpdateOrdemProducaoDto } from './dto/update-ordem-producao.dto';
-import { FilterOrdemProducaoDto } from './dto/filter-ordem-producao.dto';
-import { OrdemProducao } from './entities/ordem-producao-entity';
+import { CreateOrdemProducaoDto } from '../presentation/dto/ordens-producao/create-ordem-producao.dto';
+import { UpdateOrdemProducaoDto } from '../presentation/dto/ordens-producao/update-ordem-producao.dto';
+import { FilterOrdemProducaoDto } from '../presentation/dto/ordens-producao/filter-ordem-producao.dto';
+import { OrdemProducao } from '../domain/entities/ordem-producao.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/roles.decorator';

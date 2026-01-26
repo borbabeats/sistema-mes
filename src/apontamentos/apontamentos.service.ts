@@ -1,15 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { IApontamentosRepository } from './interfaces/apontamentos.repository.interface';
-import { CreateApontamentoDto } from './dto/create-apontamento.dto';
-import { UpdateApontamentoDto } from './dto/update-apontamento.dto';
-import { Apontamento } from './entities/apontamento.entity';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { IApontamentosRepository, APONTAMENTOS_REPOSITORY_TOKEN } from '../domain/repositories/apontamentos.repository.interface';
+import { CreateApontamentoUseCase } from '../application/use-cases/apontamentos/create-apontamento.use-case';
+import { FinalizeApontamentoUseCase } from '../application/use-cases/apontamentos/finalize-apontamento.use-case';
+import { Apontamento } from '../domain/entities/apontamento.entity';
+import { CreateApontamentoData } from '../domain/repositories/apontamentos.repository.interface';
 
 @Injectable()
 export class ApontamentosService {
-  constructor(private readonly repository: IApontamentosRepository) {}
+  constructor(
+    @Inject(APONTAMENTOS_REPOSITORY_TOKEN) private readonly repository: IApontamentosRepository,
+    private readonly createApontamentoUseCase: CreateApontamentoUseCase,
+    private readonly finalizeApontamentoUseCase: FinalizeApontamentoUseCase,
+  ) {}
 
-  async create(createApontamentoDto: CreateApontamentoDto): Promise<Apontamento> {
-    return this.repository.create(createApontamentoDto);
+  async create(createApontamentoDto: CreateApontamentoData): Promise<Apontamento> {
+    return this.createApontamentoUseCase.execute(createApontamentoDto);
   }
 
   async findAll(filters?: any): Promise<Apontamento[]> {
@@ -23,7 +28,7 @@ export class ApontamentosService {
       throw new NotFoundException(`Apontamento com ID ${id} não encontrado`);
     }
 
-    return apontamento as Apontamento;
+    return apontamento;
   }
 
   async findByMaquina(maquinaId: number): Promise<Apontamento[]> {
@@ -42,15 +47,17 @@ export class ApontamentosService {
     return this.repository.findByPeriodo(dataInicio, dataFim);
   }
 
-  async update(id: number, updateApontamentoDto: UpdateApontamentoDto): Promise<Apontamento> {
-    await this.findOne(id); // Verifica se existe
-    const updated = await this.repository.update(id, updateApontamentoDto);
-    return updated as Apontamento;
+  async update(id: number, updateApontamentoDto: any): Promise<Apontamento> {
+    await this.findOne(id);
+    return this.repository.update(id, updateApontamentoDto);
   }
 
   async remove(id: number): Promise<Apontamento> {
-    await this.findOne(id); // Verifica se existe
-    const removed = await this.repository.remove(id);
-    return removed as Apontamento;
+    await this.findOne(id);
+    return this.repository.remove(id);
+  }
+
+  async finalizeApontamento(id: number, quantidadeProduzida?: number, quantidadeDefeito?: number): Promise<Apontamento> {
+    return this.finalizeApontamentoUseCase.execute(id, quantidadeProduzida, quantidadeDefeito);
   }
 }

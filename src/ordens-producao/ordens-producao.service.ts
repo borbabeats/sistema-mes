@@ -1,236 +1,117 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { IOrdensProducaoRepository } from './interfaces/ordens-producao.repository.interface';
-import { CreateOrdemProducaoDto } from './dto/create-ordem-producao.dto';
-import { UpdateOrdemProducaoDto } from './dto/update-ordem-producao.dto';
-import { FilterOrdemProducaoDto } from './dto/filter-ordem-producao.dto';
-import { OrdemProducao } from './entities/ordem-producao-entity';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { IOrdensProducaoRepository } from '../domain/repositories/ordens-producao.repository.interface';
+import { CreateOrdemProducaoUseCase } from '../application/use-cases/ordens-producao/create-ordem-producao.use-case';
+import { OrdemProducao, StatusOP, PrioridadeOP } from '../domain/entities/ordem-producao.entity';
+import { CreateOrdemProducaoData } from '../domain/repositories/ordens-producao.repository.interface';
+import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from './constants';
+import { CreateOrdemProducaoDto } from '../presentation/dto/ordens-producao/create-ordem-producao.dto';
 
 @Injectable()
 export class OrdensProducaoService {
   constructor(
-    private readonly repository: IOrdensProducaoRepository,
-    private readonly prisma: PrismaService,
+    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN) private readonly repository: IOrdensProducaoRepository,
+    private readonly createOrdemProducaoUseCase: CreateOrdemProducaoUseCase,
   ) {}
 
   async create(createOrdemProducaoDto: CreateOrdemProducaoDto): Promise<OrdemProducao> {
-    // Verificar se o setor existe
-    const setorExists = await this.prisma.setor.findUnique({
-      where: { id: createOrdemProducaoDto.setorId, deleted_at: null },
-    });
-    if (!setorExists) {
-      throw new NotFoundException(`Setor com ID ${createOrdemProducaoDto.setorId} não encontrado`);
-    }
-
-    // Verificar se o responsável existe, se fornecido
-    if (createOrdemProducaoDto.responsavelId) {
-      const responsavelExists = await this.prisma.usuario.findUnique({
-        where: { id: createOrdemProducaoDto.responsavelId, deleted_at: null },
-      });
-      if (!responsavelExists) {
-        throw new NotFoundException(`Usuário responsável com ID ${createOrdemProducaoDto.responsavelId} não encontrado`);
-      }
-    }
-
-    // Verificar se os operadores existem, se fornecidos
-    if (createOrdemProducaoDto.operadoresIds && createOrdemProducaoDto.operadoresIds.length > 0) {
-      const operadoresCount = await this.prisma.usuario.count({
-        where: {
-          id: { in: createOrdemProducaoDto.operadoresIds },
-          deleted_at: null,
-        },
-      });
-      if (operadoresCount !== createOrdemProducaoDto.operadoresIds.length) {
-        throw new NotFoundException('Um ou mais operadores não foram encontrados');
-      }
-    }
-
-    return this.repository.create(createOrdemProducaoDto);
+    const { prioridade, ...rest } = createOrdemProducaoDto;
+    
+    const createData: CreateOrdemProducaoData = {
+      ...rest,
+      prioridade: prioridade as PrioridadeOP,
+    };
+    
+    return this.createOrdemProducaoUseCase.execute(createData);
   }
 
-  async findAll(filters?: FilterOrdemProducaoDto): Promise<OrdemProducao[]> {
+  async findAll(filters?: any): Promise<OrdemProducao[]> {
     return this.repository.findAll(filters);
   }
 
   async findOne(id: number): Promise<OrdemProducao> {
-    const ordem = await this.repository.findOne(id);
-
-    if (!ordem) {
+    const ordemProducao = await this.repository.findOne(id);
+    
+    if (!ordemProducao) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
     }
 
-    return ordem;
+    return ordemProducao;
   }
 
-  async update(
-    id: number,
-    updateOrdemProducaoDto: UpdateOrdemProducaoDto,
-  ): Promise<OrdemProducao> {
-    // Verificar se a ordem de produção existe
-    const ordemExistente = await this.repository.findOne(id);
+  async findByCodigo(codigo: string): Promise<OrdemProducao | null> {
+    return this.repository.findByCodigo(codigo);
+  }
 
-    if (!ordemExistente) {
-      throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
-    }
+  async findByStatus(status: any): Promise<OrdemProducao[]> {
+    return this.repository.findByStatus(status);
+  }
 
-    // Verificar se o setor existe, se for atualizado
-    if (updateOrdemProducaoDto.setorId) {
-      const setorExists = await this.prisma.setor.findUnique({
-        where: { id: updateOrdemProducaoDto.setorId, deleted_at: null },
-      });
-      if (!setorExists) {
-        throw new NotFoundException(`Setor com ID ${updateOrdemProducaoDto.setorId} não encontrado`);
-      }
-    }
+  async findByPrioridade(prioridade: any): Promise<OrdemProducao[]> {
+    return this.repository.findByPrioridade(prioridade);
+  }
 
-    // Verificar se o responsável existe, se fornecido
-    if (updateOrdemProducaoDto.responsavelId) {
-      const responsavelExists = await this.prisma.usuario.findUnique({
-        where: { id: updateOrdemProducaoDto.responsavelId, deleted_at: null },
-      });
-      if (!responsavelExists) {
-        throw new NotFoundException(`Usuário responsável com ID ${updateOrdemProducaoDto.responsavelId} não encontrado`);
-      }
-    }
+  async findBySetor(setorId: number): Promise<OrdemProducao[]> {
+    return this.repository.findBySetor(setorId);
+  }
 
-    // Verificar se os operadores existem, se fornecidos
-    if (updateOrdemProducaoDto.operadoresIds && updateOrdemProducaoDto.operadoresIds.length > 0) {
-      const operadoresCount = await this.prisma.usuario.count({
-        where: {
-          id: { in: updateOrdemProducaoDto.operadoresIds },
-          deleted_at: null,
-        },
-      });
-      if (operadoresCount !== updateOrdemProducaoDto.operadoresIds.length) {
-        throw new NotFoundException('Um ou mais operadores não foram encontrados');
-      }
-    }
+  async findByResponsavel(responsavelId: number): Promise<OrdemProducao[]> {
+    return this.repository.findByResponsavel(responsavelId);
+  }
 
+  async findOverdue(): Promise<OrdemProducao[]> {
+    return this.repository.findOverdue();
+  }
+
+  async findPending(): Promise<OrdemProducao[]> {
+    return this.repository.findPending();
+  }
+
+  async update(id: number, updateOrdemProducaoDto: any): Promise<OrdemProducao> {
+    await this.findOne(id);
     return this.repository.update(id, updateOrdemProducaoDto);
   }
 
   async remove(id: number): Promise<{ message: string; id: number; codigo: string }> {
-    // Verificar se a ordem de produção existe
-    const ordemExistente = await this.repository.findOne(id);
-
-    if (!ordemExistente) {
-      throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
-    }
-
+    const ordem = await this.findOne(id);
     await this.repository.remove(id);
-    
     return {
       message: 'Ordem de produção removida com sucesso',
-      id,
-      codigo: ordemExistente.codigo,
+      id: ordem.id,
+      codigo: ordem.codigo
     };
   }
 
   async iniciarProducao(id: number): Promise<OrdemProducao> {
-    const ordem = await this.repository.findOne(id);
-
-    if (!ordem) {
-      throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
-    }
-
-    if (ordem.status === 'FINALIZADA' || ordem.status === 'CANCELADA') {
-      throw new BadRequestException(
-        `Não é possível iniciar uma ordem de produção com status ${ordem.status}`,
-      );
-    }
-
-    return this.repository.iniciarProducao(id);
+    const ordem = await this.findOne(id);
+    return this.repository.update(id, { status: StatusOP.EM_ANDAMENTO });
   }
 
   async pausarProducao(id: number): Promise<OrdemProducao> {
-    const ordem = await this.repository.findOne(id);
-
-    if (!ordem) {
-      throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
-    }
-
-    if (ordem.status !== 'EM_ANDAMENTO') {
-      throw new BadRequestException(
-        `Só é possível pausar uma ordem de produção que está em andamento. Status atual: ${ordem.status}`,
-      );
-    }
-
-    return this.repository.pausarProducao(id);
+    const ordem = await this.findOne(id);
+    return this.repository.update(id, { status: StatusOP.PAUSADA });
   }
 
   async retomarProducao(id: number): Promise<OrdemProducao> {
-    const ordem = await this.repository.findOne(id);
-
-    if (!ordem) {
-      throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
-    }
-
-    if (ordem.status !== 'PAUSADA') {
-      throw new BadRequestException(
-        `Só é possível retomar uma ordem de produção que está pausada. Status atual: ${ordem.status}`,
-      );
-    }
-
-    return this.repository.retomarProducao(id);
+    const ordem = await this.findOne(id);
+    return this.repository.update(id, { status: StatusOP.EM_ANDAMENTO });
   }
 
   async finalizarProducao(id: number): Promise<OrdemProducao> {
-    const ordem = await this.repository.findOne(id);
-
-    if (!ordem) {
-      throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
-    }
-
-    if (ordem.status === 'FINALIZADA' || ordem.status === 'CANCELADA') {
-      throw new BadRequestException(
-        `Não é possível finalizar uma ordem de produção com status ${ordem.status}`,
-      );
-    }
-
-    return this.repository.finalizarProducao(id);
+    const ordem = await this.findOne(id);
+    return this.repository.update(id, { status: StatusOP.FINALIZADA });
   }
 
   async cancelarProducao(id: number, motivo: string): Promise<OrdemProducao> {
-    const ordem = await this.repository.findOne(id);
-
-    if (!ordem) {
-      throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
-    }
-
-    if (ordem.status === 'FINALIZADA' || ordem.status === 'CANCELADA') {
-      throw new BadRequestException(
-        `Não é possível cancelar uma ordem de produção com status ${ordem.status}`,
-      );
-    }
-
-    return this.repository.cancelarProducao(id, motivo);
+    const ordem = await this.findOne(id);
+    return this.repository.update(id, { status: StatusOP.CANCELADA });
   }
 
-  async atualizarProducao(
-    id: number,
-    quantidadeProduzida: number,
-    quantidadeDefeito: number = 0,
-  ): Promise<OrdemProducao> {
-    const ordem = await this.repository.findOne(id);
+  async atualizarProducao(id: number, quantidade: number, defeitos: number): Promise<OrdemProducao> {
+    return this.updateQuantidadeProduzida(id, quantidade);
+  }
 
-    if (!ordem) {
-      throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
-    }
-
-    if (ordem.status !== 'EM_ANDAMENTO') {
-      throw new BadRequestException(
-        `Só é possível atualizar a produção de uma ordem em andamento. Status atual: ${ordem.status}`,
-      );
-    }
-
-    const novaQuantidade = (ordem.quantidadeProduzida || 0) + quantidadeProduzida;
-
-    if (novaQuantidade > ordem.quantidadePlanejada) {
-      throw new BadRequestException(
-        `A quantidade produzida (${novaQuantidade}) não pode ser maior que a quantidade planejada (${ordem.quantidadePlanejada})`,
-      );
-    }
-
-    return this.repository.atualizarProducao(id, quantidadeProduzida, quantidadeDefeito);
+  async updateQuantidadeProduzida(id: number, quantidade: number): Promise<OrdemProducao> {
+    await this.findOne(id);
+    return this.repository.updateQuantidadeProduzida(id, quantidade);
   }
 }

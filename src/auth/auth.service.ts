@@ -29,7 +29,7 @@ export class AuthService {
       email: user.email,
       nome: user.nome,
       cargo: user.cargo,
-      setorId: user.setor_id,
+      setorId: user.setorId,
     };
 
     return {
@@ -39,8 +39,8 @@ export class AuthService {
         nome: user.nome,
         email: user.email,
         cargo: user.cargo,
-        photo_profile: user.photo_profile,
-        setorId: user.setor_id,
+        photoProfile: user.photoProfile,
+        setorId: user.setorId,
       },
     };
   }

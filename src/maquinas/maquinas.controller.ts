@@ -20,23 +20,25 @@ import {
   ApiQuery,
   ApiBody
 } from '@nestjs/swagger';
+import { CreateMaquinaUseCase } from '../application/use-cases/maquinas/create-maquina.use-case';
 import { MaquinasService } from './maquinas.service';
-import { CreateMaquinaDto } from './dto/create-maquina.dto';
-import { UpdateMaquinaDto } from './dto/update-maquina.dto';
-import { CreateManutencaoDto } from './dto/create-manutencao.dto';
-import { UpdateManutencaoDto } from './dto/update-manutencao.dto';
-import { StatusMaquina, StatusManutencao } from './entities/maquina.entity';
+import { CreateMaquinaDto } from '../presentation/dto/maquinas/create-maquina.dto';
+import { UpdateMaquinaDto } from '../presentation/dto/maquinas/update-maquina.dto';
+import { StatusMaquina } from '../domain/entities/maquina.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Cargo } from '../users/entities/user.entity';
+import { Cargo } from '../domain/entities/usuario.entity';
 
 @ApiBearerAuth()
 @ApiTags('máquinas')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('maquinas')
 export class MaquinasController {
-  constructor(private readonly maquinasService: MaquinasService) {}
+  constructor(
+    private readonly createMaquinaUseCase: CreateMaquinaUseCase,
+    private readonly maquinasService: MaquinasService,
+  ) {}
 
   // Rotas para Máquinas
 
@@ -47,7 +49,7 @@ export class MaquinasController {
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 409, description: 'Código de máquina já existe' })
   create(@Body() createMaquinaDto: CreateMaquinaDto) {
-    return this.maquinasService.create(createMaquinaDto);
+    return this.createMaquinaUseCase.execute(createMaquinaDto);
   }
 
   @Get()
@@ -61,7 +63,7 @@ export class MaquinasController {
     @Query('setorId') setorId?: string,
   ) {
     // Filtra por status e/ou setor, se fornecidos
-    const where: any = { deleted_at: null };
+    const where: any = {};
     
     if (status) {
       where.status = status;
@@ -106,8 +108,9 @@ export class MaquinasController {
     return this.maquinasService.remove(id);
   }
 
-  // Rotas para Manutenções
+  // Rotas para Manutenções - TODO: Implementar quando os DTOs de manutenção estiverem disponíveis na clean architecture
 
+  /*
   @Post(':id/manutencoes')
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
   @ApiOperation({ summary: 'Cria uma nova manutenção para uma máquina' })
@@ -210,4 +213,5 @@ export class MaquinasController {
 
     return this.maquinasService.getTempoUsoMaquina(maquinaId, inicio, fim);
   }
+  */
 }

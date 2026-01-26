@@ -13,8 +13,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUsuarioDto } from '../presentation/dto/usuarios/create-usuario.dto';
+import { UpdateUsuarioDto } from '../presentation/dto/usuarios/update-usuario.dto';
+import { UsuarioResponseDto } from '../presentation/dto/usuarios/usuario-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('usuarios')
@@ -27,7 +28,7 @@ export class UsersController {
   }
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto, @Request() req) {
+  async create(@Body() createUserDto: CreateUsuarioDto, @Request() req): Promise<UsuarioResponseDto> {
     if (!this.isAdmin(req.user)) {
       throw new ForbiddenException('Apenas administradores podem criar usuários');
     }
@@ -35,7 +36,7 @@ export class UsersController {
   }
 
   @Get()
-  async findAll(@Request() req) {
+  async findAll(@Request() req): Promise<UsuarioResponseDto[]> {
     if (!this.isAdmin(req.user)) {
       throw new ForbiddenException('Apenas administradores podem listar usuários');
     }
@@ -44,7 +45,7 @@ export class UsersController {
 
   @Get('profile/me')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@Request() req) {
+  async getProfile(@Request() req): Promise<UsuarioResponseDto> {
     try {
       return await this.usersService.findOne(req.user.id);
     } catch (error) {
@@ -56,7 +57,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Request() req) {
+  async findOne(@Param('id') id: string, @Request() req): Promise<UsuarioResponseDto> {
     // Permite que usuários vejam apenas seus próprios dados, a menos que sejam ADMIN
     if (req.user.cargo !== 'ADMIN' && req.user.id !== parseInt(id)) {
       throw new ForbiddenException('Você só pode visualizar seus próprios dados');
@@ -67,7 +68,7 @@ export class UsersController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
     @Request() req,
   ) {
     // Apenas ADMIN pode atualizar outros usuários
@@ -76,11 +77,11 @@ export class UsersController {
     }
 
     // Apenas ADMIN pode alterar o cargo
-    if (updateUserDto.cargo && req.user.cargo !== 'ADMIN') {
+    if (updateUsuarioDto.cargo && req.user.cargo !== 'ADMIN') {
       throw new ForbiddenException('Apenas administradores podem alterar cargos');
     }
 
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(+id, updateUsuarioDto);
   }
 
   @Delete(':id')

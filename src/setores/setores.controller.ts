@@ -12,8 +12,8 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { SetoresService } from './setores.service';
-import { CreateSetorDto } from './dto/create-setor.dto';
-import { UpdateSetorDto } from './dto/update-setor.dto';
+import { CreateSetorDto } from '../presentation/dto/setores/create-setor.dto';
+import { UpdateSetorDto } from '../presentation/dto/setores/update-setor.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('setores')
@@ -37,16 +37,6 @@ export class SetoresController {
     return this.setoresService.findAll();
   }
 
-  @Get('deleted')
-  @UseGuards(JwtAuthGuard)
-  async findDeleted(@Request() req) {
-    if (req.user.cargo !== 'ADMIN') {
-      throw new ForbiddenException(
-        'Apenas administradores podem visualizar setores deletados',
-      );
-    }
-    return this.setoresService.findDeleted();
-  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -79,16 +69,5 @@ export class SetoresController {
     return this.setoresService.remove(+id);
   }
 
-  @Patch(':id/restore')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(200)
-  async restore(@Param('id') id: string, @Request() req) {
-    if (req.user.cargo !== 'ADMIN') {
-      throw new ForbiddenException(
-        'Apenas administradores podem restaurar setores',
-      );
-    }
-    return this.setoresService.restore(+id);
-  }
 
 }

@@ -12,9 +12,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ApontamentosService } from './apontamentos.service';
-import { CreateApontamentoDto } from './dto/create-apontamento.dto';
-import { UpdateApontamentoDto } from './dto/update-apontamento.dto';
-import { Apontamento } from './entities/apontamento.entity';
+import { CreateApontamentoDto } from '../presentation/dto/apontamentos/create-apontamento.dto';
+import { UpdateApontamentoDto } from '../presentation/dto/apontamentos/update-apontamento.dto';
+import { FinalizeApontamentoDto } from '../presentation/dto/apontamentos/finalize-apontamento.dto';
+import { Apontamento } from '../domain/entities/apontamento.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -88,6 +89,22 @@ export class ApontamentosController {
     @Body() updateApontamentoDto: UpdateApontamentoDto,
   ): Promise<Apontamento> {
     return this.apontamentosService.update(id, updateApontamentoDto);
+  }
+
+  @Post(':id/finalize')
+  @Roles(Role.ADMIN, Role.GERENTE, Role.OPERADOR)
+  @ApiOperation({ summary: 'Finalizar um apontamento' })
+  @ApiResponse({ status: 200, description: 'Apontamento finalizado', type: Apontamento })
+  @ApiResponse({ status: 404, description: 'Apontamento não encontrado' })
+  finalize(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() finalizeApontamentoDto: FinalizeApontamentoDto,
+  ): Promise<Apontamento> {
+    return this.apontamentosService.finalizeApontamento(
+      id,
+      finalizeApontamentoDto.quantidadeProduzida,
+      finalizeApontamentoDto.quantidadeDefeito,
+    );
   }
 
   @Delete(':id')
