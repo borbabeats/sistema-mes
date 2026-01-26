@@ -21,10 +21,14 @@ import {
   ApiBody
 } from '@nestjs/swagger';
 import { CreateMaquinaUseCase } from '../../application/use-cases/maquinas/create-maquina.use-case';
+import { IniciarManutencaoUseCase } from '../../application/use-cases/maquinas/iniciar-manutencao.use-case';
+import { FinalizarManutencaoUseCase } from '../../application/use-cases/maquinas/finalizar-manutencao.use-case';
 import { MaquinasService } from './maquinas.service';
 import { CreateMaquinaDto } from '../../presentation/dto/maquinas/create-maquina.dto';
 import { UpdateMaquinaDto } from '../../presentation/dto/maquinas/update-maquina.dto';
-import { StatusMaquina } from '../../domain/entities/maquina.entity';
+import { IniciarManutencaoDto } from '../../presentation/dto/maquinas/iniciar-manutencao.dto';
+import { FinalizarManutencaoDto } from '../../presentation/dto/maquinas/finalizar-manutencao.dto';
+import { StatusMaquina, StatusManutencao, Maquina } from '../../domain/entities/maquina.entity';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -37,6 +41,8 @@ import { Cargo } from '../../domain/entities/usuario.entity';
 export class MaquinasController {
   constructor(
     private readonly createMaquinaUseCase: CreateMaquinaUseCase,
+    private readonly iniciarManutencaoUseCase: IniciarManutencaoUseCase,
+    private readonly finalizarManutencaoUseCase: FinalizarManutencaoUseCase,
     private readonly maquinasService: MaquinasService,
   ) {}
 
@@ -108,110 +114,31 @@ export class MaquinasController {
     return this.maquinasService.remove(id);
   }
 
-  // Rotas para Manutenções - TODO: Implementar quando os DTOs de manutenção estiverem disponíveis na clean architecture
+  // Rotas para Manutenções
 
-  /*
   @Post(':id/manutencoes')
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
-  @ApiOperation({ summary: 'Cria uma nova manutenção para uma máquina' })
-  @ApiResponse({ status: 201, description: 'Manutenção criada com sucesso' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  @ApiResponse({ status: 404, description: 'Máquina ou responsável não encontrado' })
-  createManutencao(
-    @Param('id', ParseIntPipe) maquinaId: number,
-    @Body() createManutencaoDto: CreateManutencaoDto,
-  ) {
-    return this.maquinasService.createManutencao({
-      ...createManutencaoDto,
-      maquinaId,
-    });
-  }
-
-  @Get(':id/manutencoes')
-  @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
-  @ApiOperation({ summary: 'Lista as manutenções de uma máquina' })
-  @ApiResponse({ status: 200, description: 'Lista de manutenções retornada com sucesso' })
-  @ApiQuery({ name: 'status', enum: StatusManutencao, required: false })
-  @ApiQuery({ name: 'tipo', required: false })
-  findManutencoes(
-    @Param('id', ParseIntPipe) maquinaId: number,
-    @Query('status') status?: StatusManutencao,
-    @Query('tipo') tipo?: string,
-  ) {
-    return this.maquinasService.findAllManutencoes(maquinaId, status);
-  }
-
-  @Get('manutencoes/:manutencaoId')
-  @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
-  @ApiOperation({ summary: 'Obtém uma manutenção pelo ID' })
-  @ApiResponse({ status: 200, description: 'Manutenção encontrada' })
-  @ApiResponse({ status: 404, description: 'Manutenção não encontrada' })
-  findManutencaoById(@Param('manutencaoId', ParseIntPipe) id: number) {
-    return this.maquinasService.findManutencaoById(id);
-  }
-
-  @Patch('manutencoes/:manutencaoId')
-  @Roles(Cargo.ADMIN, Cargo.GERENTE)
-  @ApiOperation({ summary: 'Atualiza uma manutenção' })
-  @ApiResponse({ status: 200, description: 'Manutenção atualizada com sucesso' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  @ApiResponse({ status: 404, description: 'Manutenção não encontrada' })
-  updateManutencao(
-    @Param('manutencaoId', ParseIntPipe) id: number,
-    @Body() updateManutencaoDto: UpdateManutencaoDto,
-  ) {
-    return this.maquinasService.updateManutencao(id, updateManutencaoDto);
-  }
-
-  @Delete('manutencoes/:manutencaoId')
-  @Roles(Cargo.ADMIN, Cargo.GERENTE)
-  @ApiOperation({ summary: 'Remove uma manutenção' })
-  @ApiResponse({ status: 200, description: 'Manutenção removida com sucesso' })
-  @ApiResponse({ status: 404, description: 'Manutenção não encontrada' })
-  removeManutencao(@Param('manutencaoId', ParseIntPipe) id: number) {
-    return this.maquinasService.removeManutencao(id);
-  }
-
-  // Rotas para Histórico de Manutenção
-
-  @Get('manutencoes/:manutencaoId/historico')
-  @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
-  @ApiOperation({ summary: 'Obtém o histórico de uma manutenção' })
-  @ApiResponse({ status: 200, description: 'Histórico retornado com sucesso' })
-  @ApiResponse({ status: 404, description: 'Manutenção não encontrada' })
-  findHistoricoManutencao(
-    @Param('manutencaoId', ParseIntPipe) manutencaoId: number,
-  ) {
-    return this.maquinasService.findHistoricoManutencao(manutencaoId);
-  }
-
-  // Rotas para Controle de Tempo de Operação
-
-  @Get(':id/tempo-uso')
-  @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
-  @ApiOperation({ summary: 'Obtém o tempo de uso de uma máquina em um período' })
-  @ApiResponse({ status: 200, description: 'Tempo de uso calculado com sucesso' })
-  @ApiResponse({ status: 400, description: 'Período inválido' })
+  @ApiOperation({ summary: 'Inicia uma manutenção para uma máquina' })
+  @ApiResponse({ status: 200, description: 'Manutenção iniciada com sucesso', type: Maquina })
+  @ApiResponse({ status: 400, description: 'Dados inválidos ou máquina não pode entrar em manutenção' })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
-  @ApiQuery({ name: 'inicio', required: true, description: 'Data de início (ISO 8601)' })
-  @ApiQuery({ name: 'fim', required: true, description: 'Data de fim (ISO 8601)' })
-  async getTempoUsoMaquina(
+  iniciarManutencao(
     @Param('id', ParseIntPipe) maquinaId: number,
-    @Query('inicio') inicioStr: string,
-    @Query('fim') fimStr: string,
+    @Body() iniciarManutencaoDto: IniciarManutencaoDto,
   ) {
-    const inicio = new Date(inicioStr);
-    const fim = new Date(fimStr);
-
-    if (isNaN(inicio.getTime()) || isNaN(fim.getTime())) {
-      throw new BadRequestException('Datas de início e fim devem ser válidas');
-    }
-
-    if (inicio >= fim) {
-      throw new BadRequestException('A data de início deve ser anterior à data de fim');
-    }
-
-    return this.maquinasService.getTempoUsoMaquina(maquinaId, inicio, fim);
+    return this.iniciarManutencaoUseCase.execute(maquinaId, iniciarManutencaoDto);
   }
-  */
+
+  @Patch(':id/manutencoes/finalizar')
+  @Roles(Cargo.ADMIN, Cargo.GERENTE)
+  @ApiOperation({ summary: 'Finaliza a manutenção de uma máquina' })
+  @ApiResponse({ status: 200, description: 'Manutenção finalizada com sucesso', type: Maquina })
+  @ApiResponse({ status: 400, description: 'Dados inválidos ou máquina não está em manutenção' })
+  @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
+  finalizarManutencao(
+    @Param('id', ParseIntPipe) maquinaId: number,
+    @Body() finalizarManutencaoDto: FinalizarManutencaoDto,
+  ) {
+    return this.finalizarManutencaoUseCase.execute(maquinaId, finalizarManutencaoDto);
+  }
 }

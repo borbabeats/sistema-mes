@@ -112,7 +112,7 @@ export class ApontamentosController {
   @ApiOperation({ summary: 'Remover um apontamento' })
   @ApiResponse({ status: 200, description: 'Apontamento removido' })
   @ApiResponse({ status: 404, description: 'Apontamento não encontrado' })
-  remove(@Param('id', ParseIntPipe) id: number): Promise<Apontamento> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string; id: number }> {
     return this.apontamentosService.remove(id);
   }
 }

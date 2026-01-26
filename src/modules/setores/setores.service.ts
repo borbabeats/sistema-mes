@@ -1,32 +1,35 @@
-import { Injectable, NotFoundException, ConflictException, Inject } from '@nestjs/common';
-import { ISetoresRepository } from '../../domain/repositories/setores.repository.interface';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { CreateSetorDto } from '../../presentation/dto/setores/create-setor.dto';
 import { UpdateSetorDto } from '../../presentation/dto/setores/update-setor.dto';
 import { Setor } from '../../domain/entities/setor.entity';
-import { SETORES_REPOSITORY_TOKEN } from './constants';
+import { CreateSetorUseCase } from '../../application/use-cases/setores/create-setor.use-case';
+import { FindSetorUseCase } from '../../application/use-cases/setores/find-setor.use-case';
+import { FindAllSetoresUseCase } from '../../application/use-cases/setores/find-all-setores.use-case';
+import { UpdateSetorUseCase } from '../../application/use-cases/setores/update-setor.use-case';
+import { DeleteSetorUseCase } from '../../application/use-cases/setores/delete-setor.use-case';
 
 @Injectable()
 export class SetoresService {
-  constructor(@Inject(SETORES_REPOSITORY_TOKEN) private readonly setorRepository: ISetoresRepository) {}
+  constructor(
+    private readonly createSetorUseCase: CreateSetorUseCase,
+    private readonly findSetorUseCase: FindSetorUseCase,
+    private readonly findAllSetoresUseCase: FindAllSetoresUseCase,
+    private readonly updateSetorUseCase: UpdateSetorUseCase,
+    private readonly deleteSetorUseCase: DeleteSetorUseCase,
+  ) {}
 
   async create(createSetorDto: CreateSetorDto): Promise<Setor> {
-    const setorExistente = await this.setorRepository.findByNome(createSetorDto.nome);
-
-    if (setorExistente) {
-      throw new ConflictException('Já existe um setor com este nome');
-    }
-
-    return this.setorRepository.create({
+    return this.createSetorUseCase.execute({
       nome: createSetorDto.nome,
     });
   }
 
   async findAll(): Promise<Setor[]> {
-    return this.setorRepository.findAll();
+    return this.findAllSetoresUseCase.execute();
   }
 
   async findOne(id: number): Promise<Setor> {
-    const setor = await this.setorRepository.findOne(id);
+    const setor = await this.findSetorUseCase.execute(id);
 
     if (!setor) {
       throw new NotFoundException(`Setor com ID ${id} não encontrado`);
@@ -36,13 +39,11 @@ export class SetoresService {
   }
 
   async update(id: number, updateSetorDto: UpdateSetorDto): Promise<Setor> {
-    await this.findOne(id);
-
-    return this.setorRepository.update(id, updateSetorDto);
+    return this.updateSetorUseCase.execute(id, updateSetorDto);
   }
 
-  async remove(id: number): Promise<Setor> {
-    return this.setorRepository.remove(id);
+  async remove(id: number): Promise<{ message: string; id: number; nome: string }> {
+    return this.deleteSetorUseCase.execute(id);
   }
 
 }

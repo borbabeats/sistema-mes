@@ -1,14 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IMaquinasRepository, CreateMaquinaData, MAQUINAS_REPOSITORY_TOKEN } from '../../../domain/repositories/maquinas.repository.interface';
-import { ISetoresRepository } from '../../../domain/repositories/setores.repository.interface';
 import { Maquina, StatusMaquina } from '../../../domain/entities/maquina.entity';
-import { SETORES_REPOSITORY_TOKEN } from '../../../modules/setores/constants';
+import { FindSetorUseCase } from '../setores/find-setor.use-case';
 
 @Injectable()
 export class CreateMaquinaUseCase {
   constructor(
     @Inject(MAQUINAS_REPOSITORY_TOKEN) private readonly maquinasRepository: IMaquinasRepository,
-    @Inject(SETORES_REPOSITORY_TOKEN) private readonly setoresRepository: ISetoresRepository,
+    private readonly findSetorUseCase: FindSetorUseCase,
   ) {}
 
   async execute(data: CreateMaquinaData): Promise<Maquina> {
@@ -20,7 +19,7 @@ export class CreateMaquinaUseCase {
 
     // Verificar se o setor existe (se fornecido)
     if (data.setorId) {
-      const setor = await this.setoresRepository.findOne(data.setorId);
+      const setor = await this.findSetorUseCase.execute(data.setorId);
       if (!setor) {
         throw new Error('Setor não encontrado');
       }

@@ -1,17 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IOrdensProducaoRepository, CreateOrdemProducaoData } from '../../../domain/repositories/ordens-producao.repository.interface';
-import { ISetoresRepository } from '../../../domain/repositories/setores.repository.interface';
+import { FindSetorUseCase } from '../setores/find-setor.use-case';
 import { IUsuariosRepository } from '../../../domain/repositories/usuarios.repository.interface';
 import { OrdemProducao, StatusOP, PrioridadeOP } from '../../../domain/entities/ordem-producao.entity';
 import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../modules/ordens-producao/constants';
-import { SETORES_REPOSITORY_TOKEN } from '../../../modules/setores/constants';
 import { USUARIOS_REPOSITORY_TOKEN } from '../../../modules/users/constants';
 
 @Injectable()
 export class CreateOrdemProducaoUseCase {
   constructor(
     @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN) private readonly ordensProducaoRepository: IOrdensProducaoRepository,
-    @Inject(SETORES_REPOSITORY_TOKEN) private readonly setoresRepository: ISetoresRepository,
+    private readonly findSetorUseCase: FindSetorUseCase,
     @Inject(USUARIOS_REPOSITORY_TOKEN) private readonly usuariosRepository: IUsuariosRepository,
   ) {}
 
@@ -23,7 +22,7 @@ export class CreateOrdemProducaoUseCase {
     }
 
     // Verificar se o setor existe
-    const setor = await this.setoresRepository.findOne(data.setorId);
+    const setor = await this.findSetorUseCase.execute(data.setorId);
     if (!setor) {
       throw new Error('Setor não encontrado');
     }

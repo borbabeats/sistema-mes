@@ -1,72 +1,72 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IApontamentosRepository, APONTAMENTOS_REPOSITORY_TOKEN, CreateApontamentoData } from '../../../domain/repositories/apontamentos.repository.interface';
+import { IApontamentosRepository, CreateApontamentoData, APONTAMENTOS_REPOSITORY_TOKEN } from '../../../domain/repositories/apontamentos.repository.interface';
 import { Apontamento } from '../../../domain/entities/apontamento.entity';
-import { IMaquinasRepository, MAQUINAS_REPOSITORY_TOKEN } from '../../../domain/repositories/maquinas.repository.interface';
-import { IOrdensProducaoRepository } from '../../../domain/repositories/ordens-producao.repository.interface';
-import { IUsuariosRepository } from '../../../domain/repositories/usuarios.repository.interface';
+import { FindMaquinaUseCase } from '../maquinas/find-maquina.use-case';
+import { FindOrdemProducaoUseCase } from '../ordens-producao/find-ordem-producao.use-case';
+import { FindUsuarioUseCase } from '../usuarios/find-usuario.use-case';
+import { UpdateStatusMaquinaUseCase } from '../maquinas/update-status-maquina.use-case';
+import { IniciarProducaoUseCase } from '../ordens-producao/iniciar-producao.use-case';
+import { UpdateQuantidadeProduzidaUseCase } from '../ordens-producao/update-quantidade-produzida.use-case';
 import { StatusMaquina } from '../../../domain/entities/maquina.entity';
-import { StatusOP } from '../../../domain/entities/ordem-producao.entity';
-import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../modules/ordens-producao/constants';
-import { USUARIOS_REPOSITORY_TOKEN } from '../../../modules/users/constants';
 
 @Injectable()
 export class CreateApontamentoUseCase {
   constructor(
     @Inject(APONTAMENTOS_REPOSITORY_TOKEN) private readonly apontamentosRepository: IApontamentosRepository,
-    @Inject(MAQUINAS_REPOSITORY_TOKEN) private readonly maquinasRepository: IMaquinasRepository,
-    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN) private readonly ordensProducaoRepository: IOrdensProducaoRepository,
-    @Inject(USUARIOS_REPOSITORY_TOKEN) private readonly usuariosRepository: IUsuariosRepository,
+    private readonly findMaquinaUseCase: FindMaquinaUseCase,
+    private readonly findOrdemProducaoUseCase: FindOrdemProducaoUseCase,
+    private readonly findUsuarioUseCase: FindUsuarioUseCase,
+    private readonly updateStatusMaquinaUseCase: UpdateStatusMaquinaUseCase,
+    private readonly iniciarProducaoUseCase: IniciarProducaoUseCase,
+    private readonly updateQuantidadeProduzidaUseCase: UpdateQuantidadeProduzidaUseCase,
   ) {}
 
   async execute(data: CreateApontamentoData): Promise<Apontamento> {
     // Validações de negócio
-    const maquina = await this.maquinasRepository.findOne(data.maquinaId);
+    const maquina = await this.findMaquinaUseCase.execute(data.maquinaId);
     if (!maquina) {
       throw new Error('Máquina não encontrada');
     }
 
-    const ordemProducao = await this.ordensProducaoRepository.findOne(data.opId);
+    const ordemProducao = await this.findOrdemProducaoUseCase.execute(data.opId);
     if (!ordemProducao) {
       throw new Error('Ordem de produção não encontrada');
     }
 
-    const usuario = await this.usuariosRepository.findOne(data.usuarioId);
+    const usuario = await this.findUsuarioUseCase.execute(data.usuarioId);
     if (!usuario) {
       throw new Error('Usuário não encontrado');
     }
 
-    // Verificar se a máquina está disponível para produção
-    if (!maquina.canStartProduction()) {
-      throw new Error('Máquina não está disponível para produção');
+    // Validar quantidades
+    if (data.quantidadeProduzida && data.quantidadeProduzida < 0) {
+      throw new Error('Quantidade produzida não pode ser negativa');
     }
 
-    // Verificar se a ordem de produção pode ser iniciada
-    if (!ordemProducao.canStart()) {
-      throw new Error('Ordem de produção não pode ser iniciada');
+    if (data.quantidadeDefeito && data.quantidadeDefeito < 0) {
+      throw new Error('Quantidade de defeito não pode ser negativa');
+    }
+
+    // Validar data
+    if (data.dataInicio < new Date()) {
+      throw new Error('Data de início não pode ser no passado');
     }
 
     // Criar apontamento
     const apontamento = new Apontamento({
       ...data,
-      quantidadeProduzida: data.quantidadeProduzida || 0,
-      quantidadeDefeito: data.quantidadeDefeito || 0,
     });
 
-    if (!apontamento.isValid()) {
-      throw new Error('Dados do apontamento inválidos');
-    }
-
     // Atualizar status da máquina para EM_USO
-    await this.maquinasRepository.update(data.maquinaId, { status: StatusMaquina.EM_USO });
+    await this.updateStatusMaquinaUseCase.execute(data.maquinaId, StatusMaquina.EM_USO);
 
     // Iniciar ordem de produção se ainda não estiver em andamento
-    if (ordemProducao.isPending()) {
-      await this.ordensProducaoRepository.update(data.opId, {
-        status: StatusOP.EM_ANDAMENTO,
-        dataInicioReal: data.dataInicio,
-      });
+    if (ordemProducao.status === 'RASCUNHO' || ordemProducao.status === 'PLANEJADA') {
+      await this.iniciarProducaoUseCase.execute(ordemProducao.id);
     }
 
-    return this.apontamentosRepository.create(apontamento);
+    const createdApontamento = await this.apontamentosRepository.create(apontamento);
+
+    return createdApontamento;
   }
 }

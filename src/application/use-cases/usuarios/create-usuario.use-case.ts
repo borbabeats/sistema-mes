@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { IUsuariosRepository, CreateUsuarioData } from '../../../domain/repositories/usuarios.repository.interface';
-import { ISetoresRepository } from '../../../domain/repositories/setores.repository.interface';
+import { FindSetorUseCase } from '../setores/find-setor.use-case';
 import { Usuario, Cargo } from '../../../domain/entities/usuario.entity';
+import { USUARIOS_REPOSITORY_TOKEN } from '../../../modules/users/constants';
 
 @Injectable()
 export class CreateUsuarioUseCase {
   constructor(
-    private readonly usuariosRepository: IUsuariosRepository,
-    private readonly setoresRepository: ISetoresRepository,
+    @Inject(USUARIOS_REPOSITORY_TOKEN) private readonly usuariosRepository: IUsuariosRepository,
+    private readonly findSetorUseCase: FindSetorUseCase,
   ) {}
 
   async execute(data: CreateUsuarioData): Promise<Usuario> {
@@ -21,7 +22,7 @@ export class CreateUsuarioUseCase {
 
     // Verificar se o setor existe (se fornecido)
     if (data.setorId) {
-      const setor = await this.setoresRepository.findOne(data.setorId);
+      const setor = await this.findSetorUseCase.execute(data.setorId);
       if (!setor) {
         throw new Error('Setor não encontrado');
       }
