@@ -1,6 +1,6 @@
 // src/users/dto/create-user.dto.ts
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
-import { Cargo } from '@prisma/client';
+import { Cargo } from '../entities/user.entity';
 
 export class CreateUserDto {
   @IsString()

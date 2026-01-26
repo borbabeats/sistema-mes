@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Setor as PrismaSetor } from '@prisma/client';
 import { Usuario } from '../../users/entities/user.entity';
 
-export class Setor implements PrismaSetor {
+export class Setor {
   @ApiProperty()
   id: number;
 
@@ -11,6 +10,15 @@ export class Setor implements PrismaSetor {
 
   @ApiProperty({ type: () => [Usuario], required: false })
   usuarios?: Usuario[];
+
+  @ApiProperty({ required: false })
+  maquinas?: any[];
+
+  @ApiProperty({ required: false })
+  qtdUsuarios?: number;
+
+  @ApiProperty({ required: false })
+  qtdMaquinas?: number;
 
   @ApiProperty()
   created_at: Date;

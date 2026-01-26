@@ -29,7 +29,7 @@ import { StatusMaquina, StatusManutencao } from './entities/maquina.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Cargo } from '../auth/entities/usuario.entity';
+import { Cargo } from '../users/entities/user.entity';
 
 @ApiBearerAuth()
 @ApiTags('máquinas')
@@ -61,7 +61,7 @@ export class MaquinasController {
     @Query('setorId') setorId?: string,
   ) {
     // Filtra por status e/ou setor, se fornecidos
-    const where: any = { deletedAt: null };
+    const where: any = { deleted_at: null };
     
     if (status) {
       where.status = status;

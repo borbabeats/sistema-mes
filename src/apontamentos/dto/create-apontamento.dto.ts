@@ -1,27 +1,50 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsDateString, IsOptional, IsInt, Min } from 'class-validator';
 
 export class CreateApontamentoDto {
-  @ApiProperty({ description: 'ID da máquina' })
-  maquinaId: number;
-
-  @ApiProperty({ description: 'ID do operador' })
+  @ApiProperty({ description: 'ID da ordem de produção' })
+  @IsNumber()
+  @IsNotEmpty()
   opId: number;
 
-  @ApiProperty({ description: 'ID do usuário' })
+  @ApiProperty({ description: 'ID da máquina' })
+  @IsNumber()
+  @IsNotEmpty()
+  maquinaId: number;
+
+  @ApiProperty({ description: 'ID do usuário/operador' })
+  @IsNumber()
+  @IsNotEmpty()
   usuarioId: number;
 
+  @ApiProperty({ 
+    description: 'Quantidade produzida',
+    default: 0 
+  })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  quantidadeProduzida?: number;
+
+  @ApiProperty({ 
+    description: 'Quantidade de defeitos',
+    default: 0 
+  })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  quantidadeDefeito?: number;
+
   @ApiProperty({ description: 'Data e hora de início do apontamento' })
-  dataHoraInicio: Date;
+  @IsDateString()
+  @IsNotEmpty()
+  dataInicio: Date;
 
   @ApiProperty({ 
     description: 'Data e hora de fim do apontamento',
     required: false 
   })
-  dataHoraFim?: Date;
-
-  @ApiProperty({ 
-    description: 'Observações sobre o apontamento',
-    required: false 
-  })
-  observacoes?: string;
+  @IsDateString()
+  @IsOptional()
+  dataFim?: Date;
 }

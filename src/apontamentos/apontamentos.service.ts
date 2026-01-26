@@ -1,41 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { IApontamentosRepository } from './interfaces/apontamentos.repository.interface';
 import { CreateApontamentoDto } from './dto/create-apontamento.dto';
 import { UpdateApontamentoDto } from './dto/update-apontamento.dto';
+import { Apontamento } from './entities/apontamento.entity';
 
 @Injectable()
 export class ApontamentosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly repository: IApontamentosRepository) {}
 
-  async create(createApontamentoDto: CreateApontamentoDto) {
-    return this.prisma.apontamento.create({
-      data: {
-        ...createApontamentoDto,
-        dataInicio: createApontamentoDto.dataHoraInicio,
-      },
-    });
+  async create(createApontamentoDto: CreateApontamentoDto): Promise<Apontamento> {
+    return this.repository.create(createApontamentoDto);
   }
 
-  async findAll() {
-    return this.prisma.apontamento.findMany();
+  async findAll(filters?: any): Promise<Apontamento[]> {
+    return this.repository.findAll(filters);
   }
 
-  async findOne(id: number) {
-    return this.prisma.apontamento.findUnique({
-      where: { id },
-    });
+  async findOne(id: number): Promise<Apontamento> {
+    const apontamento = await this.repository.findOne(id);
+    
+    if (!apontamento) {
+      throw new NotFoundException(`Apontamento com ID ${id} não encontrado`);
+    }
+
+    return apontamento as Apontamento;
   }
 
-  async update(id: number, updateApontamentoDto: UpdateApontamentoDto) {
-    return this.prisma.apontamento.update({
-      where: { id },
-      data: updateApontamentoDto,
-    });
+  async findByMaquina(maquinaId: number): Promise<Apontamento[]> {
+    return this.repository.findByMaquina(maquinaId);
   }
 
-  async remove(id: number) {
-    return this.prisma.apontamento.delete({
-      where: { id },
-    });
+  async findByUsuario(usuarioId: number): Promise<Apontamento[]> {
+    return this.repository.findByUsuario(usuarioId);
+  }
+
+  async findByOrdemProducao(opId: number): Promise<Apontamento[]> {
+    return this.repository.findByOrdemProducao(opId);
+  }
+
+  async findByPeriodo(dataInicio: Date, dataFim: Date): Promise<Apontamento[]> {
+    return this.repository.findByPeriodo(dataInicio, dataFim);
+  }
+
+  async update(id: number, updateApontamentoDto: UpdateApontamentoDto): Promise<Apontamento> {
+    await this.findOne(id); // Verifica se existe
+    const updated = await this.repository.update(id, updateApontamentoDto);
+    return updated as Apontamento;
+  }
+
+  async remove(id: number): Promise<Apontamento> {
+    await this.findOne(id); // Verifica se existe
+    const removed = await this.repository.remove(id);
+    return removed as Apontamento;
   }
 }

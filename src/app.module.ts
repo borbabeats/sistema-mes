@@ -8,9 +8,10 @@ import { SetoresModule } from './setores/setores.module';
 import { OrdensProducaoModule } from './ordens-producao/ordens-producao.module';
 import { ApontamentosModule } from './apontamentos/apontamentos.module';
 import { MaquinasModule } from './maquinas/maquinas.module';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, SetoresModule, OrdensProducaoModule, ApontamentosModule, MaquinasModule],
+  imports: [LoggerModule, PrismaModule, AuthModule, UsersModule, SetoresModule, OrdensProducaoModule, ApontamentosModule, MaquinasModule],
   controllers: [AppController],
   providers: [AppService],
 })

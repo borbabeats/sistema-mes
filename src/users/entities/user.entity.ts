@@ -1,8 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Usuario as PrismaUsuario } from '@prisma/client';
 import { Setor } from '../../setores/entities/setor.entity';
 
-export class Usuario implements PrismaUsuario {
+export enum Cargo {
+  ADMIN = 'ADMIN',
+  GERENTE = 'GERENTE', 
+  OPERADOR = 'OPERADOR'
+}
+
+export class Usuario {
   @ApiProperty()
   id: number;
 
@@ -19,7 +24,7 @@ export class Usuario implements PrismaUsuario {
   senha: string;
 
   @ApiProperty({ enum: ['ADMIN', 'GERENTE', 'OPERADOR'] })
-  cargo: 'ADMIN' | 'GERENTE' | 'OPERADOR';
+  cargo: Cargo;
 
   @ApiProperty({ required: false, nullable: true })
   photo_profile: string | null;

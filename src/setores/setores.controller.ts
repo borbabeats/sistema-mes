@@ -15,7 +15,6 @@ import { SetoresService } from './setores.service';
 import { CreateSetorDto } from './dto/create-setor.dto';
 import { UpdateSetorDto } from './dto/update-setor.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Cargo } from '@prisma/client';
 
 @Controller('setores')
 @UseGuards(JwtAuthGuard)

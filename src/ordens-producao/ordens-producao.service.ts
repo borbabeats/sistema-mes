@@ -1,247 +1,124 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { IOrdensProducaoRepository } from './interfaces/ordens-producao.repository.interface';
 import { CreateOrdemProducaoDto } from './dto/create-ordem-producao.dto';
 import { UpdateOrdemProducaoDto } from './dto/update-ordem-producao.dto';
 import { FilterOrdemProducaoDto } from './dto/filter-ordem-producao.dto';
 import { OrdemProducao } from './entities/ordem-producao-entity';
-import { Prisma } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class OrdensProducaoService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly repository: IOrdensProducaoRepository,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async create(createOrdemProducaoDto: CreateOrdemProducaoDto): Promise<OrdemProducao> {
-    const { operadoresIds, dataInicio, dataFim, ...data } = createOrdemProducaoDto;
-
     // Verificar se o setor existe
     const setorExists = await this.prisma.setor.findUnique({
-      where: { id: data.setorId, deleted_at: null },
+      where: { id: createOrdemProducaoDto.setorId, deleted_at: null },
     });
     if (!setorExists) {
-      throw new NotFoundException(`Setor com ID ${data.setorId} não encontrado`);
+      throw new NotFoundException(`Setor com ID ${createOrdemProducaoDto.setorId} não encontrado`);
     }
 
     // Verificar se o responsável existe, se fornecido
-    if (data.responsavelId) {
+    if (createOrdemProducaoDto.responsavelId) {
       const responsavelExists = await this.prisma.usuario.findUnique({
-        where: { id: data.responsavelId, deleted_at: null },
+        where: { id: createOrdemProducaoDto.responsavelId, deleted_at: null },
       });
       if (!responsavelExists) {
-        throw new NotFoundException(`Usuário responsável com ID ${data.responsavelId} não encontrado`);
+        throw new NotFoundException(`Usuário responsável com ID ${createOrdemProducaoDto.responsavelId} não encontrado`);
       }
     }
 
     // Verificar se os operadores existem, se fornecidos
-    if (operadoresIds && operadoresIds.length > 0) {
+    if (createOrdemProducaoDto.operadoresIds && createOrdemProducaoDto.operadoresIds.length > 0) {
       const operadoresCount = await this.prisma.usuario.count({
         where: {
-          id: { in: operadoresIds },
+          id: { in: createOrdemProducaoDto.operadoresIds },
           deleted_at: null,
         },
       });
-      if (operadoresCount !== operadoresIds.length) {
+      if (operadoresCount !== createOrdemProducaoDto.operadoresIds.length) {
         throw new NotFoundException('Um ou mais operadores não foram encontrados');
       }
     }
 
-    const ordemProducao = await this.prisma.$transaction(async (prisma) => {
-      const ordem = await prisma.ordemProducao.create({
-        data: {
-          ...data,
-          status: 'PLANEJADA', // Define o status inicial como PLANEJADA
-          dataInicioPlanejado: dataInicio ? new Date(dataInicio) : null,
-          dataFimPlanejado: dataFim ? new Date(dataFim) : null,
-          operadores: operadoresIds?.length
-            ? {
-                connect: operadoresIds.map((id) => ({ id })),
-              }
-            : undefined,
-        },
-        include: {
-          setor: true,
-          responsavel: true,
-          operadores: true,
-        },
-      });
-
-      return new OrdemProducao(ordem);
-    });
-
-    return ordemProducao;
+    return this.repository.create(createOrdemProducaoDto);
   }
 
   async findAll(filters?: FilterOrdemProducaoDto): Promise<OrdemProducao[]> {
-    const { search, status, prioridade, setorId, responsavelId, dataInicio, dataFim, ...rest } = filters || {};
-
-    const where: Prisma.OrdemProducaoWhereInput = {
-      deletedAt: null,
-      ...(search && {
-        OR: [
-          { codigo: { contains: search, mode: 'insensitive' as const } },
-          { produto: { contains: search, mode: 'insensitive' as const } },
-          { descricao: search ? { contains: search, mode: 'insensitive' as const } : undefined },
-        ].filter(Boolean) as Prisma.OrdemProducaoWhereInput[],
-      }),
-      ...(status && { status }),
-      ...(prioridade && { prioridade }),
-      ...(setorId && { setorId }),
-      ...(responsavelId && { responsavelId }),
-      ...((dataInicio || dataFim) && {
-        AND: [
-          dataInicio ? { dataInicioPlanejado: { gte: new Date(dataInicio) } } : undefined,
-          dataFim ? { dataFimPlanejado: { lte: new Date(dataFim) } } : undefined,
-        ].filter(Boolean) as Prisma.OrdemProducaoWhereInput[],
-      }),
-    };
-
-    const ordens = await this.prisma.ordemProducao.findMany({
-      where,
-      include: {
-        setor: true,
-        responsavel: true,
-        operadores: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
-
-    return ordens.map((ordem) => new OrdemProducao(ordem));
+    return this.repository.findAll(filters);
   }
 
   async findOne(id: number): Promise<OrdemProducao> {
-    const ordem = await this.prisma.ordemProducao.findUnique({
-      where: { id, deletedAt: null },
-      include: {
-        setor: true,
-        responsavel: true,
-        operadores: true,
-        apontamentos: {
-          include: {
-            maquina: true,
-            usuario: true,
-          },
-          orderBy: {
-            dataInicio: 'desc',
-          },
-        },
-      },
-    });
+    const ordem = await this.repository.findOne(id);
 
     if (!ordem) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
     }
 
-    return new OrdemProducao(ordem);
+    return ordem;
   }
 
   async update(
     id: number,
     updateOrdemProducaoDto: UpdateOrdemProducaoDto,
   ): Promise<OrdemProducao> {
-    const { operadoresIds, dataInicio, dataFim, ...data } = updateOrdemProducaoDto;
-
     // Verificar se a ordem de produção existe
-    const ordemExistente = await this.prisma.ordemProducao.findUnique({
-      where: { id, deletedAt: null },
-    });
+    const ordemExistente = await this.repository.findOne(id);
 
     if (!ordemExistente) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
     }
 
     // Verificar se o setor existe, se for atualizado
-    if (data.setorId) {
+    if (updateOrdemProducaoDto.setorId) {
       const setorExists = await this.prisma.setor.findUnique({
-        where: { id: data.setorId, deleted_at: null },
+        where: { id: updateOrdemProducaoDto.setorId, deleted_at: null },
       });
       if (!setorExists) {
-        throw new NotFoundException(`Setor com ID ${data.setorId} não encontrado`);
+        throw new NotFoundException(`Setor com ID ${updateOrdemProducaoDto.setorId} não encontrado`);
       }
     }
 
     // Verificar se o responsável existe, se fornecido
-    if (data.responsavelId) {
+    if (updateOrdemProducaoDto.responsavelId) {
       const responsavelExists = await this.prisma.usuario.findUnique({
-        where: { id: data.responsavelId, deleted_at: null },
+        where: { id: updateOrdemProducaoDto.responsavelId, deleted_at: null },
       });
       if (!responsavelExists) {
-        throw new NotFoundException(`Usuário responsável com ID ${data.responsavelId} não encontrado`);
+        throw new NotFoundException(`Usuário responsável com ID ${updateOrdemProducaoDto.responsavelId} não encontrado`);
       }
     }
 
     // Verificar se os operadores existem, se fornecidos
-    if (operadoresIds && operadoresIds.length > 0) {
+    if (updateOrdemProducaoDto.operadoresIds && updateOrdemProducaoDto.operadoresIds.length > 0) {
       const operadoresCount = await this.prisma.usuario.count({
         where: {
-          id: { in: operadoresIds },
+          id: { in: updateOrdemProducaoDto.operadoresIds },
           deleted_at: null,
         },
       });
-      if (operadoresCount !== operadoresIds.length) {
+      if (operadoresCount !== updateOrdemProducaoDto.operadoresIds.length) {
         throw new NotFoundException('Um ou mais operadores não foram encontrados');
       }
     }
 
-    // Atualizar a ordem de produção
-    const ordemAtualizada = await this.prisma.$transaction(async (prisma) => {
-      // Se for mudar o status para EM_ANDAMENTO e ainda não tiver data de início real
-      if (data.status === 'EM_ANDAMENTO' && !ordemExistente.dataInicioReal) {
-        data.dataInicioReal = new Date();
-      }
-
-      // Se for mudar o status para FINALIZADA
-      if (data.status === 'FINALIZADA') {
-        data.dataFimReal = new Date();
-      }
-
-      const updateData: any = { 
-        ...data,
-        // Atualiza as datas de planejamento se fornecidas
-        ...(dataInicio && { dataInicioPlanejado: new Date(dataInicio) }),
-        ...(dataFim && { dataFimPlanejado: new Date(dataFim) }),
-      };
-
-      // Se houver operadores para atualizar
-      if (operadoresIds) {
-        updateData.operadores = {
-          set: operadoresIds.map((id) => ({ id })),
-        };
-      }
-
-      const ordem = await prisma.ordemProducao.update({
-        where: { id },
-        data: updateData,
-        include: {
-          setor: true,
-          responsavel: true,
-          operadores: true,
-        },
-      });
-
-      return new OrdemProducao(ordem);
-    });
-
-    return ordemAtualizada;
+    return this.repository.update(id, updateOrdemProducaoDto);
   }
 
   async remove(id: number): Promise<{ message: string; id: number; codigo: string }> {
     // Verificar se a ordem de produção existe
-    const ordemExistente = await this.prisma.ordemProducao.findUnique({
-      where: { id, deletedAt: null },
-    });
+    const ordemExistente = await this.repository.findOne(id);
 
     if (!ordemExistente) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
     }
 
-    // Soft delete
-    await this.prisma.ordemProducao.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
+    await this.repository.remove(id);
+    
     return {
       message: 'Ordem de produção removida com sucesso',
       id,
@@ -250,9 +127,7 @@ export class OrdensProducaoService {
   }
 
   async iniciarProducao(id: number): Promise<OrdemProducao> {
-    const ordem = await this.prisma.ordemProducao.findUnique({
-      where: { id, deletedAt: null },
-    });
+    const ordem = await this.repository.findOne(id);
 
     if (!ordem) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
@@ -264,26 +139,11 @@ export class OrdensProducaoService {
       );
     }
 
-    const ordemAtualizada = await this.prisma.ordemProducao.update({
-      where: { id },
-      data: {
-        status: 'EM_ANDAMENTO',
-        dataInicioReal: new Date(),
-      },
-      include: {
-        setor: true,
-        responsavel: true,
-        operadores: true,
-      },
-    });
-
-    return new OrdemProducao(ordemAtualizada);
+    return this.repository.iniciarProducao(id);
   }
 
   async pausarProducao(id: number): Promise<OrdemProducao> {
-    const ordem = await this.prisma.ordemProducao.findUnique({
-      where: { id, deletedAt: null },
-    });
+    const ordem = await this.repository.findOne(id);
 
     if (!ordem) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
@@ -295,25 +155,11 @@ export class OrdensProducaoService {
       );
     }
 
-    const ordemAtualizada = await this.prisma.ordemProducao.update({
-      where: { id },
-      data: {
-        status: 'PAUSADA',
-      },
-      include: {
-        setor: true,
-        responsavel: true,
-        operadores: true,
-      },
-    });
-
-    return new OrdemProducao(ordemAtualizada);
+    return this.repository.pausarProducao(id);
   }
 
   async retomarProducao(id: number): Promise<OrdemProducao> {
-    const ordem = await this.prisma.ordemProducao.findUnique({
-      where: { id, deletedAt: null },
-    });
+    const ordem = await this.repository.findOne(id);
 
     if (!ordem) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
@@ -325,25 +171,11 @@ export class OrdensProducaoService {
       );
     }
 
-    const ordemAtualizada = await this.prisma.ordemProducao.update({
-      where: { id },
-      data: {
-        status: 'EM_ANDAMENTO',
-      },
-      include: {
-        setor: true,
-        responsavel: true,
-        operadores: true,
-      },
-    });
-
-    return new OrdemProducao(ordemAtualizada);
+    return this.repository.retomarProducao(id);
   }
 
   async finalizarProducao(id: number): Promise<OrdemProducao> {
-    const ordem = await this.prisma.ordemProducao.findUnique({
-      where: { id, deletedAt: null },
-    });
+    const ordem = await this.repository.findOne(id);
 
     if (!ordem) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
@@ -355,26 +187,11 @@ export class OrdensProducaoService {
       );
     }
 
-    const ordemAtualizada = await this.prisma.ordemProducao.update({
-      where: { id },
-      data: {
-        status: 'FINALIZADA',
-        dataFimReal: new Date(),
-      },
-      include: {
-        setor: true,
-        responsavel: true,
-        operadores: true,
-      },
-    });
-
-    return new OrdemProducao(ordemAtualizada);
+    return this.repository.finalizarProducao(id);
   }
 
   async cancelarProducao(id: number, motivo: string): Promise<OrdemProducao> {
-    const ordem = await this.prisma.ordemProducao.findUnique({
-      where: { id, deletedAt: null },
-    });
+    const ordem = await this.repository.findOne(id);
 
     if (!ordem) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
@@ -386,22 +203,7 @@ export class OrdensProducaoService {
       );
     }
 
-    const ordemAtualizada = await this.prisma.ordemProducao.update({
-      where: { id },
-      data: {
-        status: 'CANCELADA',
-        observacoes: motivo
-          ? `${ordem.observacoes || ''}\n\n---\n**CANCELADA EM**: ${new Date().toISOString()}\n**MOTIVO**: ${motivo}`
-          : ordem.observacoes,
-      },
-      include: {
-        setor: true,
-        responsavel: true,
-        operadores: true,
-      },
-    });
-
-    return new OrdemProducao(ordemAtualizada);
+    return this.repository.cancelarProducao(id, motivo);
   }
 
   async atualizarProducao(
@@ -409,9 +211,7 @@ export class OrdensProducaoService {
     quantidadeProduzida: number,
     quantidadeDefeito: number = 0,
   ): Promise<OrdemProducao> {
-    const ordem = await this.prisma.ordemProducao.findUnique({
-      where: { id, deletedAt: null },
-    });
+    const ordem = await this.repository.findOne(id);
 
     if (!ordem) {
       throw new NotFoundException(`Ordem de produção com ID ${id} não encontrada`);
@@ -431,25 +231,6 @@ export class OrdensProducaoService {
       );
     }
 
-    const ordemAtualizada = await this.prisma.ordemProducao.update({
-      where: { id },
-      data: {
-        quantidadeProduzida: novaQuantidade,
-        // Se atingiu ou ultrapassou a quantidade planejada, finaliza automaticamente
-        ...(novaQuantidade >= ordem.quantidadePlanejada
-          ? {
-              status: 'FINALIZADA',
-              dataFimReal: new Date(),
-            }
-          : {}),
-      },
-      include: {
-        setor: true,
-        responsavel: true,
-        operadores: true,
-      },
-    });
-
-    return new OrdemProducao(ordemAtualizada);
+    return this.repository.atualizarProducao(id, quantidadeProduzida, quantidadeDefeito);
   }
 }
