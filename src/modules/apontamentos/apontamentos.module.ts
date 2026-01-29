@@ -15,6 +15,7 @@ import { FindByMaquinaUseCase } from '../../application/use-cases/apontamentos/f
 import { FindByUsuarioUseCase } from '../../application/use-cases/apontamentos/find-by-usuario.use-case';
 import { FindByOrdemProducaoUseCase } from '../../application/use-cases/apontamentos/find-by-ordem-producao.use-case';
 import { FindByPeriodoUseCase } from '../../application/use-cases/apontamentos/find-by-periodo.use-case';
+import { FindAllApontamentosPaginatedUseCase } from '../../application/use-cases/apontamentos/find-all-apontamentos-paginated.use-case';
 import { MaquinasModule } from '../maquinas/maquinas.module';
 import { OrdensProducaoModule } from '../ordens-producao/ordens-producao.module';
 import { UsersModule } from '../users/users.module';
@@ -37,6 +38,7 @@ import { UsersModule } from '../users/users.module';
     FindByUsuarioUseCase,
     FindByOrdemProducaoUseCase,
     FindByPeriodoUseCase,
+    FindAllApontamentosPaginatedUseCase,
   ],
   controllers: [ApontamentosController],
   exports: [
@@ -52,6 +54,7 @@ import { UsersModule } from '../users/users.module';
     FindByUsuarioUseCase,
     FindByOrdemProducaoUseCase,
     FindByPeriodoUseCase,
+    FindAllApontamentosPaginatedUseCase,
   ],
 })
 export class ApontamentosModule {}

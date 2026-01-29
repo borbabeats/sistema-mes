@@ -20,11 +20,17 @@ export class UsuarioResponseDto {
   })
   cargo?: Cargo;
 
+  @ApiProperty({ description: 'Turno de trabalho' })
+  turno?: string;
+
   @ApiProperty({ description: 'URL da foto de perfil' })
   photoProfile?: string;
 
   @ApiProperty({ description: 'ID do setor' })
   setorId?: number;
+
+  @ApiProperty({ description: 'Nome do setor' })
+  nomeSetor?: string;
 
   @ApiProperty({ description: 'Data de criação' })
   createdAt: Date;

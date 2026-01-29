@@ -15,6 +15,7 @@ export class UsuariosRepository implements IUsuariosRepository {
         telefone: data.telefone,
         senha: data.senha,
         cargo: data.cargo || Cargo.OPERADOR,
+        turno: data.turno,
         photo_profile: data.photoProfile,
         setor_id: data.setorId,
       },
@@ -30,23 +31,40 @@ export class UsuariosRepository implements IUsuariosRepository {
     if (filters?.email) whereClause.email = { contains: filters.email };
     if (filters?.cargo) whereClause.cargo = filters.cargo;
     if (filters?.setorId) whereClause.setor_id = filters.setorId;
+    if (filters?.turno) whereClause.turno = filters.turno;
 
     const usuarios = await this.prisma.usuario.findMany({
       where: whereClause,
+      include: {
+        setor: {
+          select: {
+            id: true,
+            nome: true
+          }
+        }
+      },
       orderBy: {
         nome: 'asc',
       },
     });
 
-    return usuarios.map((u) => this.mapToEntity(u));
+    return usuarios.map((u) => this.mapToEntityWithSetor(u));
   }
 
   async findOne(id: number): Promise<Usuario | null> {
     const usuario = await this.prisma.usuario.findUnique({
       where: { id },
+      include: {
+        setor: {
+          select: {
+            id: true,
+            nome: true
+          }
+        }
+      }
     });
 
-    return usuario ? this.mapToEntity(usuario) : null;
+    return usuario ? this.mapToEntityWithSetor(usuario) : null;
   }
 
   async findByEmail(email: string): Promise<Usuario | null> {
@@ -102,6 +120,7 @@ export class UsuariosRepository implements IUsuariosRepository {
     if (data.telefone !== undefined) updateData.telefone = data.telefone;
     if (data.senha !== undefined) updateData.senha = data.senha;
     if (data.cargo !== undefined) updateData.cargo = data.cargo;
+    if (data.turno !== undefined) updateData.turno = data.turno;
     if (data.photoProfile !== undefined) updateData.photo_profile = data.photoProfile;
     if (data.setorId !== undefined) updateData.setor_id = data.setorId;
 
@@ -140,11 +159,20 @@ export class UsuariosRepository implements IUsuariosRepository {
       telefone: prismaUsuario.telefone,
       senha: prismaUsuario.senha,
       cargo: prismaUsuario.cargo as Cargo,
+      turno: prismaUsuario.turno,
       photoProfile: prismaUsuario.photo_profile,
       setorId: prismaUsuario.setor_id,
       createdAt: prismaUsuario.created_at,
       updatedAt: prismaUsuario.updated_at,
       deletedAt: prismaUsuario.deleted_at,
     });
+  }
+
+  private mapToEntityWithSetor(prismaUsuario: any): Usuario {
+    const usuario = this.mapToEntity(prismaUsuario);
+    if (prismaUsuario.setor) {
+      (usuario as any).nomeSetor = prismaUsuario.setor.nome;
+    }
+    return usuario;
   }
 }

@@ -15,7 +15,9 @@ import { ApontamentosService } from './apontamentos.service';
 import { CreateApontamentoDto } from '../../presentation/dto/apontamentos/create-apontamento.dto';
 import { UpdateApontamentoDto } from '../../presentation/dto/apontamentos/update-apontamento.dto';
 import { FinalizeApontamentoDto } from '../../presentation/dto/apontamentos/finalize-apontamento.dto';
+import { FindAllApontamentosDto } from '../../presentation/dto/apontamentos/find-all-apontamentos.dto';
 import { Apontamento } from '../../domain/entities/apontamento.entity';
+import { PaginatedResult } from '../../presentation/dto/common/pagination.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/roles.decorator';
@@ -39,10 +41,10 @@ export class ApontamentosController {
 
   @Get()
   @Roles(Role.ADMIN, Role.GERENTE, Role.OPERADOR)
-  @ApiOperation({ summary: 'Listar todos os apontamentos' })
-  @ApiResponse({ status: 200, description: 'Lista de apontamentos', type: [Apontamento] })
-  findAll(@Query() filters?: any): Promise<Apontamento[]> {
-    return this.apontamentosService.findAll(filters);
+  @ApiOperation({ summary: 'Listar todos os apontamentos com filtros e paginação' })
+  @ApiResponse({ status: 200, description: 'Lista paginada de apontamentos' })
+  findAll(@Query() filters: FindAllApontamentosDto): Promise<PaginatedResult<Apontamento>> {
+    return this.apontamentosService.findAllPaginated(filters);
   }
 
   @Get('maquina/:maquinaId')

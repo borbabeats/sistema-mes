@@ -30,6 +30,7 @@ model Usuario {
   telefone      String?  @db.VarChar(20)
   senha         String   @db.VarChar(255)
   cargo         Cargo    @default(OPERADOR)
+  turno         String?  @db.VarChar(50)
   photo_profile  String?  @db.VarChar(255) // URL da imagem de perfil no CDN
   setor_id      Int?     @map("setor_id")
   mantencoesResponsavel Manutencao[] @relation("ManutencaoResponsavel")

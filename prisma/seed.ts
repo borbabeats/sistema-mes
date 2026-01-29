@@ -98,6 +98,7 @@ async function main() {
             telefone: `11998${String(i * 10 + j).padStart(6, '0')}`,
             senha: hashedPassword,
             cargo: 'OPERADOR',
+            turno: 'MANHA',
             setor_id: setor.id,
           },
         });

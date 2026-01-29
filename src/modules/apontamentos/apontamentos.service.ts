@@ -4,6 +4,7 @@ import { CreateApontamentoUseCase } from '../../application/use-cases/apontament
 import { FinalizeApontamentoUseCase } from '../../application/use-cases/apontamentos/finalize-apontamento.use-case';
 import { FindApontamentoUseCase } from '../../application/use-cases/apontamentos/find-apontamento.use-case';
 import { FindAllApontamentosUseCase } from '../../application/use-cases/apontamentos/find-all-apontamentos.use-case';
+import { FindAllApontamentosPaginatedUseCase } from '../../application/use-cases/apontamentos/find-all-apontamentos-paginated.use-case';
 import { UpdateApontamentoUseCase } from '../../application/use-cases/apontamentos/update-apontamento.use-case';
 import { DeleteApontamentoUseCase } from '../../application/use-cases/apontamentos/delete-apontamento.use-case';
 import { FindByMaquinaUseCase } from '../../application/use-cases/apontamentos/find-by-maquina.use-case';
@@ -11,6 +12,8 @@ import { FindByUsuarioUseCase } from '../../application/use-cases/apontamentos/f
 import { FindByOrdemProducaoUseCase } from '../../application/use-cases/apontamentos/find-by-ordem-producao.use-case';
 import { FindByPeriodoUseCase } from '../../application/use-cases/apontamentos/find-by-periodo.use-case';
 import { CreateApontamentoData } from '../../domain/repositories/apontamentos.repository.interface';
+import { FindAllApontamentosDto } from '../../presentation/dto/apontamentos/find-all-apontamentos.dto';
+import { PaginatedResult } from '../../presentation/dto/common/pagination.dto';
 
 @Injectable()
 export class ApontamentosService {
@@ -19,6 +22,7 @@ export class ApontamentosService {
     private readonly finalizeApontamentoUseCase: FinalizeApontamentoUseCase,
     private readonly findApontamentoUseCase: FindApontamentoUseCase,
     private readonly findAllApontamentosUseCase: FindAllApontamentosUseCase,
+    private readonly findAllApontamentosPaginatedUseCase: FindAllApontamentosPaginatedUseCase,
     private readonly updateApontamentoUseCase: UpdateApontamentoUseCase,
     private readonly deleteApontamentoUseCase: DeleteApontamentoUseCase,
     private readonly findByMaquinaUseCase: FindByMaquinaUseCase,
@@ -31,8 +35,12 @@ export class ApontamentosService {
     return this.createApontamentoUseCase.execute(createApontamentoDto);
   }
 
-  async findAll(filters?: any): Promise<Apontamento[]> {
+  async findAll(filters?: FindAllApontamentosDto): Promise<Apontamento[]> {
     return this.findAllApontamentosUseCase.execute(filters);
+  }
+
+  async findAllPaginated(filters?: FindAllApontamentosDto): Promise<PaginatedResult<Apontamento>> {
+    return this.findAllApontamentosPaginatedUseCase.execute(filters);
   }
 
   async findOne(id: number): Promise<Apontamento> {

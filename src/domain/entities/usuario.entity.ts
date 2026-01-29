@@ -4,6 +4,7 @@ export enum Cargo {
   OPERADOR = 'OPERADOR',
 }
 
+
 export class Usuario {
   id: number;
   nome: string;
@@ -11,6 +12,7 @@ export class Usuario {
   telefone?: string;
   senha: string;
   cargo: Cargo;
+  turno?: string;
   photoProfile?: string;
   setorId?: number;
   createdAt: Date;

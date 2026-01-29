@@ -1,6 +1,10 @@
 export class Setor {
   id: number;
   nome: string;
+  qtdUsuarios?: number;
+  qtdMaquinas?: number;
+  usuarios?: any[];
+  maquinas?: any[];
   created_at: Date;
   updated_at: Date;
   deleted_at?: Date | null;
