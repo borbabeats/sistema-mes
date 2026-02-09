@@ -33,6 +33,11 @@ export class UpdateUsuarioDto {
   @IsString()
   cargo?: string;
 
+  @ApiProperty({ description: 'Turno de trabalho', required: false })
+  @IsOptional()
+  @IsString()
+  turno?: string;
+
   @ApiProperty({ description: 'URL da foto de perfil', required: false })
   @IsOptional()
   @IsString()

@@ -18,7 +18,14 @@ export class UsersService {
 
   private toUsuarioResponseDto(usuario: Usuario): UsuarioResponseDto {
     const { senha, ...usuarioSemSenha } = usuario;
-    return usuarioSemSenha as UsuarioResponseDto;
+    const response = usuarioSemSenha as UsuarioResponseDto;
+    
+    // Adicionar nomeSetor se existir no objeto usuário
+    if ((usuario as any).nomeSetor) {
+      response.nomeSetor = (usuario as any).nomeSetor;
+    }
+    
+    return response;
   }
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<UsuarioResponseDto> {

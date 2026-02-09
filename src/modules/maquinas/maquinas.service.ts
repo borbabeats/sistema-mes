@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { IMaquinasRepository, MAQUINAS_REPOSITORY_TOKEN } from '../../domain/repositories/maquinas.repository.interface';
 import { CreateMaquinaData } from '../../domain/repositories/maquinas.repository.interface';
 import { Maquina } from '../../domain/entities/maquina.entity';
+import { MaquinaResponseDto } from '../../presentation/dto/maquinas/maquina-response.dto';
 import { CreateMaquinaUseCase } from '../../application/use-cases/maquinas/create-maquina.use-case';
 import { FindMaquinaUseCase } from '../../application/use-cases/maquinas/find-maquina.use-case';
 import { FindAllMaquinasUseCase } from '../../application/use-cases/maquinas/find-all-maquinas.use-case';
@@ -34,62 +35,100 @@ export class MaquinasService {
     private readonly findAvailableUseCase: FindAvailableUseCase,
   ) {}
 
-  async create(createMaquinaDto: CreateMaquinaData): Promise<Maquina> {
-    return this.createMaquinaUseCase.execute(createMaquinaDto);
+  private toMaquinaResponseDto(maquina: Maquina): MaquinaResponseDto {
+    const response: MaquinaResponseDto = {
+      id: maquina.id,
+      codigo: maquina.codigo,
+      nome: maquina.nome,
+      descricao: maquina.descricao,
+      fabricante: maquina.fabricante,
+      modelo: maquina.modelo,
+      numeroSerie: maquina.numeroSerie,
+      anoFabricacao: maquina.anoFabricacao,
+      capacidade: maquina.capacidade,
+      status: maquina.status,
+      horasUso: maquina.horasUso,
+      setorId: maquina.setorId,
+      createdAt: maquina.createdAt,
+      updatedAt: maquina.updatedAt,
+      deletedAt: maquina.deletedAt,
+    };
+
+    // Adicionar dados do setor se existirem
+    if ((maquina as any).setor) {
+      response.setor = (maquina as any).setor;
+    }
+
+    return response;
   }
 
-  async findAll(filters?: any): Promise<Maquina[]> {
-    return this.findAllMaquinasUseCase.execute(filters);
+  async create(createMaquinaDto: CreateMaquinaData): Promise<MaquinaResponseDto> {
+    const maquina = await this.createMaquinaUseCase.execute(createMaquinaDto);
+    return this.toMaquinaResponseDto(maquina);
   }
 
-  async findOne(id: number): Promise<Maquina> {
+  async findAll(filters?: any): Promise<MaquinaResponseDto[]> {
+    const maquinas = await this.findAllMaquinasUseCase.execute(filters);
+    return maquinas.map(maquina => this.toMaquinaResponseDto(maquina));
+  }
+
+  async findOne(id: number): Promise<MaquinaResponseDto> {
     const maquina = await this.findMaquinaUseCase.execute(id);
     
     if (!maquina) {
       throw new NotFoundException(`Máquina com ID ${id} não encontrada`);
     }
 
-    return maquina;
+    return this.toMaquinaResponseDto(maquina);
   }
 
-  async findByCodigo(codigo: string): Promise<Maquina | null> {
-    return this.findByCodigoUseCase.execute(codigo);
+  async findByCodigo(codigo: string): Promise<MaquinaResponseDto | null> {
+    const maquina = await this.findByCodigoUseCase.execute(codigo);
+    return maquina ? this.toMaquinaResponseDto(maquina) : null;
   }
 
-  async findBySetor(setorId: number): Promise<Maquina[]> {
-    return this.findBySetorUseCase.execute(setorId);
+  async findBySetor(setorId: number): Promise<MaquinaResponseDto[]> {
+    const maquinas = await this.findBySetorUseCase.execute(setorId);
+    return maquinas.map(maquina => this.toMaquinaResponseDto(maquina));
   }
 
-  async findByStatus(status: any): Promise<Maquina[]> {
-    return this.findByStatusUseCase.execute(status);
+  async findByStatus(status: any): Promise<MaquinaResponseDto[]> {
+    const maquinas = await this.findByStatusUseCase.execute(status);
+    return maquinas.map(maquina => this.toMaquinaResponseDto(maquina));
   }
 
-  async findAvailable(): Promise<Maquina[]> {
-    return this.findAvailableUseCase.execute();
+  async findAvailable(): Promise<MaquinaResponseDto[]> {
+    const maquinas = await this.findAvailableUseCase.execute();
+    return maquinas.map(maquina => this.toMaquinaResponseDto(maquina));
   }
 
-  async update(id: number, updateMaquinaDto: any): Promise<Maquina> {
-    return this.updateMaquinaUseCase.execute(id, updateMaquinaDto);
+  async update(id: number, updateMaquinaDto: any): Promise<MaquinaResponseDto> {
+    const maquina = await this.updateMaquinaUseCase.execute(id, updateMaquinaDto);
+    return this.toMaquinaResponseDto(maquina);
   }
 
   async remove(id: number): Promise<{ message: string; id: number; codigo: string }> {
     return this.deleteMaquinaUseCase.execute(id);
   }
 
-  async updateHorasUso(id: number, horasAdicionais: number): Promise<Maquina> {
-    return this.updateHorasUsoUseCase.execute(id, horasAdicionais);
+  async updateHorasUso(id: number, horasAdicionais: number): Promise<MaquinaResponseDto> {
+    const maquina = await this.updateHorasUsoUseCase.execute(id, horasAdicionais);
+    return this.toMaquinaResponseDto(maquina);
   }
 
   // Métodos de manutenção usando os novos use cases
-  async iniciarManutencao(id: number, manutencaoData: any): Promise<Maquina> {
-    return this.iniciarManutencaoUseCase.execute(id, manutencaoData);
+  async iniciarManutencao(id: number, manutencaoData: any): Promise<MaquinaResponseDto> {
+    const maquina = await this.iniciarManutencaoUseCase.execute(id, manutencaoData);
+    return this.toMaquinaResponseDto(maquina);
   }
 
-  async finalizarManutencao(id: number, manutencaoData: any): Promise<Maquina> {
-    return this.finalizarManutencaoUseCase.execute(id, manutencaoData);
+  async finalizarManutencao(id: number, manutencaoData: any): Promise<MaquinaResponseDto> {
+    const maquina = await this.finalizarManutencaoUseCase.execute(id, manutencaoData);
+    return this.toMaquinaResponseDto(maquina);
   }
 
-  async updateStatus(id: number, status: any, motivo?: string): Promise<Maquina> {
-    return this.updateStatusMaquinaUseCase.execute(id, status, motivo);
+  async updateStatus(id: number, status: any, motivo?: string): Promise<MaquinaResponseDto> {
+    const maquina = await this.updateStatusMaquinaUseCase.execute(id, status, motivo);
+    return this.toMaquinaResponseDto(maquina);
   }
 }

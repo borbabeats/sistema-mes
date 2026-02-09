@@ -19,6 +19,7 @@ export interface CreateUsuarioData {
   telefone?: string;
   senha: string;
   cargo?: Cargo;
+  turno?: string;
   photoProfile?: string;
   setorId?: number;
 }
@@ -29,6 +30,7 @@ export interface UpdateUsuarioData {
   telefone?: string;
   senha?: string;
   cargo?: Cargo;
+  turno?: string;
   photoProfile?: string;
   setorId?: number;
 }
@@ -37,5 +39,6 @@ export interface UsuarioFilters {
   nome?: string;
   email?: string;
   cargo?: Cargo;
+  turno?: string;
   setorId?: number;
 }

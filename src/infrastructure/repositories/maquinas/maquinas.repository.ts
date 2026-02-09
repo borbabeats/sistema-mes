@@ -38,20 +38,36 @@ export class MaquinasRepository implements IMaquinasRepository {
 
     const maquinas = await this.prisma.maquina.findMany({
       where: whereClause,
+      include: {
+        setor: {
+          select: {
+            id: true,
+            nome: true
+          }
+        }
+      },
       orderBy: {
         nome: 'asc',
       },
     });
 
-    return maquinas.map((m) => this.mapToEntity(m));
+    return maquinas.map((m) => this.mapToEntityWithSetor(m));
   }
 
   async findOne(id: number): Promise<Maquina | null> {
     const maquina = await this.prisma.maquina.findUnique({
       where: { id },
+      include: {
+        setor: {
+          select: {
+            id: true,
+            nome: true
+          }
+        }
+      }
     });
 
-    return maquina ? this.mapToEntity(maquina) : null;
+    return maquina ? this.mapToEntityWithSetor(maquina) : null;
   }
 
   async findByCodigo(codigo: string): Promise<Maquina | null> {
@@ -151,10 +167,18 @@ export class MaquinasRepository implements IMaquinasRepository {
       capacidade: prismaMaquina.capacidade,
       status: prismaMaquina.status as StatusMaquina,
       horasUso: prismaMaquina.horasUso,
-      setorId: prismaMaquina.setorId,
-      createdAt: prismaMaquina.createdAt,
-      updatedAt: prismaMaquina.updatedAt,
-      deletedAt: prismaMaquina.deletedAt,
+      setorId: prismaMaquina.setor_id,
+      createdAt: prismaMaquina.created_at,
+      updatedAt: prismaMaquina.updated_at,
+      deletedAt: prismaMaquina.deleted_at,
     });
+  }
+
+  private mapToEntityWithSetor(prismaMaquina: any): Maquina {
+    const maquina = this.mapToEntity(prismaMaquina);
+    if (prismaMaquina.setor) {
+      (maquina as any).setor = prismaMaquina.setor;
+    }
+    return maquina;
   }
 }
