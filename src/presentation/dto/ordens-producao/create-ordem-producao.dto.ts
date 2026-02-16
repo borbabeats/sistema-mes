@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional, IsNumber, Min, IsDate } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsNumber, Min, IsDateString } from 'class-validator';
 
 export class CreateOrdemProducaoDto {
   @ApiProperty({ description: 'Código único da ordem de produção' })
@@ -35,13 +35,13 @@ export class CreateOrdemProducaoDto {
 
   @ApiProperty({ description: 'Data de início planejada', required: false })
   @IsOptional()
-  @IsDate()
-  dataInicioPlanejado?: Date;
+  @IsDateString()
+  dataInicioPlanejado?: string;
 
   @ApiProperty({ description: 'Data de fim planejada', required: false })
   @IsOptional()
-  @IsDate()
-  dataFimPlanejado?: Date;
+  @IsDateString()
+  dataFimPlanejado?: string;
 
   @ApiProperty({ description: 'ID do setor' })
   @IsNotEmpty()

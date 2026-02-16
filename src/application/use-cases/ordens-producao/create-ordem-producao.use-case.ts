@@ -46,6 +46,8 @@ export class CreateOrdemProducaoUseCase {
       quantidadeProduzida: 0,
       status: StatusOP.RASCUNHO,
       prioridade: data.prioridade || PrioridadeOP.MEDIA,
+      dataInicioPlanejado: data.dataInicioPlanejado ? new Date(data.dataInicioPlanejado).toISOString() : null,
+      dataFimPlanejado: data.dataFimPlanejado ? new Date(data.dataFimPlanejado).toISOString() : null,
     });
 
     return this.ordensProducaoRepository.create(ordemProducao);

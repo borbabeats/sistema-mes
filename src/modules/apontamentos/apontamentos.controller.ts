@@ -49,26 +49,56 @@ export class ApontamentosController {
 
   @Get('maquina/:maquinaId')
   @Roles(Role.ADMIN, Role.GERENTE, Role.OPERADOR)
-  @ApiOperation({ summary: 'Listar apontamentos de uma máquina' })
-  @ApiResponse({ status: 200, description: 'Lista de apontamentos', type: [Apontamento] })
-  findByMaquina(@Param('maquinaId', ParseIntPipe) maquinaId: number): Promise<Apontamento[]> {
-    return this.apontamentosService.findByMaquina(maquinaId);
+  @ApiOperation({ summary: 'Listar apontamentos de uma máquina com paginação' })
+  @ApiResponse({ status: 200, description: 'Lista paginada de apontamentos' })
+  findByMaquina(
+    @Param('maquinaId', ParseIntPipe) maquinaId: number,
+    @Query() pagination: { page?: number; limit?: number; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }
+  ): Promise<PaginatedResult<Apontamento>> {
+    const filters = new FindAllApontamentosDto();
+    filters.maquinaId = maquinaId;
+    filters.page = pagination.page || 1;
+    filters.limit = pagination.limit || 20;
+    filters.sortBy = pagination.sortBy;
+    filters.sortOrder = pagination.sortOrder || 'DESC';
+    
+    return this.apontamentosService.findAllPaginated(filters);
   }
 
   @Get('usuario/:usuarioId')
   @Roles(Role.ADMIN, Role.GERENTE, Role.OPERADOR)
-  @ApiOperation({ summary: 'Listar apontamentos de um usuário' })
-  @ApiResponse({ status: 200, description: 'Lista de apontamentos', type: [Apontamento] })
-  findByUsuario(@Param('usuarioId', ParseIntPipe) usuarioId: number): Promise<Apontamento[]> {
-    return this.apontamentosService.findByUsuario(usuarioId);
+  @ApiOperation({ summary: 'Listar apontamentos de um usuário com paginação' })
+  @ApiResponse({ status: 200, description: 'Lista paginada de apontamentos' })
+  findByUsuario(
+    @Param('usuarioId', ParseIntPipe) usuarioId: number,
+    @Query() pagination: { page?: number; limit?: number; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }
+  ): Promise<PaginatedResult<Apontamento>> {
+    const filters = new FindAllApontamentosDto();
+    filters.usuarioId = usuarioId;
+    filters.page = pagination.page || 1;
+    filters.limit = pagination.limit || 20;
+    filters.sortBy = pagination.sortBy;
+    filters.sortOrder = pagination.sortOrder || 'DESC';
+    
+    return this.apontamentosService.findAllPaginated(filters);
   }
 
   @Get('ordem-producao/:opId')
   @Roles(Role.ADMIN, Role.GERENTE, Role.OPERADOR)
-  @ApiOperation({ summary: 'Listar apontamentos de uma ordem de produção' })
-  @ApiResponse({ status: 200, description: 'Lista de apontamentos', type: [Apontamento] })
-  findByOrdemProducao(@Param('opId', ParseIntPipe) opId: number): Promise<Apontamento[]> {
-    return this.apontamentosService.findByOrdemProducao(opId);
+  @ApiOperation({ summary: 'Listar apontamentos de uma ordem de produção com paginação' })
+  @ApiResponse({ status: 200, description: 'Lista paginada de apontamentos' })
+  findByOrdemProducao(
+    @Param('opId', ParseIntPipe) opId: number,
+    @Query() pagination: { page?: number; limit?: number; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }
+  ): Promise<PaginatedResult<Apontamento>> {
+    const filters = new FindAllApontamentosDto();
+    filters.opId = opId;
+    filters.page = pagination.page || 1;
+    filters.limit = pagination.limit || 20;
+    filters.sortBy = pagination.sortBy;
+    filters.sortOrder = pagination.sortOrder || 'DESC';
+    
+    return this.apontamentosService.findAllPaginated(filters);
   }
 
   @Get(':id')

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsNumber, IsDate, Min } from 'class-validator';
+import { IsOptional, IsNumber, IsDateString, Min } from 'class-validator';
 
 export class UpdateApontamentoDto {
   @ApiProperty({ description: 'ID da ordem de produção relacionada', required: false })
@@ -19,8 +19,8 @@ export class UpdateApontamentoDto {
 
   @ApiProperty({ description: 'Data e hora de início do apontamento', required: false })
   @IsOptional()
-  @IsDate()
-  dataInicio?: Date;
+  @IsDateString() 
+  dataInicio?: string;
 
   @ApiProperty({ 
     description: 'Data e hora de fim do apontamento', 
@@ -28,8 +28,8 @@ export class UpdateApontamentoDto {
     nullable: true
   })
   @IsOptional()
-  @IsDate()
-  dataFim?: Date | null;
+  @IsDateString()
+  dataFim?: string | null;
 
   @ApiProperty({ 
     description: 'Quantidade produzida no apontamento',

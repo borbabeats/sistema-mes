@@ -24,10 +24,10 @@ export class OrdemProducao {
   quantidadeProduzida: number;
   status: StatusOP;
   prioridade: PrioridadeOP;
-  dataFimReal?: Date | null;
-  dataInicioReal?: Date | null;
-  dataInicioPlanejado?: Date | null;
-  dataFimPlanejado?: Date | null;
+  dataFimReal?: string | null;
+  dataInicioReal?: string | null;
+  dataInicioPlanejado?: string | null;
+  dataFimPlanejado?: string | null;
   setorId: number;
   responsavelId?: number | null;
   observacoes?: string | null;
@@ -93,13 +93,13 @@ export class OrdemProducao {
     if (!this.dataFimPlanejado || this.isCompleted() || this.isCancelled()) {
       return false;
     }
-    return new Date() > this.dataFimPlanejado;
+    return new Date() > new Date(this.dataFimPlanejado);
   }
  
   startProduction(): void {
     if (this.canStart()) {
       this.status = StatusOP.EM_ANDAMENTO;
-      this.dataInicioReal = new Date();
+      this.dataInicioReal = new Date().toISOString();
       this.updatedAt = new Date();
     }
   }
@@ -107,7 +107,7 @@ export class OrdemProducao {
   completeProduction(): void {
     if (this.canComplete()) {
       this.status = StatusOP.FINALIZADA;
-      this.dataFimReal = new Date();
+      this.dataFimReal = new Date().toISOString();
       this.updatedAt = new Date();
     }
   }

@@ -172,6 +172,26 @@ export class ApontamentosRepository implements IApontamentosRepository {
       }
     }
 
+    // Construir orderBy dinâmico
+    let orderBy: any = { dataInicio: 'desc' };
+    
+    if (filters?.sortBy) {
+      const validSortFields = [
+        'id', 'opId', 'maquinaId', 'usuarioId', 
+        'quantidadeProduzida', 'quantidadeDefeito', 
+        'dataInicio', 'dataFim'
+      ];
+      
+      // Verificar se é um campo válido ou campo relacionado
+      if (validSortFields.includes(filters.sortBy)) {
+        orderBy = { [filters.sortBy]: (filters.sortOrder || 'DESC').toLowerCase() };
+      } else if (filters.sortBy.includes('.')) {
+        // Para campos relacionados como 'op.codigo', 'maquina.nome', etc.
+        const [relation, field] = filters.sortBy.split('.');
+        orderBy = { [relation]: { [field]: (filters.sortOrder || 'DESC').toLowerCase() } };
+      }
+    }
+
     const skip = (page - 1) * limit;
 
     const [apontamentos, total] = await Promise.all([
@@ -186,9 +206,7 @@ export class ApontamentosRepository implements IApontamentosRepository {
           maquina: true,
           usuario: true,
         },
-        orderBy: {
-          dataInicio: 'desc',
-        },
+        orderBy,
         skip,
         take: limit,
       }),

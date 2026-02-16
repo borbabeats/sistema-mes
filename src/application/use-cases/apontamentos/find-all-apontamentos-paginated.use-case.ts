@@ -20,15 +20,15 @@ export class FindAllApontamentosPaginatedUseCase {
       status: filters?.status,
       setorId: filters?.setorId,
       ativo: filters?.ativo,
-      search: filters?.search,
+      search: filters?.search || filters?.filter, // Usa filter ou search
       searchField: filters?.searchField,
+      sortBy: filters?.sortBy,
+      sortOrder: filters?.sortOrder || 'DESC',
     };
     
-    // Padrão Refine: _start e _end
-    const start = filters?._start || 0;
-    const end = filters?._end || 10;
-    const limit = end - start + 1;
-    const page = Math.floor(start / limit) + 1;
+    // Padrão RESTful: ?page=1&limit=20
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 20;
     
     return this.apontamentosRepository.findAllPaginated(repositoryFilters, page, limit);
   }

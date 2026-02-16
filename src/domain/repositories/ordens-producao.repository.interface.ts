@@ -22,8 +22,8 @@ export interface CreateOrdemProducaoData {
   descricao?: string | null;
   quantidadePlanejada: number;
   prioridade?: PrioridadeOP;
-  dataInicioPlanejado?: Date | null;
-  dataFimPlanejado?: Date | null;
+  dataInicioPlanejado?: string | null;
+  dataFimPlanejado?: string | null;
   setorId: number;
   responsavelId?: number | null;
   observacoes?: string | null;

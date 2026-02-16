@@ -14,6 +14,15 @@ export class UpdateApontamentoUseCase {
     private readonly findUsuarioUseCase: FindUsuarioUseCase,
   ) {}
 
+  private parseDate(dateString?: string | null): Date | null | undefined {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      throw new Error('Data inválida');
+    }
+    return date;
+  }
+
   async execute(id: number, data: UpdateApontamentoData): Promise<Apontamento> {
     // Verificar se o apontamento existe
     const apontamento = await this.apontamentosRepository.findOne(id);
@@ -45,8 +54,11 @@ export class UpdateApontamentoUseCase {
       }
     }
 
-    // Validar datas
-    if (data.dataInicio && data.dataFim && data.dataInicio > data.dataFim) {
+    // Converter e validar datas
+    const dataInicio = this.parseDate(data.dataInicio);
+    const dataFim = this.parseDate(data.dataFim);
+
+    if (dataInicio && dataFim && dataInicio > dataFim) {
       throw new Error('Data de início não pode ser maior que a data de fim');
     }
 
@@ -59,6 +71,11 @@ export class UpdateApontamentoUseCase {
       throw new Error('Quantidade de defeito não pode ser negativa');
     }
 
-    return this.apontamentosRepository.update(id, data);
+    // Preparar dados para atualização com datas convertidas
+    return this.apontamentosRepository.update(id, {
+      ...data,
+      dataInicio: dataInicio?.toISOString(),
+      dataFim: dataFim?.toISOString() || null,
+    });
   }
 }

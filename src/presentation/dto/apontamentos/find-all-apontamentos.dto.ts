@@ -5,29 +5,53 @@ import { Transform } from 'class-transformer';
 
 export class FindAllApontamentosDto extends FilterApontamentosDto {
   @ApiPropertyOptional({
-    description: 'Posição inicial (Refine pattern)',
+    description: 'Número da página (iniciando em 1)',
     type: Number,
-    default: 0,
+    default: 1,
   })
   @IsOptional()
   @IsInt()
-  @Min(0)
+  @Min(1)
   @Transform(({ value }) => parseInt(value))
-  _start?: number = 0;
+  page?: number = 1;
 
   @ApiPropertyOptional({
-    description: 'Posição final (Refine pattern)',
+    description: 'Quantidade de registros por página',
     type: Number,
-    default: 10,
+    default: 20,
   })
   @IsOptional()
   @IsInt()
-  @Min(0)
+  @Min(1)
   @Transform(({ value }) => parseInt(value))
-  _end?: number = 10;
+  limit?: number = 20;
 
   @ApiPropertyOptional({
-    description: 'Termo de busca',
+    description: 'Campo para ordenação (ex: dataInicio, quantidadeProduzida, op.codigo, maquina.nome)',
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+
+  @ApiPropertyOptional({
+    description: 'Direção da ordenação (ASC ou DESC)',
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  sortOrder?: 'ASC' | 'DESC' = 'DESC';
+
+  @ApiPropertyOptional({
+    description: 'Termo de busca geral (busca em código da OP, nome da máquina, nome do usuário, produto)',
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  filter?: string;
+
+  @ApiPropertyOptional({
+    description: 'Termo de busca (legado - mantido para compatibilidade)',
     type: String,
   })
   @IsOptional()
@@ -35,7 +59,7 @@ export class FindAllApontamentosDto extends FilterApontamentosDto {
   search?: string;
 
   @ApiPropertyOptional({
-    description: 'Campo específico para busca',
+    description: 'Campo específico para busca (legado - mantido para compatibilidade)',
     type: String,
   })
   @IsOptional()

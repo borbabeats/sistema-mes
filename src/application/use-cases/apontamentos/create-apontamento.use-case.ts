@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IApontamentosRepository, CreateApontamentoData, APONTAMENTOS_REPOSITORY_TOKEN } from '../../../domain/repositories/apontamentos.repository.interface';
+import { IApontamentosRepository, CreateApontamentoData, CreateApontamentoInternalData, APONTAMENTOS_REPOSITORY_TOKEN } from '../../../domain/repositories/apontamentos.repository.interface';
 import { Apontamento } from '../../../domain/entities/apontamento.entity';
 import { FindMaquinaUseCase } from '../maquinas/find-maquina.use-case';
 import { FindOrdemProducaoUseCase } from '../ordens-producao/find-ordem-producao.use-case';
@@ -20,6 +20,14 @@ export class CreateApontamentoUseCase {
     private readonly iniciarProducaoUseCase: IniciarProducaoUseCase,
     private readonly updateQuantidadeProduzidaUseCase: UpdateQuantidadeProduzidaUseCase,
   ) {}
+
+  private parseDate(dateString: string): Date {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      throw new Error('Data inválida');
+    }
+    return date;
+  }
 
   async execute(data: CreateApontamentoData): Promise<Apontamento> {
     // Validações de negócio
@@ -47,15 +55,25 @@ export class CreateApontamentoUseCase {
       throw new Error('Quantidade de defeito não pode ser negativa');
     }
 
-    // Validar data
-    if (data.dataInicio < new Date()) {
+    // Converter e validar data
+    const dataInicio = this.parseDate(data.dataInicio);
+    if (dataInicio < new Date()) {
       throw new Error('Data de início não pode ser no passado');
     }
 
-    // Criar apontamento
-    const apontamento = new Apontamento({
+    const dataFim = data.dataFim ? this.parseDate(data.dataFim) : null;
+
+    // Validar período se dataFim fornecida
+    if (dataFim && dataInicio > dataFim) {
+      throw new Error('Data de início não pode ser maior que a data de fim');
+    }
+
+    // Preparar dados para criação com datas convertidas
+    const createData: CreateApontamentoInternalData = {
       ...data,
-    });
+      dataInicio,
+      dataFim,
+    };
 
     // Atualizar status da máquina para EM_USO
     await this.updateStatusMaquinaUseCase.execute(data.maquinaId, StatusMaquina.EM_USO);
@@ -65,7 +83,11 @@ export class CreateApontamentoUseCase {
       await this.iniciarProducaoUseCase.execute(ordemProducao.id);
     }
 
-    const createdApontamento = await this.apontamentosRepository.create(apontamento);
+    const createdApontamento = await this.apontamentosRepository.create({
+      ...createData,
+      dataInicio: createData.dataInicio.toISOString(),
+      dataFim: createData.dataFim?.toISOString() || null,
+    });
 
     return createdApontamento;
   }

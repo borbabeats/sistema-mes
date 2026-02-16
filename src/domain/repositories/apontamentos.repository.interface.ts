@@ -22,6 +22,16 @@ export interface CreateApontamentoData {
   usuarioId: number;
   quantidadeProduzida?: number;
   quantidadeDefeito?: number;
+  dataInicio: string;
+  dataFim?: string | null;
+}
+
+export interface CreateApontamentoInternalData {
+  opId: number;
+  maquinaId: number;
+  usuarioId: number;
+  quantidadeProduzida?: number;
+  quantidadeDefeito?: number;
   dataInicio: Date;
   dataFim?: Date | null;
 }
@@ -32,8 +42,8 @@ export interface UpdateApontamentoData {
   usuarioId?: number;
   quantidadeProduzida?: number;
   quantidadeDefeito?: number;
-  dataInicio?: Date;
-  dataFim?: Date | null;
+  dataInicio?: string;
+  dataFim?: string | null;
 }
 
 export interface ApontamentoFilters {
@@ -47,4 +57,6 @@ export interface ApontamentoFilters {
   ativo?: boolean;
   search?: string;
   searchField?: string;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
 }
