@@ -1,14 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as cors from 'cors';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   // Configuração do CORS
   app.enableCors({
-    origin: 'http://localhost:3001',
+    origin: 'http://localhost:3002',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -21,5 +21,6 @@ async function bootstrap() {
     })
   )
   await app.listen(process.env.PORT ?? 3001);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

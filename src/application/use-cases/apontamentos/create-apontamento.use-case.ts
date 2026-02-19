@@ -57,7 +57,13 @@ export class CreateApontamentoUseCase {
 
     // Converter e validar data
     const dataInicio = this.parseDate(data.dataInicio);
-    if (dataInicio < new Date()) {
+    const agora = new Date();
+    
+    // Ajustar para comparação apenas de datas (ignorar horas/minutos)
+    const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
+    const dataInicioAjustada = new Date(dataInicio.getFullYear(), dataInicio.getMonth(), dataInicio.getDate());
+    
+    if (dataInicioAjustada < hoje) {
       throw new Error('Data de início não pode ser no passado');
     }
 

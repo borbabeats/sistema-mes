@@ -14,6 +14,14 @@ export enum PrioridadeOP {
   ALTA = 'ALTA',
   URGENTE = 'URGENTE',
 }
+
+export enum OrigemOP {
+  PEDIDO_VENDA = 'PEDIDO_VENDA',
+  REPOSICAO_ESTOQUE = 'REPOSICAO_ESTOQUE',
+  PLANO_MESTRE_PRODUCAO = 'PLANO_MESTRE_PRODUCAO',
+  DEMANDA_INTERNA = 'DEMANDA_INTERNA',
+  PREVISAO_VENDAS = 'PREVISAO_VENDAS',
+}
  
 export class OrdemProducao {
   id: number;
@@ -30,6 +38,8 @@ export class OrdemProducao {
   dataFimPlanejado?: string | null;
   setorId: number;
   responsavelId?: number | null;
+  origemTipo?: OrigemOP | null;
+  origemId?: string | null;
   observacoes?: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -41,6 +51,7 @@ export class OrdemProducao {
       this.status = data.status || StatusOP.RASCUNHO;
       this.prioridade = data.prioridade || PrioridadeOP.MEDIA;
       this.quantidadeProduzida = data.quantidadeProduzida || 0;
+      this.origemTipo = data.origemTipo || OrigemOP.PEDIDO_VENDA;
     }
   }
  

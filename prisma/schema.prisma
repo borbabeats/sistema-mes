@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model Setor {
@@ -123,6 +124,8 @@ model OrdemProducao {
   dataFimReal          DateTime?
   setorId              Int
   responsavelId        Int?
+  origemTipo           OrigemOP?          @default(PEDIDO_VENDA)
+  origemId             String?            @db.VarChar(100)
   observacoes          String?            @db.Text
   createdAt            DateTime           @default(now()) @map("created_at")
   updatedAt            DateTime           @updatedAt @map("updated_at")
@@ -230,6 +233,14 @@ enum StatusManutencao {
   CONCLUIDA
   CANCELADA
   ATRASADA
+}
+
+enum OrigemOP {
+  PEDIDO_VENDA
+  REPOSICAO_ESTOQUE
+  PLANO_MESTRE_PRODUCAO
+  DEMANDA_INTERNA
+  PREVISAO_VENDAS
 }
 
 enum StatusOP {

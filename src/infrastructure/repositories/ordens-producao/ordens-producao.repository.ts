@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { IOrdensProducaoRepository, CreateOrdemProducaoData, UpdateOrdemProducaoData, OrdemProducaoFilters } from '../../../domain/repositories/ordens-producao.repository.interface';
-import { OrdemProducao, StatusOP, PrioridadeOP } from '../../../domain/entities/ordem-producao.entity';
+import { OrdemProducao, StatusOP, PrioridadeOP, OrigemOP } from '../../../domain/entities/ordem-producao.entity';
 
 @Injectable()
 export class OrdensProducaoRepository implements IOrdensProducaoRepository {
@@ -21,6 +21,8 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
         dataFimPlanejado: data.dataFimPlanejado,
         setorId: data.setorId,
         responsavelId: data.responsavelId,
+        origemTipo: data.origemTipo || OrigemOP.PEDIDO_VENDA,
+        origemId: data.origemId,
         observacoes: data.observacoes,
       },
     });
@@ -35,6 +37,7 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
     if (filters?.produto) whereClause.produto = { contains: filters.produto, mode: 'insensitive' };
     if (filters?.status) whereClause.status = filters.status;
     if (filters?.prioridade) whereClause.prioridade = filters.prioridade;
+    if (filters?.origemTipo) whereClause.origemTipo = filters.origemTipo;
     if (filters?.setorId) whereClause.setor_id = filters.setorId;
     if (filters?.responsavelId) whereClause.responsavel_id = filters.responsavelId;
 
@@ -174,6 +177,8 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
     if (data.dataFimPlanejado !== undefined) updateData.dataFimPlanejado = data.dataFimPlanejado;
     if (data.setorId !== undefined) updateData.setor_id = data.setorId;
     if (data.responsavelId !== undefined) updateData.responsavel_id = data.responsavelId;
+    if (data.origemTipo !== undefined) updateData.origemTipo = data.origemTipo;
+    if (data.origemId !== undefined) updateData.origemId = data.origemId;
     if (data.observacoes !== undefined) updateData.observacoes = data.observacoes;
 
     const ordemProducao = await this.prisma.ordemProducao.update({
@@ -219,6 +224,8 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
       dataFimPlanejado: prismaOrdemProducao.dataFimPlanejado,
       setorId: prismaOrdemProducao.setor_id,
       responsavelId: prismaOrdemProducao.responsavel_id,
+      origemTipo: prismaOrdemProducao.origemTipo as OrigemOP,
+      origemId: prismaOrdemProducao.origemId,
       observacoes: prismaOrdemProducao.observacoes,
       createdAt: prismaOrdemProducao.createdAt,
       updatedAt: prismaOrdemProducao.updatedAt,

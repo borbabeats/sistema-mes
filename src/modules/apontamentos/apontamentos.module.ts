@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ApontamentosService } from './apontamentos.service';
 import { ApontamentosController } from './apontamentos.controller';
 import { PrismaModule } from '../../prisma/prisma.module';
@@ -21,7 +21,7 @@ import { OrdensProducaoModule } from '../ordens-producao/ordens-producao.module'
 import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [PrismaModule, LoggerModule, MaquinasModule, OrdensProducaoModule, UsersModule],
+  imports: [PrismaModule, LoggerModule, MaquinasModule, forwardRef(() => OrdensProducaoModule), UsersModule],
   providers: [
     ApontamentosService,
     {

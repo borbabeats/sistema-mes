@@ -1,4 +1,4 @@
-import { OrdemProducao, StatusOP, PrioridadeOP } from '../entities/ordem-producao.entity';
+import { OrdemProducao, StatusOP, PrioridadeOP, OrigemOP } from '../entities/ordem-producao.entity';
 
 export interface IOrdensProducaoRepository {
   create(data: CreateOrdemProducaoData): Promise<OrdemProducao>;
@@ -26,6 +26,8 @@ export interface CreateOrdemProducaoData {
   dataFimPlanejado?: string | null;
   setorId: number;
   responsavelId?: number | null;
+  origemTipo?: OrigemOP | null;
+  origemId?: string | null;
   observacoes?: string | null;
 }
 
@@ -43,6 +45,8 @@ export interface UpdateOrdemProducaoData {
   dataFimPlanejado?: Date | null;
   setorId?: number;
   responsavelId?: number | null;
+  origemTipo?: OrigemOP | null;
+  origemId?: string | null;
   observacoes?: string | null;
 }
 
@@ -51,6 +55,7 @@ export interface OrdemProducaoFilters {
   produto?: string;
   status?: StatusOP;
   prioridade?: PrioridadeOP;
+  origemTipo?: OrigemOP;
   setorId?: number;
   responsavelId?: number;
   dataInicio?: Date;

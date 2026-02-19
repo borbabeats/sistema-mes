@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { OrdensProducaoService } from './ordens-producao.service';
 import { OrdensProducaoController } from './ordens-producao.controller';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { SetoresModule } from '../setores/setores.module';
 import { UsersModule } from '../users/users.module';
+import { ApontamentosModule } from '../apontamentos/apontamentos.module';
 import { OrdensProducaoRepository } from '../../infrastructure/repositories/ordens-producao/ordens-producao.repository';
 import { LoggerModule } from '../../logger/logger.module';
 import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from './constants';
@@ -27,7 +28,7 @@ import { FindOverdueUseCase } from '../../application/use-cases/ordens-producao/
 import { FindPendingUseCase } from '../../application/use-cases/ordens-producao/find-pending.use-case';
 
 @Module({
-  imports: [PrismaModule, SetoresModule, UsersModule, LoggerModule],
+  imports: [PrismaModule, SetoresModule, UsersModule, LoggerModule, forwardRef(() => ApontamentosModule)],
   controllers: [OrdensProducaoController],
   providers: [
     OrdensProducaoService,

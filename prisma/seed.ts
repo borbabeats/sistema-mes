@@ -1,21 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-import mariadb from 'mariadb';
 import * as bcrypt from 'bcrypt';
 
-// Create adapter with connection config
-const adapter = new PrismaMariaDb({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '3307'),
-  user: process.env.DB_USERNAME || 'mes_user',
-  password: process.env.DB_PASSWORD || 'mes123',
-  database: process.env.DB_DATABASE || 'mes_system',
-  allowPublicKeyRetrieval: true,
-  ssl: false
-});
-
-// Initialize Prisma Client with adapter for Prisma 7.2
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Iniciando seed do banco de dados...');
@@ -184,6 +170,8 @@ async function main() {
         quantidadeProduzida: 100,
         status: 'FINALIZADA',
         prioridade: 'ALTA',
+        origemTipo: 'PEDIDO_VENDA',
+        origemId: 'PV-2024-0001',
         dataInicioPlanejado: new Date(agora.getTime() - 7 * 24 * 60 * 60 * 1000),
         dataFimPlanejado: new Date(agora.getTime() - 1 * 24 * 60 * 60 * 1000),
         dataInicioReal: new Date(agora.getTime() - 6 * 24 * 60 * 60 * 1000),
@@ -210,6 +198,8 @@ async function main() {
         quantidadeProduzida: 42,
         status: 'EM_ANDAMENTO',
         prioridade: 'URGENTE',
+        origemTipo: 'REPOSICAO_ESTOQUE',
+        origemId: 'ESTOQUE_MIN-CILINDRO_COMP',
         dataInicioPlanejado: new Date(agora.getTime() - 3 * 24 * 60 * 60 * 1000),
         dataFimPlanejado: new Date(agora.getTime() + 2 * 24 * 60 * 60 * 1000),
         dataInicioReal: new Date(agora.getTime() - 2 * 24 * 60 * 60 * 1000),
@@ -232,6 +222,8 @@ async function main() {
         quantidadeProduzida: 30,
         status: 'FINALIZADA',
         prioridade: 'MEDIA',
+        origemTipo: 'DEMANDA_INTERNA',
+        origemId: 'ENG-CHASSIS-A',
         dataInicioPlanejado: new Date(agora.getTime() - 5 * 24 * 60 * 60 * 1000),
         dataFimPlanejado: new Date(agora.getTime() - 2 * 24 * 60 * 60 * 1000),
         dataInicioReal: new Date(agora.getTime() - 4 * 24 * 60 * 60 * 1000),
@@ -258,6 +250,8 @@ async function main() {
         quantidadeProduzida: 18,
         status: 'EM_ANDAMENTO',
         prioridade: 'MEDIA',
+        origemTipo: 'PLANO_MESTRE_PRODUCAO',
+        origemId: 'PMP-2024-W08',
         dataInicioPlanejado: new Date(agora.getTime() - 2 * 24 * 60 * 60 * 1000),
         dataFimPlanejado: new Date(agora.getTime() + 3 * 24 * 60 * 60 * 1000),
         dataInicioReal: new Date(agora.getTime() - 1 * 24 * 60 * 60 * 1000),
@@ -280,6 +274,8 @@ async function main() {
         quantidadeProduzida: 0,
         status: 'PLANEJADA',
         prioridade: 'ALTA',
+        origemTipo: 'PREVISAO_VENDAS',
+        origemId: 'FORECAST-MOTOR-2024Q1',
         dataInicioPlanejado: new Date(agora.getTime() + 1 * 24 * 60 * 60 * 1000),
         dataFimPlanejado: new Date(agora.getTime() + 5 * 24 * 60 * 60 * 1000),
         setorId: setores[2].id,

@@ -67,7 +67,7 @@ export class FinalizeApontamentoUseCase {
       await this.updateQuantidadeProduzidaUseCase.execute(apontamento.opId, novaQuantidade);
 
       // Verificar se a ordem de produção foi concluída e finalizar automaticamente
-      if (novaQuantidade >= ordemProducao.quantidadePlanejada) {
+      if (novaQuantidade >= ordemProducao.quantidadePlanejada && ordemProducao.status !== 'FINALIZADA') {
         await this.finalizarProducaoUseCase.execute(apontamento.opId);
       }
     }
