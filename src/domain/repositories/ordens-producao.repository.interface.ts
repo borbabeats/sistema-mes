@@ -1,8 +1,10 @@
 import { OrdemProducao, StatusOP, PrioridadeOP, OrigemOP } from '../entities/ordem-producao.entity';
+import { PaginatedResult } from '../../presentation/dto/common/pagination.dto';
 
 export interface IOrdensProducaoRepository {
   create(data: CreateOrdemProducaoData): Promise<OrdemProducao>;
   findAll(filters?: OrdemProducaoFilters): Promise<OrdemProducao[]>;
+  findAllPaginated(filters?: OrdemProducaoFilters, page?: number, limit?: number): Promise<PaginatedResult<OrdemProducao>>;
   findOne(id: number): Promise<OrdemProducao | null>;
   findByCodigo(codigo: string): Promise<OrdemProducao | null>;
   findByStatus(status: StatusOP): Promise<OrdemProducao[]>;
@@ -60,4 +62,8 @@ export interface OrdemProducaoFilters {
   responsavelId?: number;
   dataInicio?: Date;
   dataFim?: Date;
+  search?: string;
+  searchField?: string;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
 }

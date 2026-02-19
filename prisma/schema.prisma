@@ -45,6 +45,7 @@ model Usuario {
   logNotificacoes     LogNotificacao[]
   ordensComoResponsavel OrdemProducao[] @relation("OrdemProducaoResponsavel")
   ordensComoOperador  OrdemProducao[]  @relation("OrdemProducaoOperadores")
+  statusLogs          OrdemProducaoStatusLog[]
   
   @@map("usuarios")
 }
@@ -135,6 +136,7 @@ model OrdemProducao {
   responsavel          Usuario?           @relation("OrdemProducaoResponsavel", fields: [responsavelId], references: [id])
   operadores           Usuario[]          @relation("OrdemProducaoOperadores")
   apontamentos         Apontamento[]
+  statusLogs           OrdemProducaoStatusLog[]
   
   @@map("ordens_producao")
 }
@@ -263,4 +265,19 @@ enum TipoEventoNotificacao {
 enum StatusEnvioNotificacao {
   SUCESSO
   FALHA
+}
+
+model OrdemProducaoStatusLog {
+  id           Int        @id @default(autoincrement())
+  ordem_id     Int        @map("ordem_id")
+  de_status     StatusOP   @map("de_status")
+  para_status   StatusOP   @map("para_status")
+  motivo       String?    @db.Text
+  usuario_id   Int?       @map("usuario_id")
+  created_at   DateTime   @default(now()) @map("created_at")
+  
+  ordemProducao OrdemProducao? @relation(fields: [ordem_id], references: [id], onDelete: Cascade)
+  usuario       Usuario?       @relation(fields: [usuario_id], references: [id])
+  
+  @@map("ordem_producao_status_logs")
 }

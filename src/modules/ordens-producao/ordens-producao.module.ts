@@ -7,17 +7,12 @@ import { UsersModule } from '../users/users.module';
 import { ApontamentosModule } from '../apontamentos/apontamentos.module';
 import { OrdensProducaoRepository } from '../../infrastructure/repositories/ordens-producao/ordens-producao.repository';
 import { LoggerModule } from '../../logger/logger.module';
-import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from './constants';
+import { ORDENS_PRODUCAO_REPOSITORY_TOKEN, ORDEM_PRODUCAO_STATUS_LOG_REPOSITORY_TOKEN } from './constants';
 import { CreateOrdemProducaoUseCase } from '../../application/use-cases/ordens-producao/create-ordem-producao.use-case';
 import { FindOrdemProducaoUseCase } from '../../application/use-cases/ordens-producao/find-ordem-producao.use-case';
 import { FindAllOrdensProducaoUseCase } from '../../application/use-cases/ordens-producao/find-all-ordens-producao.use-case';
 import { UpdateOrdemProducaoUseCase } from '../../application/use-cases/ordens-producao/update-ordem-producao.use-case';
 import { DeleteOrdemProducaoUseCase } from '../../application/use-cases/ordens-producao/delete-ordem-producao.use-case';
-import { IniciarProducaoUseCase } from '../../application/use-cases/ordens-producao/iniciar-producao.use-case';
-import { PausarProducaoUseCase } from '../../application/use-cases/ordens-producao/pausar-producao.use-case';
-import { RetomarProducaoUseCase } from '../../application/use-cases/ordens-producao/retomar-producao.use-case';
-import { FinalizarProducaoUseCase } from '../../application/use-cases/ordens-producao/finalizar-producao.use-case';
-import { CancelarProducaoUseCase } from '../../application/use-cases/ordens-producao/cancelar-producao.use-case';
 import { UpdateQuantidadeProduzidaUseCase } from '../../application/use-cases/ordens-producao/update-quantidade-produzida.use-case';
 import { FindByCodigoUseCase } from '../../application/use-cases/ordens-producao/find-by-codigo.use-case';
 import { FindByStatusUseCase } from '../../application/use-cases/ordens-producao/find-by-status.use-case';
@@ -26,6 +21,14 @@ import { FindBySetorUseCase } from '../../application/use-cases/ordens-producao/
 import { FindByResponsavelUseCase } from '../../application/use-cases/ordens-producao/find-by-responsavel.use-case';
 import { FindOverdueUseCase } from '../../application/use-cases/ordens-producao/find-overdue.use-case';
 import { FindPendingUseCase } from '../../application/use-cases/ordens-producao/find-pending.use-case';
+import { FindAllOrdensProducaoPaginatedUseCase } from '../../application/use-cases/ordens-producao/find-all-ordens-producao-paginated.use-case';
+import { ChangeStatusOrdemProducaoUseCase } from '../../application/use-cases/ordens-producao/change-status-ordem-producao.use-case';
+import { IniciarProducaoUseCase } from '../../application/use-cases/ordens-producao/iniciar-producao.use-case';
+import { FinalizarProducaoUseCase } from '../../application/use-cases/ordens-producao/finalizar-producao.use-case';
+import { PausarProducaoUseCase } from '../../application/use-cases/ordens-producao/pausar-producao.use-case';
+import { RetomarProducaoUseCase } from '../../application/use-cases/ordens-producao/retomar-producao.use-case';
+import { CancelarProducaoUseCase } from '../../application/use-cases/ordens-producao/cancelar-producao.use-case';
+import { OrdemProducaoStatusLogRepository } from '../../infrastructure/repositories/ordens-producao-status-log/ordens-producao-status-log.repository';
 
 @Module({
   imports: [PrismaModule, SetoresModule, UsersModule, LoggerModule, forwardRef(() => ApontamentosModule)],
@@ -35,13 +38,15 @@ import { FindPendingUseCase } from '../../application/use-cases/ordens-producao/
     CreateOrdemProducaoUseCase,
     FindOrdemProducaoUseCase,
     FindAllOrdensProducaoUseCase,
-    UpdateOrdemProducaoUseCase,
-    DeleteOrdemProducaoUseCase,
+    FindAllOrdensProducaoPaginatedUseCase,
+    ChangeStatusOrdemProducaoUseCase,
     IniciarProducaoUseCase,
+    FinalizarProducaoUseCase,
     PausarProducaoUseCase,
     RetomarProducaoUseCase,
-    FinalizarProducaoUseCase,
     CancelarProducaoUseCase,
+    UpdateOrdemProducaoUseCase,
+    DeleteOrdemProducaoUseCase,
     UpdateQuantidadeProduzidaUseCase,
     FindByCodigoUseCase,
     FindByStatusUseCase,
@@ -54,7 +59,11 @@ import { FindPendingUseCase } from '../../application/use-cases/ordens-producao/
       provide: ORDENS_PRODUCAO_REPOSITORY_TOKEN,
       useClass: OrdensProducaoRepository,
     },
+    {
+      provide: ORDEM_PRODUCAO_STATUS_LOG_REPOSITORY_TOKEN,
+      useClass: OrdemProducaoStatusLogRepository,
+    },
   ],
-  exports: [OrdensProducaoService, ORDENS_PRODUCAO_REPOSITORY_TOKEN, CreateOrdemProducaoUseCase, FindOrdemProducaoUseCase, FindAllOrdensProducaoUseCase, UpdateOrdemProducaoUseCase, DeleteOrdemProducaoUseCase, IniciarProducaoUseCase, PausarProducaoUseCase, RetomarProducaoUseCase, FinalizarProducaoUseCase, CancelarProducaoUseCase, UpdateQuantidadeProduzidaUseCase, FindByCodigoUseCase, FindByStatusUseCase, FindByPrioridadeUseCase, FindBySetorUseCase, FindByResponsavelUseCase, FindOverdueUseCase, FindPendingUseCase],
+  exports: [OrdensProducaoService, ORDENS_PRODUCAO_REPOSITORY_TOKEN, ORDEM_PRODUCAO_STATUS_LOG_REPOSITORY_TOKEN, CreateOrdemProducaoUseCase, FindOrdemProducaoUseCase, FindAllOrdensProducaoUseCase, FindAllOrdensProducaoPaginatedUseCase, ChangeStatusOrdemProducaoUseCase, IniciarProducaoUseCase, FinalizarProducaoUseCase, PausarProducaoUseCase, RetomarProducaoUseCase, CancelarProducaoUseCase, UpdateOrdemProducaoUseCase, DeleteOrdemProducaoUseCase, UpdateQuantidadeProduzidaUseCase, FindByCodigoUseCase, FindByStatusUseCase, FindByPrioridadeUseCase, FindBySetorUseCase, FindByResponsavelUseCase, FindOverdueUseCase, FindPendingUseCase],
 })
 export class OrdensProducaoModule {}
