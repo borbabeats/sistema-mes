@@ -18,17 +18,6 @@ services:
     networks:
       - mes_network
 
-  adminer:
-    image: adminer:latest
-    container_name: sistema_mes_adminer
-    restart: always
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mysql
-    networks:
-      - mes_network
-
 volumes:
   mysql_data:
 

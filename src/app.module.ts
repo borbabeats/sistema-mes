@@ -8,10 +8,12 @@ import { SetoresModule } from './modules/setores/setores.module';
 import { OrdensProducaoModule } from './modules/ordens-producao/ordens-producao.module';
 import { ApontamentosModule } from './modules/apontamentos/apontamentos.module';
 import { MaquinasModule } from './modules/maquinas/maquinas.module';
+import { ManutencoesModule } from './modules/manutencoes/manutencoes.module';
+import { SharedModule } from './modules/shared/shared.module';
 import { LoggerModule } from './logger/logger.module';
 
 @Module({
-  imports: [LoggerModule, PrismaModule, AuthModule, UsersModule, SetoresModule, OrdensProducaoModule, ApontamentosModule, MaquinasModule],
+  imports: [LoggerModule, PrismaModule, SharedModule, AuthModule, UsersModule, SetoresModule, OrdensProducaoModule, ApontamentosModule, MaquinasModule, ManutencoesModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -117,14 +117,20 @@ export class MaquinasService {
   }
 
   // Métodos de manutenção usando os novos use cases
-  async iniciarManutencao(id: number, manutencaoData: any): Promise<MaquinaResponseDto> {
-    const maquina = await this.iniciarManutencaoUseCase.execute(id, manutencaoData);
-    return this.toMaquinaResponseDto(maquina);
+  async iniciarManutencao(id: number, manutencaoData: any): Promise<{ maquina: MaquinaResponseDto; manutencao: any }> {
+    const result = await this.iniciarManutencaoUseCase.execute(id, manutencaoData);
+    return {
+      maquina: this.toMaquinaResponseDto(result.maquina),
+      manutencao: result.manutencao,
+    };
   }
 
-  async finalizarManutencao(id: number, manutencaoData: any): Promise<MaquinaResponseDto> {
-    const maquina = await this.finalizarManutencaoUseCase.execute(id, manutencaoData);
-    return this.toMaquinaResponseDto(maquina);
+  async finalizarManutencao(id: number, manutencaoData: any): Promise<{ maquina: MaquinaResponseDto; manutencao: any }> {
+    const result = await this.finalizarManutencaoUseCase.execute(id, manutencaoData);
+    return {
+      maquina: this.toMaquinaResponseDto(result.maquina),
+      manutencao: result.manutencao,
+    };
   }
 
   async updateStatus(id: number, status: any, motivo?: string): Promise<MaquinaResponseDto> {

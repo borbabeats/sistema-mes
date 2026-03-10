@@ -4,7 +4,9 @@ import { MaquinasService } from './maquinas.service';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { MaquinasRepository } from '../../infrastructure/repositories/maquinas/maquinas.repository';
 import { MAQUINAS_REPOSITORY_TOKEN } from '../../domain/repositories/maquinas.repository.interface';
+import { MANUTENCOES_REPOSITORY_TOKEN } from '../../domain/repositories/manutencoes.repository.interface';
 import { SetoresModule } from '../setores/setores.module';
+import { ManutencoesModule } from '../manutencoes/manutencoes.module';
 import { CreateMaquinaUseCase } from '../../application/use-cases/maquinas/create-maquina.use-case';
 import { FindMaquinaUseCase } from '../../application/use-cases/maquinas/find-maquina.use-case';
 import { FindAllMaquinasUseCase } from '../../application/use-cases/maquinas/find-all-maquinas.use-case';
@@ -18,6 +20,7 @@ import { FindByCodigoUseCase } from '../../application/use-cases/maquinas/find-b
 import { FindBySetorUseCase } from '../../application/use-cases/maquinas/find-by-setor.use-case';
 import { FindByStatusUseCase } from '../../application/use-cases/maquinas/find-by-status.use-case';
 import { FindAvailableUseCase } from '../../application/use-cases/maquinas/find-available.use-case';
+import { ListarManutencoesUseCase } from '../../application/use-cases/manutencoes/listar-manutencoes.use-case';
 
 @Module({
   imports: [PrismaModule, SetoresModule],
@@ -37,10 +40,7 @@ import { FindAvailableUseCase } from '../../application/use-cases/maquinas/find-
     FindBySetorUseCase,
     FindByStatusUseCase,
     FindAvailableUseCase,
-    {
-      provide: MAQUINAS_REPOSITORY_TOKEN,
-      useClass: MaquinasRepository,
-    },
+    ListarManutencoesUseCase,
   ],
   exports: [
     MaquinasService, 
@@ -57,7 +57,7 @@ import { FindAvailableUseCase } from '../../application/use-cases/maquinas/find-
     FindBySetorUseCase,
     FindByStatusUseCase,
     FindAvailableUseCase,
-    MAQUINAS_REPOSITORY_TOKEN,
+    ListarManutencoesUseCase,
   ],
 })
 export class MaquinasModule {}
