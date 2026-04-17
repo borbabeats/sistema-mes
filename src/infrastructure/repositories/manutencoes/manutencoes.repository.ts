@@ -23,6 +23,11 @@ export class ManutencoesRepository implements IManutencoesRepository {
       observacoes: manutencao.observacoes,
       createdAt: manutencao.created_at,
       updatedAt: manutencao.updated_at,
+      maquina: manutencao.maquina,
+      responsavel: manutencao.responsavel ? {
+        ...manutencao.responsavel,
+        senha: undefined
+      } : undefined,
     };
   }
 
@@ -76,7 +81,9 @@ export class ManutencoesRepository implements IManutencoesRepository {
     responsavelId?: number;
     dataInicio?: Date;
     dataFim?: Date;
-  }): Promise<Manutencao[]> {
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: Manutencao[]; total: number }> {
     const where: any = {};
 
     if (filters?.maquinaId) {
@@ -101,18 +108,30 @@ export class ManutencoesRepository implements IManutencoesRepository {
       }
     }
 
-    const manutencoes = await this.prisma.manutencao.findMany({
-      where,
-      include: {
-        maquina: true,
-        responsavel: true,
-      },
-      orderBy: {
-        dataAgendada: 'asc',
-      },
-    });
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const skip = (page - 1) * limit;
 
-    return manutencoes.map(m => this.toEntity(m));
+    const [manutencoes, total] = await this.prisma.$transaction([
+      this.prisma.manutencao.findMany({
+        where,
+        include: {
+          maquina: true,
+          responsavel: true,
+        },
+        orderBy: {
+          dataAgendada: 'asc',
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.manutencao.count({ where }),
+    ]);
+
+    return {
+      data: manutencoes.map(m => this.toEntity(m)),
+      total,
+    };
   }
 
   async update(id: number, data: UpdateManutencaoData): Promise<Manutencao> {
@@ -181,8 +200,58 @@ export class ManutencoesRepository implements IManutencoesRepository {
     return this.findByStatus(StatusManutencao.AGENDADA);
   }
 
+  async findAgendadasPaginated(page: number = 1, limit: number = 10): Promise<{ data: Manutencao[]; total: number }> {
+    const skip = (page - 1) * limit;
+
+    const [manutencoes, total] = await this.prisma.$transaction([
+      this.prisma.manutencao.findMany({
+        where: { status: StatusManutencao.AGENDADA },
+        include: {
+          maquina: true,
+          responsavel: true,
+        },
+        orderBy: {
+          dataAgendada: 'asc',
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.manutencao.count({ where: { status: StatusManutencao.AGENDADA } }),
+    ]);
+
+    return {
+      data: manutencoes.map(m => this.toEntity(m)),
+      total,
+    };
+  }
+
   async findEmAndamento(): Promise<Manutencao[]> {
     return this.findByStatus(StatusManutencao.EM_ANDAMENTO);
+  }
+
+  async findEmAndamentoPaginated(page: number = 1, limit: number = 10): Promise<{ data: Manutencao[]; total: number }> {
+    const skip = (page - 1) * limit;
+
+    const [manutencoes, total] = await this.prisma.$transaction([
+      this.prisma.manutencao.findMany({
+        where: { status: StatusManutencao.EM_ANDAMENTO },
+        include: {
+          maquina: true,
+          responsavel: true,
+        },
+        orderBy: {
+          dataAgendada: 'asc',
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.manutencao.count({ where: { status: StatusManutencao.EM_ANDAMENTO } }),
+    ]);
+
+    return {
+      data: manutencoes.map(m => this.toEntity(m)),
+      total,
+    };
   }
 
   async findAtrasadas(): Promise<Manutencao[]> {
@@ -203,6 +272,37 @@ export class ManutencoesRepository implements IManutencoesRepository {
     });
 
     return manutencoes.map(m => this.toEntity(m));
+  }
+
+  async findAtrasadasPaginated(page: number = 1, limit: number = 10): Promise<{ data: Manutencao[]; total: number }> {
+    const skip = (page - 1) * limit;
+    const where = {
+      status: StatusManutencao.AGENDADA,
+      dataAgendada: {
+        lt: new Date(),
+      },
+    };
+
+    const [manutencoes, total] = await this.prisma.$transaction([
+      this.prisma.manutencao.findMany({
+        where,
+        include: {
+          maquina: true,
+          responsavel: true,
+        },
+        orderBy: {
+          dataAgendada: 'asc',
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.manutencao.count({ where }),
+    ]);
+
+    return {
+      data: manutencoes.map(m => this.toEntity(m)),
+      total,
+    };
   }
 
   async createHistorico(data: {

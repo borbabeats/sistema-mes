@@ -33,11 +33,13 @@ src/
 
 - **Framework**: NestJS
 - **Linguagem**: TypeScript
-- **Banco de Dados**: PostgreSQL com Prisma ORM
+- **Banco de Dados**: MySQL/MariaDB com Prisma ORM
 - **Autenticação**: JWT
 - **Validação**: class-validator
 - **Documentação**: Swagger/OpenAPI
 - **Segurança**: bcrypt (hash de senhas)
+- **Logging**: Winston
+- **WebSocket**: Notificações em tempo real
 
 ## 📋 Funcionalidades
 
@@ -57,26 +59,53 @@ src/
 
 ### 🤖 Gestão de Máquinas
 - Cadastro de máquinas
-- Controle de status (DISPONÍVEL, MANUTENÇÃO, INATIVA)
+- Controle de status (DISPONÍVEL, EM_USO, MANUTENÇÃO, INATIVA, PARADA, DESATIVADA)
 - Associação com setores
+- Controle de horas de uso
+
+### 🔧 Gestão de Manutenções
+- Agendamento de manutenções (PREVENTIVA, CORRETIVA, PREDITIVA, LUBRIFICAÇÃO, CALIBRACAO)
+- Controle de status das manutenções
+- Histórico de manutenções
+- Controle de custos
 
 ### 📋 Ordens de Produção (OP)
 - Criação e gestão de OPs
-- Controle de status (RASCUNHO, PENDENTE, EM_ANDAMENTO, PAUSADA, FINALIZADA, CANCELADA)
-- Priorização de produção
-- Controle de quantidades
+- Controle de status (RASCUNHO, PLANEJADA, EM_ANDAMENTO, PAUSADA, FINALIZADA, CANCELADA, ATRASADA)
+- Priorização de produção (BAIXA, MEDIA, ALTA, URGENTE)
+- Controle de quantidades planejadas vs produzidas
+- Controle de prazos planejados vs reais
+- Histórico de mudanças de status
 
 ### ⏱️ Apontamentos de Produção
 - Registro de tempo de produção
-- Controle de quantidades produzidas
+- Controle de quantidades produzidas e com defeito
+- Associação com OPs, máquinas e operadores
 - Finalização de apontamentos
+
+### 📊 Dashboard Analytics
+- **KPIs de Produção**: OPs ativas, produção do dia, eficiência global, taxa de defeitos
+- **KPIs de Qualidade**: índice de qualidade, rejeições do mês, conformidade
+- **KPIs de Recursos**: máquinas ativas, OEE, disponibilidade
+- **KPIs de Prazos**: OPs em atraso, cumprimento de prazos, tempo médio de ciclo
+- **Gráficos**: produção diária, produção por setor, status das OPs, tendência de qualidade
+- **Relatórios**: OEE em tempo real, top 5 produtos, produção por turno
+- **Alertas**: máquinas paradas, OPs atrasadas, taxa de defeitos alta
+- **Metas**: progresso diário, eficiência por operador
+
+### 🔔 Sistema de Notificações
+- Configuração de notificações por evento
+- Envio via WebSocket e WhatsApp
+- Tipos de eventos: máquina parada, OP atrasada, defeito alto, OP finalizada
+- Histórico de envio de notificações
 
 ## 🛠️ Instalação e Configuração
 
 ### Pré-requisitos
 - Node.js 18+
-- PostgreSQL
+- MySQL/MariaDB
 - npm ou yarn
+- Docker (opcional)
 
 ### Instalação
 
@@ -102,7 +131,7 @@ npm run start:dev
 
 ```env
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/mes_db"
+DATABASE_URL="mysql://user:password@localhost:3306/mes_system"
 
 # JWT
 JWT_SECRET="your-secret-key"
@@ -208,8 +237,34 @@ Content-Type: application/json
   "codigo": "MAQ-001",
   "nome": "Torno CNC",
   "descricao": "Torno computadorizado",
-  "capacidade": 100,
+  "fabricante": "DMG Mori",
+  "modelo": "CTX 310",
+  "capacidade": "100 peças/hora",
   "setorId": 1
+}
+```
+
+### Manutenções
+
+#### Listar Manutenções
+```http
+GET /manutencoes
+Authorization: Bearer <token>
+```
+
+#### Criar Manutenção
+```http
+POST /manutencoes
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "maquinaId": 1,
+  "tipo": "PREVENTIVA",
+  "descricao": "Manutenção preventiva mensal",
+  "dataAgendada": "2024-12-20T08:00:00Z",
+  "custoEstimado": 500.00,
+  "responsavelId": 2
 }
 ```
 
@@ -278,15 +333,112 @@ Content-Type: application/json
 }
 ```
 
+### Dashboard Analytics
+
+#### KPIs de Produção
+```http
+GET /dashboard/kpis/producao
+Authorization: Bearer <token>
+```
+
+#### KPIs de Qualidade
+```http
+GET /dashboard/kpis/qualidade
+Authorization: Bearer <token>
+```
+
+#### KPIs de Recursos
+```http
+GET /dashboard/kpis/recursos
+Authorization: Bearer <token>
+```
+
+#### KPIs de Prazos
+```http
+GET /dashboard/kpis/prazos
+Authorization: Bearer <token>
+```
+
+#### Gráfico de Produção Diária
+```http
+GET /dashboard/graficos/producao-diaria?dias=30
+Authorization: Bearer <token>
+```
+
+#### Produção por Setor
+```http
+GET /dashboard/graficos/producao-por-setor?periodo=mes
+Authorization: Bearer <token>
+```
+
+#### Status das OPs
+```http
+GET /dashboard/graficos/status-ops
+Authorization: Bearer <token>
+```
+
+#### OEE em Tempo Real
+```http
+GET /dashboard/graficos/oee-tempo-real
+Authorization: Bearer <token>
+```
+
+#### Top 5 Produtos
+```http
+GET /dashboard/graficos/top-produtos?periodo=mes
+Authorization: Bearer <token>
+```
+
+#### Produção por Turno
+```http
+GET /dashboard/graficos/producao-por-turno?dias=7
+Authorization: Bearer <token>
+```
+
+#### Alertas Críticos
+```http
+GET /dashboard/alertas/criticos
+Authorization: Bearer <token>
+```
+
+#### Metas do Dia
+```http
+GET /dashboard/metas/dia
+Authorization: Bearer <token>
+```
+
+#### Eficiência por Operador
+```http
+GET /dashboard/eficiencia/operadores?periodo=semana
+Authorization: Bearer <token>
+```
+
 ## 📊 Estrutura de Dados
 
 ### Status das Ordens de Produção
 - `RASCUNHO`: Ordem criada mas não iniciada
-- `PENDENTE`: Aguardando recursos
+- `PLANEJADA`: Ordem planejada e agendada
 - `EM_ANDAMENTO`: Em produção
 - `PAUSADA`: Produção interrompida temporariamente
 - `FINALIZADA`: Produção concluída
 - `CANCELADA`: Ordem cancelada
+- `ATRASADA`: Ordem fora do prazo planejado
+
+### Status das Máquinas
+- `DISPONIVEL`: Máquina disponível para uso
+- `EM_USO`: Máquina em operação
+- `MANUTENCAO`: Máquina em manutenção
+- `INATIVA`: Máquina inativa
+- `PARADA`: Máquina parada
+- `DESATIVADA`: Máquina desativada permanentemente
+
+### Tipos de Manutenção
+- `PREVENTIVA`: Manutenção preventiva agendada
+- `CORRETIVA`: Manutenção corretiva por falha
+- `PREDITIVA`: Manutenção preditiva baseada em condições
+- `LUBRIFICACAO`: Lubrificação programada
+- `CALIBRACAO`: Calibração de equipamentos
+- `OUTRA`: Outro tipo de manutenção
 
 ### Prioridades
 - `BAIXA`: Baixa prioridade

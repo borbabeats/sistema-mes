@@ -12,7 +12,9 @@ export interface IManutencoesRepository {
     responsavelId?: number;
     dataInicio?: Date;
     dataFim?: Date;
-  }): Promise<Manutencao[]>;
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: Manutencao[]; total: number }>;
   update(id: number, data: UpdateManutencaoData): Promise<Manutencao>;
   delete(id: number): Promise<void>;
 
@@ -20,8 +22,11 @@ export interface IManutencoesRepository {
   findByMaquina(maquinaId: number): Promise<Manutencao[]>;
   findByStatus(status: StatusManutencao): Promise<Manutencao[]>;
   findAgendadas(): Promise<Manutencao[]>;
+  findAgendadasPaginated(page: number, limit: number): Promise<{ data: Manutencao[]; total: number }>;
   findEmAndamento(): Promise<Manutencao[]>;
+  findEmAndamentoPaginated(page: number, limit: number): Promise<{ data: Manutencao[]; total: number }>;
   findAtrasadas(): Promise<Manutencao[]>;
+  findAtrasadasPaginated(page: number, limit: number): Promise<{ data: Manutencao[]; total: number }>;
 
   // Histórico
   createHistorico(data: {

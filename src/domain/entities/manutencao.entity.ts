@@ -30,6 +30,8 @@ export interface Manutencao {
   observacoes?: string;
   createdAt: Date;
   updatedAt: Date;
+  maquina?: any;
+  responsavel?: any;
 }
 
 export interface CreateManutencaoData {

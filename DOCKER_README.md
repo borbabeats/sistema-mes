@@ -40,12 +40,6 @@ docker-compose down
 - **Password:** mes123
 - **Root Password:** root123
 
-#### Adminer (Interface Web):
-- **URL:** http://localhost:8080 (produção) ou http://localhost:8081 (desenvolvimento)
-- **Server:** mysql
-- **Username:** mes_user
-- **Password:** mes123
-- **Database:** mes_system
 
 ### Configuração no Projeto
 
@@ -94,8 +88,6 @@ docker-compose down -v
 
 - **3306:** MySQL (produção)
 - **3307:** MySQL (desenvolvimento)
-- **8080:** Adminer (produção)
-- **8081:** Adminer (desenvolvimento)
 
 ### Volume de Dados
 

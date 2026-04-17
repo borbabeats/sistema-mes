@@ -11,9 +11,10 @@ import { MaquinasModule } from './modules/maquinas/maquinas.module';
 import { ManutencoesModule } from './modules/manutencoes/manutencoes.module';
 import { SharedModule } from './modules/shared/shared.module';
 import { LoggerModule } from './logger/logger.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
-  imports: [LoggerModule, PrismaModule, SharedModule, AuthModule, UsersModule, SetoresModule, OrdensProducaoModule, ApontamentosModule, MaquinasModule, ManutencoesModule],
+  imports: [LoggerModule, PrismaModule, SharedModule, AuthModule, UsersModule, SetoresModule, OrdensProducaoModule, ApontamentosModule, MaquinasModule, ManutencoesModule, DashboardModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -18,18 +18,18 @@ import {
   ApiResponse, 
   ApiBearerAuth,
   ApiQuery,
-  ApiParam
 } from '@nestjs/swagger';
-import { AgendarManutencaoUseCase } from '../../application/use-cases/manutencoes/agendar-manutencao.use-case';
 import { ListarManutencoesUseCase } from '../../application/use-cases/manutencoes/listar-manutencoes.use-case';
+import { AgendarManutencaoUseCase } from '../../application/use-cases/manutencoes/agendar-manutencao.use-case';
 import { CancelarManutencaoUseCase } from '../../application/use-cases/manutencoes/cancelar-manutencao.use-case';
 import { AgendarManutencaoDto } from '../../presentation/dto/maquinas/agendar-manutencao.dto';
 import { CancelarManutencaoDto } from '../../presentation/dto/maquinas/cancelar-manutencao.dto';
+import { PaginationDto } from '../../presentation/dto/pagination.dto';
+import { Cargo } from '../../domain/entities/usuario.entity';
 import { StatusManutencao } from '../../domain/entities/manutencao.entity';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import { Cargo } from '../../domain/entities/usuario.entity';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @ApiBearerAuth()
 @ApiTags('manutenções')
@@ -73,8 +73,23 @@ export class ManutencoesController {
   @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
   @ApiOperation({ summary: 'Lista manutenções agendadas' })
   @ApiResponse({ status: 200, description: 'Lista de manutenções agendadas retornada com sucesso' })
-  async findAgendadas() {
-    return this.listarManutencoesUseCase.findAgendadas();
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async findAgendadas(@Query() pagination: PaginationDto) {
+    const { page = 1, limit = 10 } = pagination;
+    const result = await this.listarManutencoesUseCase.findAgendadasPaginated(page, limit);
+    
+    return {
+      data: result.data,
+      pagination: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+        hasNext: page * limit < result.total,
+        hasPrev: page > 1,
+      },
+    };
   }
 
   @Get('em-andamento')
@@ -89,8 +104,23 @@ export class ManutencoesController {
   @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
   @ApiOperation({ summary: 'Lista manutenções atrasadas' })
   @ApiResponse({ status: 200, description: 'Lista de manutenções atrasadas retornada com sucesso' })
-  async findAtrasadas() {
-    return this.listarManutencoesUseCase.findAtrasadas();
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async findAtrasadas(@Query() pagination: PaginationDto) {
+    const { page = 1, limit = 10 } = pagination;
+    const result = await this.listarManutencoesUseCase.findAtrasadasPaginated(page, limit);
+    
+    return {
+      data: result.data,
+      pagination: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+        hasNext: page * limit < result.total,
+        hasPrev: page > 1,
+      },
+    };
   }
 
   @Post()
@@ -100,7 +130,11 @@ export class ManutencoesController {
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
   async agendar(@Body() agendarManutencaoDto: AgendarManutencaoDto) {
-    return this.agendarManutencaoUseCase.execute(agendarManutencaoDto);
+    const result = await this.agendarManutencaoUseCase.execute(agendarManutencaoDto);
+    return {
+      message: 'Manutenção agendada com sucesso',
+      data: result.manutencao
+    };
   }
 
   @Patch(':id/cancelar')
