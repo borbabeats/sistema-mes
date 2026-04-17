@@ -1,40 +1,60 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsDate, IsNotEmpty } from 'class-validator';
-import { TipoManutencao } from '../../../domain/entities/maquina.entity';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsOptional, IsEnum, IsDate, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
+import { TipoManutencao } from '../../../domain/entities/manutencao.entity';
 
 export class IniciarManutencaoDto {
-  @ApiProperty({
+  @ApiProperty({ 
     description: 'Tipo da manutenção',
-    enum: TipoManutencao,
-    example: TipoManutencao.PREVENTIVA,
+    enum: TipoManutencao 
   })
-  @IsNotEmpty()
-  @IsString()
+  @IsEnum(TipoManutencao)
   tipo: TipoManutencao;
 
-  @ApiProperty({
-    description: 'Descrição da manutenção',
-    example: 'Manutenção preventiva mensal da máquina',
+  @ApiProperty({ 
+    description: 'Descrição detalhada da manutenção' 
   })
-  @IsNotEmpty()
   @IsString()
   descricao: string;
 
-  @ApiProperty({
-    description: 'Previsão de término da manutenção',
-    example: '2024-02-01T18:00:00Z',
-    required: false,
+  @ApiPropertyOptional({ 
+    description: 'Data agendada para a manutenção',
+    type: Date 
   })
   @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  dataAgendada?: Date;
+
+  @ApiPropertyOptional({ 
+    description: 'Previsão de término da manutenção',
+    type: Date 
+  })
+  @IsOptional()
+  @Type(() => Date)
   @IsDate()
   previsaoTermino?: Date;
 
-  @ApiProperty({
-    description: 'Responsável pela manutenção',
-    example: 'João Silva',
-    required: false,
+  @ApiPropertyOptional({ 
+    description: 'ID do responsável pela manutenção',
+    type: Number 
+  })
+  @IsOptional()
+  @IsNumber()
+  responsavelId?: number;
+
+  @ApiPropertyOptional({ 
+    description: 'Custo estimado da manutenção',
+    type: Number 
+  })
+  @IsOptional()
+  @IsNumber()
+  custoEstimado?: number;
+
+  @ApiPropertyOptional({ 
+    description: 'Observações adicionais' 
   })
   @IsOptional()
   @IsString()
-  responsavel?: string;
+  observacoes?: string;
 }

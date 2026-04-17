@@ -33,6 +33,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { Cargo } from '../../domain/entities/usuario.entity';
+import { ListarManutencoesUseCase } from '../../application/use-cases/manutencoes/listar-manutencoes.use-case';
 
 @ApiBearerAuth()
 @ApiTags('máquinas')
@@ -44,6 +45,7 @@ export class MaquinasController {
     private readonly iniciarManutencaoUseCase: IniciarManutencaoUseCase,
     private readonly finalizarManutencaoUseCase: FinalizarManutencaoUseCase,
     private readonly maquinasService: MaquinasService,
+    private readonly listarManutencoesUseCase: ListarManutencoesUseCase,
   ) {}
 
   // Rotas para Máquinas
@@ -55,7 +57,7 @@ export class MaquinasController {
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 409, description: 'Código de máquina já existe' })
   create(@Body() createMaquinaDto: CreateMaquinaDto) {
-    return this.createMaquinaUseCase.execute(createMaquinaDto);
+    return this.maquinasService.create(createMaquinaDto);
   }
 
   @Get()
@@ -119,10 +121,10 @@ export class MaquinasController {
   @Post(':id/manutencoes')
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
   @ApiOperation({ summary: 'Inicia uma manutenção para uma máquina' })
-  @ApiResponse({ status: 200, description: 'Manutenção iniciada com sucesso', type: Maquina })
+  @ApiResponse({ status: 200, description: 'Manutenção iniciada com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos ou máquina não pode entrar em manutenção' })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
-  iniciarManutencao(
+  async iniciarManutencao(
     @Param('id', ParseIntPipe) maquinaId: number,
     @Body() iniciarManutencaoDto: IniciarManutencaoDto,
   ) {
@@ -132,13 +134,22 @@ export class MaquinasController {
   @Patch(':id/manutencoes/finalizar')
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
   @ApiOperation({ summary: 'Finaliza a manutenção de uma máquina' })
-  @ApiResponse({ status: 200, description: 'Manutenção finalizada com sucesso', type: Maquina })
+  @ApiResponse({ status: 200, description: 'Manutenção finalizada com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos ou máquina não está em manutenção' })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
-  finalizarManutencao(
+  async finalizarManutencao(
     @Param('id', ParseIntPipe) maquinaId: number,
     @Body() finalizarManutencaoDto: FinalizarManutencaoDto,
   ) {
     return this.finalizarManutencaoUseCase.execute(maquinaId, finalizarManutencaoDto);
+  }
+
+  @Get(':id/manutencoes')
+  @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
+  @ApiOperation({ summary: 'Lista manutenções de uma máquina específica' })
+  @ApiResponse({ status: 200, description: 'Lista de manutenções da máquina retornada com sucesso' })
+  @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
+  async listarManutencoes(@Param('id', ParseIntPipe) id: number) {
+    return this.listarManutencoesUseCase.findByMaquina(id);
   }
 }
