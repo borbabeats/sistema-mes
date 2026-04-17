@@ -1,6 +1,6 @@
 services:
   sistema-mes-api:
-    build: .
+    image: sistema-mes-api:latest
     container_name: sistema-mes-api
     restart: unless-stopped
     ports:

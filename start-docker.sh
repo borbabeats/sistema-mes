@@ -21,9 +21,13 @@ if ! docker network ls | grep -q "apps-network"; then
     docker network create apps-network
 fi
 
+# Build da imagem manualmente (sem buildx)
+echo "Build da imagem Docker..."
+docker build -t sistema-mes-api:latest .
+
 # Iniciar container em foreground (modo attached)
 echo "Iniciando Sistema MES API..."
-docker compose up --build
+docker compose up
 
 # Se chegou aqui, o container parou
 echo "Container parado, finalizando..."
