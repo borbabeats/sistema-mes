@@ -2,9 +2,9 @@ module.exports = {
   apps: [
     {
       name: 'sistema-mes-api',
-      script: 'docker-compose up',
-      cwd: '/apps/sistema-mes',
-      interpreter: '/bin/bash',
+      script: './start-docker.sh',
+      cwd: '/opt/sistema-mes',
+      interpreter: 'none',
       instances: 1,
       autorestart: true,
       watch: false,
