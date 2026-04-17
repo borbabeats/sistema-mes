@@ -8,7 +8,7 @@ cd /opt/sistema-mes
 # Função para cleanup ao receber sinal de terminação
 cleanup() {
     echo "Recebido sinal de terminação, parando container..."
-    docker-compose down
+    docker compose down
     exit 0
 }
 
@@ -23,7 +23,7 @@ fi
 
 # Iniciar container em foreground (modo attached)
 echo "Iniciando Sistema MES API..."
-docker-compose up --build
+docker compose up --build
 
 # Se chegou aqui, o container parou
 echo "Container parado, finalizando..."
