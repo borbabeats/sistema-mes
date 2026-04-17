@@ -64,33 +64,29 @@ jobs:
           command_timeout: 60s
           script: |
             # Entrar no diretório do projeto
-            cd /opt/sistema-mes
-            
-            # Fazer backup do código atual
-            if [ -d ".git" ]; then
-              cp -r .git ../sistema-mes-backup-$(date +%Y%m%d_%H%M%S)
-            fi
+            cd /apps/sistema-mes
             
             # Fazer pull das atualizações
             git pull origin main
             
-            # Instalar novas dependências
-            npm ci --production
+            # Parar container atual
+            docker-compose down
             
-            # Gerar Prisma client
-            npx prisma generate
+            # Remover imagens antigas para economizar espaço
+            docker system prune -f
             
-            # Rodar migrações do banco (se necessário)
-            # npx prisma migrate deploy
+            # Build e iniciar nova versão
+            docker-compose build --no-cache
+            docker-compose up -d
             
-            # Reiniciar aplicação com PM2
-            pm2 restart sistema-mes
+            # Aguardar container iniciar
+            sleep 30
             
             # Verificar status
-            pm2 status
+            docker-compose ps
             
             # Mostrar logs recentes
-            pm2 logs sistema-mes --lines 20
+            docker-compose logs --tail=20
 
   health-check:
     needs: deploy

@@ -1,10 +1,35 @@
 version: '3.8'
 
 services:
+  sistema-mes-api:
+    build: .
+    container_name: sistema-mes-api-dev
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    networks:
+      - dev-network
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   mysql:
     image: mysql:8.0
-    container_name: sistema_mes_mysql_dev
-    restart: always
+    container_name: sistema-mes-mysql-dev
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: mes_system
@@ -14,13 +39,13 @@ services:
       - "3307:3306"
     volumes:
       - mysql_dev_data:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
-      - mes_dev_network
+      - dev-network
+    command: --default-authentication-plugin=mysql_native_password
+
+networks:
+  dev-network:
+    driver: bridge
 
 volumes:
   mysql_dev_data:
-
-networks:
-  mes_dev_network:
-    driver: bridge
