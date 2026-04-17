@@ -1,0 +1,119 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm run test
+      
+      - name: Run linting
+        run: npm run lint
+      
+      - name: Build application
+        run: npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          timeout: 300s
+          command_timeout: 60s
+          script: |
+            # Entrar no diretório do projeto
+            cd /opt/sistema-mes
+            
+            # Fazer backup do código atual
+            if [ -d ".git" ]; then
+              cp -r .git ../sistema-mes-backup-$(date +%Y%m%d_%H%M%S)
+            fi
+            
+            # Fazer pull das atualizações
+            git pull origin main
+            
+            # Instalar novas dependências
+            npm ci --production
+            
+            # Gerar Prisma client
+            npx prisma generate
+            
+            # Rodar migrações do banco (se necessário)
+            # npx prisma migrate deploy
+            
+            # Reiniciar aplicação com PM2
+            pm2 restart sistema-mes
+            
+            # Verificar status
+            pm2 status
+            
+            # Mostrar logs recentes
+            pm2 logs sistema-mes --lines 20
+
+  health-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+      
+      - name: Health Check
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}:3000/health)
+          if [ $response -eq 200 ]; then
+            echo "✅ Health check passed - Application is responding"
+          else
+            echo "❌ Health check failed - Status code: $response"
+            exit 1
+          fi
+      
+      - name: API Documentation Check
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}:3000/api)
+          if [ $response -eq 200 ]; then
+            echo "✅ API documentation is accessible"
+          else
+            echo "❌ API documentation check failed - Status code: $response"
+            exit 1
+          fi

@@ -30,7 +30,11 @@
     "docker:down": "docker-compose -f docker-compose.dev.yml down",
     "docker:logs": "docker-compose -f docker-compose.dev.yml logs -f",
     "docker:down-v": "docker-compose -f docker-compose.dev.yml down -v",
-    "prisma:seed": "npx prisma db seed --schema=./prisma/schema.prisma"
+    "prisma:seed": "npx prisma db seed --schema=./prisma/schema.prisma",
+    "docker:build": "docker build -t sistema-mes .",
+    "docker:run": "docker run -p 3000:3000 sistema-mes",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
+    "docker:prod-down": "docker-compose -f docker-compose.prod.yml down"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
