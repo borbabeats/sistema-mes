@@ -13,9 +13,9 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: '3000'
       },
-      error_file: './logs/pm2-error.log',
-      out_file: './logs/pm2-out.log',
-      log_file: './logs/pm2-combined.log',
+      error_file: '/tmp/pm2-sistema-mes-error.log',
+      out_file: '/tmp/pm2-sistema-mes-out.log',
+      log_file: '/tmp/pm2-sistema-mes-combined.log',
       time: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
