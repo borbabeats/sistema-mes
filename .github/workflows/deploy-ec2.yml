@@ -80,10 +80,10 @@ jobs:
             sleep 30
             
             # Verificar status
-            docker-compose ps
+            docker compose ps
             
             # Mostrar logs recentes
-            docker-compose logs --tail=20
+            docker compose logs --tail=20
 
   health-check:
     needs: deploy
