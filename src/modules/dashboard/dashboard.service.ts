@@ -325,14 +325,14 @@ export class DashboardService {
       planejado: number;
     }[] = [];
     const mapaProduzido = new Map(
-      producaoDiaria.map((item) => [
-        item.data.toISOString().split('T')[0],
+      (producaoDiaria as any[]).map((item) => [
+        (item.data as Date).toISOString().split('T')[0],
         Number(item.produzido),
       ]),
     );
     const mapaPlanejado = new Map(
-      producaoPlanejadaDiaria.map((item) => [
-        item.data.toISOString().split('T')[0],
+      (producaoPlanejadaDiaria as any[]).map((item) => [
+        (item.data as Date).toISOString().split('T')[0],
         Number(item.planejado),
       ]),
     );
@@ -344,8 +344,8 @@ export class DashboardService {
 
       dadosCombinados.push({
         data: dataStr,
-        produzido: mapaProduzido.get(dataStr) || 0,
-        planejado: mapaPlanejado.get(dataStr) || 0,
+        produzido: (mapaProduzido.get(dataStr) as number) || 0,
+        planejado: (mapaPlanejado.get(dataStr) as number) || 0,
       });
     }
 
@@ -385,7 +385,7 @@ export class DashboardService {
       ORDER BY produzido DESC
     `;
 
-    return producaoPorSetor.map((item) => ({
+    return (producaoPorSetor as any[]).map((item) => ({
       setor: item.setor,
       produzido: Number(item.produzido),
     }));
@@ -429,9 +429,9 @@ export class DashboardService {
       ORDER BY data ASC
     `;
 
-    return tendenciaQualidade.map((item) => ({
-      data: item.data.toISOString().split('T')[0],
-      taxaQualidade: Number(item.taxaQualidade.toFixed(2)),
+    return (tendenciaQualidade as any[]).map((item) => ({
+      data: (item.data as Date).toISOString().split('T')[0],
+      taxaQualidade: Number((item.taxaQualidade as number).toFixed(2)),
     }));
   }
 
@@ -523,10 +523,10 @@ export class DashboardService {
       LIMIT 5
     `;
 
-    return topProdutos.map((item) => ({
+    return (topProdutos as any[]).map((item) => ({
       produto: item.produto,
       quantidade: Number(item.quantidade),
-      qualidade: Number(item.qualidade.toFixed(2)),
+      qualidade: Number((item.qualidade as number).toFixed(2)),
     }));
   }
 
@@ -566,9 +566,9 @@ export class DashboardService {
       const dataStr = data.toISOString().split('T')[0];
 
       turnos.forEach((turno) => {
-        const producao = producaoPorTurno.find(
+        const producao = (producaoPorTurno as any[]).find(
           (item) =>
-            item.data.toISOString().split('T')[0] === dataStr &&
+            (item.data as Date).toISOString().split('T')[0] === dataStr &&
             item.turno === turno,
         );
 
@@ -709,14 +709,14 @@ export class DashboardService {
       LIMIT 10
     `;
 
-    return eficienciaOperadores.map((item, index) => ({
+    return (eficienciaOperadores as any[]).map((item, index) => ({
       posicao: index + 1,
       nome: item.nome,
       cargo: item.cargo,
       totalApontamentos: Number(item.totalApontamentos),
       totalProduzido: Number(item.totalProduzido),
-      mediaProducao: Number(item.mediaProducao?.toFixed(2) || 0),
-      taxaQualidade: Number(item.taxaQualidade.toFixed(2)),
+      mediaProducao: Number((item.mediaProducao as number)?.toFixed(2) || 0),
+      taxaQualidade: Number((item.taxaQualidade as number).toFixed(2)),
     }));
   }
 }
