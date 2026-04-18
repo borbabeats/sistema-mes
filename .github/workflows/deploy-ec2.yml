@@ -39,17 +39,25 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
+      - name: Get runner public IP
+        id: ip
+        uses: haythem/public-ip@v1.3
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          node-version: '24'
-          cache: 'npm'
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
       
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Build application
-        run: npm run build
+      - name: Add runner IP to Security Group
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id sg-0f8a9c2b1d3e4f5a6 \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32 \
+            --description "GitHub Actions runner temporary access"
       
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.1.0
@@ -90,6 +98,15 @@ jobs:
             
             # Mostrar logs recentes
             docker compose logs --tail=20
+      
+      - name: Remove runner IP from Security Group
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id sg-0f8a9c2b1d3e4f5a6 \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
   health-check:
     needs: deploy
