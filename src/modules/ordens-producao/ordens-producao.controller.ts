@@ -153,7 +153,6 @@ export class OrdensProducaoController {
     return this.ordensProducaoService.atualizarProducao(
       id,
       quantidade,
-      defeitos,
     );
   }
 }
