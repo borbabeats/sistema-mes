@@ -57,8 +57,7 @@ jobs:
             --group-id sg-097e19a6935ebaca8 \
             --protocol tcp \
             --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32 \
-            --description "GitHub Actions runner temporary access"
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
       
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.1.0
