@@ -64,20 +64,19 @@ jobs:
           command_timeout: 60s
           script: |
             # Entrar no diretório do projeto
-            cd /apps/sistema-mes
+            cd /opt/sistema-mes
             
             # Fazer pull das atualizações
             git pull origin main
             
-            # Parar container atual
-            docker-compose down
+            # Parar containers PM2
+            pm2 stop all
             
             # Remover imagens antigas para economizar espaço
             docker system prune -f
             
-            # Build e iniciar nova versão
-            docker-compose build --no-cache
-            docker-compose up -d
+            # Iniciar PM2 (vai fazer build via script)
+            pm2 start ecosystem.config.js
             
             # Aguardar container iniciar
             sleep 30
