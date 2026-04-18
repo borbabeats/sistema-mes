@@ -35,7 +35,13 @@
     "docker:build": "docker build -t sistema-mes .",
     "docker:run": "docker run -p 3000:3000 sistema-mes",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
-    "docker:prod-down": "docker-compose -f docker-compose.prod.yml down"
+    "docker:prod-down": "docker-compose -f docker-compose.prod.yml down",
+    "db:setup": "./scripts/setup-rds-database.sh $DATABASE_URL",
+    "db:reset": "mysql -h $(echo $DATABASE_URL | sed -n 's/.*@\\([^:]*\\):.*/\\1/p') -P $(echo $DATABASE_URL | sed -n 's/.*:\\([0-9]*\\)\\/\\.*/\\1/p') -u $(echo $DATABASE_URL | sed -n 's/\\/\\/\\([^:]*\\):.*/\\1/p') -p$(echo $DATABASE_URL | sed -n 's/.*:\\([^@]*\\)@.*/\\1/p') < scripts/reset-database.sql",
+    "db:migrate": "DATABASE_URL=\"$DATABASE_URL\" npx prisma migrate deploy",
+    "db:generate": "DATABASE_URL=\"$DATABASE_URL\" npx prisma generate",
+    "db:seed": "DATABASE_URL=\"$DATABASE_URL\" npm run seed",
+    "db:full": "npm run db:reset && npm run db:migrate && npm run db:generate && npm run db:seed"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
