@@ -110,12 +110,16 @@ jobs:
       - name: Remove runner IP from Security Group
         if: always()
         run: |
-          aws ec2 revoke-security-group-ingress \
-            --region us-east-1 \
-            --group-id sg-097e19a6935ebaca8 \
-            --protocol tcp \
-            --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          if [ -n "${{ steps.ip.outputs.ipv4 }}" ]; then
+            aws ec2 revoke-security-group-ingress \
+              --region us-east-1 \
+              --group-id sg-097e19a6935ebaca8 \
+              --protocol tcp \
+              --port 22 \
+              --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          else
+            echo "No IP to remove from Security Group"
+          fi
 
   health-check:
     needs: deploy
