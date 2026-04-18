@@ -54,11 +54,10 @@ jobs:
           echo "Found EC2 IP: $IP"
       
       - name: Update EC2_HOST secret
-        uses: peter-murray/create-or-update-secret@v4
-        with:
-          name: EC2_HOST
-          value: ${{ steps.get-ip.outputs.IP }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "${{ steps.get-ip.outputs.IP }}" | gh secret set EC2_HOST
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     needs: [test, update-ec2-host]
