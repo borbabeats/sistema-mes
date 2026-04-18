@@ -37,10 +37,10 @@
     "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
     "docker:prod-down": "docker-compose -f docker-compose.prod.yml down",
     "db:setup": "./scripts/setup-rds-database.sh $DATABASE_URL",
-    "db:reset": "source $(pwd)/.env && if [ -z \"$DATABASE_URL\" ]; then echo 'DATABASE_URL is not set'; exit 1; fi; node -e \"const url = process.env.DATABASE_URL; const match = url.match(/mysql:\\/\\/(.*):(.*)@(.+):(.*)\\/(.+)/); if (match) { const [, user, pass, host, port, db] = match; console.log('mysql -h ' + host + ' -P ' + port + ' -u ' + user + ' -p' + pass + ' < scripts/reset-database.sql'); } else { console.error('Invalid DATABASE_URL format'); process.exit(1); }\" | bash",
+    "db:reset": "source $(pwd)/.env && if [ -z \"$DATABASE_URL\" ]; then echo 'DATABASE_URL is not set'; exit 1; fi; DATABASE_URL=\"$DATABASE_URL\" node -e \"const url = process.env.DATABASE_URL; const match = url.match(/mysql:\\/\\/(.*):(.*)@(.+):(.*)\\/(.+)/); if (match) { const [, user, pass, host, port, db] = match; console.log('mysql -h ' + host + ' -P ' + port + ' -u ' + user + ' -p' + pass + ' < scripts/reset-database.sql'); } else { console.error('Invalid DATABASE_URL format'); process.exit(1); }\" | bash",
     "db:migrate": "source $(pwd)/.env && DATABASE_URL=\"$DATABASE_URL\" npx prisma migrate deploy",
     "db:generate": "source $(pwd)/.env && DATABASE_URL=\"$DATABASE_URL\" npx prisma generate",
-    "db:seed": "source $(pwd)/.env && DATABASE_URL=\"$DATABASE_URL\" npm run seed",
+    "db:seed": "source $(pwd)/.env && DATABASE_URL=\"$DATABASE_URL\" npx ts-node prisma/seed.ts",
     "db:full": "npm run db:reset && npm run db:migrate && npm run db:generate && npm run db:seed"
   },
   "dependencies": {
