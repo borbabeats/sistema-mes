@@ -54,12 +54,11 @@ jobs:
           echo "Found EC2 IP: $IP"
       
       - name: Update EC2_HOST secret
-        uses: peter-evans/create-or-update-secret@v3
+        uses: peter-murray/create-or-update-secret@v4
         with:
-          secret: EC2_HOST
+          name: EC2_HOST
+          value: ${{ steps.get-ip.outputs.IP }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          repository: borbabeats/sistema-mes
-          secret-value: ${{ steps.get-ip.outputs.IP }}
 
   deploy:
     needs: [test, update-ec2-host]
