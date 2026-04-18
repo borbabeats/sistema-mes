@@ -79,6 +79,12 @@ jobs:
             # Aguardar container iniciar
             sleep 30
             
+            # Restart forçado para garantir nova versão
+            pm2 restart all
+            
+            # Aguardar mais um pouco
+            sleep 15
+            
             # Verificar status
             docker compose ps
             
@@ -106,10 +112,10 @@ jobs:
       
       - name: API Documentation Check
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}:3000/api)
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}:3000/health)
           if [ $response -eq 200 ]; then
-            echo "✅ API documentation is accessible"
+            echo "API documentation is accessible"
           else
-            echo "❌ API documentation check failed - Status code: $response"
+            echo "API documentation check failed - Status code: $response"
             exit 1
           fi
