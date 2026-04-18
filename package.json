@@ -102,9 +102,6 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "prisma": {
-      "seed": "ts-node prisma/seed.ts"
-    },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
