@@ -54,5 +54,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node healthcheck.js
 
-# Start the application
-CMD ["npm", "run", "start:prod"]
+# Start the application (NestJS outputs to dist/src/ instead of dist/)
+CMD ["node", "dist/src/main.js"]
