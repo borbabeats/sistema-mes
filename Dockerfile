@@ -24,6 +24,9 @@ RUN ls -la dist/
 # Production stage
 FROM node:18-alpine AS production
 
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nestjs -u 1001
