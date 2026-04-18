@@ -7,7 +7,10 @@ import { UsersModule } from '../users/users.module';
 import { ApontamentosModule } from '../apontamentos/apontamentos.module';
 import { OrdensProducaoRepository } from '../../infrastructure/repositories/ordens-producao/ordens-producao.repository';
 import { LoggerModule } from '../../logger/logger.module';
-import { ORDENS_PRODUCAO_REPOSITORY_TOKEN, ORDEM_PRODUCAO_STATUS_LOG_REPOSITORY_TOKEN } from './constants';
+import {
+  ORDENS_PRODUCAO_REPOSITORY_TOKEN,
+  ORDEM_PRODUCAO_STATUS_LOG_REPOSITORY_TOKEN,
+} from './constants';
 import { CreateOrdemProducaoUseCase } from '../../application/use-cases/ordens-producao/create-ordem-producao.use-case';
 import { FindOrdemProducaoUseCase } from '../../application/use-cases/ordens-producao/find-ordem-producao.use-case';
 import { FindAllOrdensProducaoUseCase } from '../../application/use-cases/ordens-producao/find-all-ordens-producao.use-case';
@@ -31,7 +34,13 @@ import { CancelarProducaoUseCase } from '../../application/use-cases/ordens-prod
 import { OrdemProducaoStatusLogRepository } from '../../infrastructure/repositories/ordens-producao-status-log/ordens-producao-status-log.repository';
 
 @Module({
-  imports: [PrismaModule, SetoresModule, UsersModule, LoggerModule, forwardRef(() => ApontamentosModule)],
+  imports: [
+    PrismaModule,
+    SetoresModule,
+    UsersModule,
+    LoggerModule,
+    forwardRef(() => ApontamentosModule),
+  ],
   controllers: [OrdensProducaoController],
   providers: [
     OrdensProducaoService,
@@ -64,6 +73,30 @@ import { OrdemProducaoStatusLogRepository } from '../../infrastructure/repositor
       useClass: OrdemProducaoStatusLogRepository,
     },
   ],
-  exports: [OrdensProducaoService, ORDENS_PRODUCAO_REPOSITORY_TOKEN, ORDEM_PRODUCAO_STATUS_LOG_REPOSITORY_TOKEN, CreateOrdemProducaoUseCase, FindOrdemProducaoUseCase, FindAllOrdensProducaoUseCase, FindAllOrdensProducaoPaginatedUseCase, ChangeStatusOrdemProducaoUseCase, IniciarProducaoUseCase, FinalizarProducaoUseCase, PausarProducaoUseCase, RetomarProducaoUseCase, CancelarProducaoUseCase, UpdateOrdemProducaoUseCase, DeleteOrdemProducaoUseCase, UpdateQuantidadeProduzidaUseCase, FindByCodigoUseCase, FindByStatusUseCase, FindByPrioridadeUseCase, FindBySetorUseCase, FindByResponsavelUseCase, FindOverdueUseCase, FindPendingUseCase],
+  exports: [
+    OrdensProducaoService,
+    ORDENS_PRODUCAO_REPOSITORY_TOKEN,
+    ORDEM_PRODUCAO_STATUS_LOG_REPOSITORY_TOKEN,
+    CreateOrdemProducaoUseCase,
+    FindOrdemProducaoUseCase,
+    FindAllOrdensProducaoUseCase,
+    FindAllOrdensProducaoPaginatedUseCase,
+    ChangeStatusOrdemProducaoUseCase,
+    IniciarProducaoUseCase,
+    FinalizarProducaoUseCase,
+    PausarProducaoUseCase,
+    RetomarProducaoUseCase,
+    CancelarProducaoUseCase,
+    UpdateOrdemProducaoUseCase,
+    DeleteOrdemProducaoUseCase,
+    UpdateQuantidadeProduzidaUseCase,
+    FindByCodigoUseCase,
+    FindByStatusUseCase,
+    FindByPrioridadeUseCase,
+    FindBySetorUseCase,
+    FindByResponsavelUseCase,
+    FindOverdueUseCase,
+    FindPendingUseCase,
+  ],
 })
 export class OrdensProducaoModule {}

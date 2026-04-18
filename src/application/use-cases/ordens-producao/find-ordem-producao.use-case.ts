@@ -6,7 +6,8 @@ import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../modules/ordens-produc
 @Injectable()
 export class FindOrdemProducaoUseCase {
   constructor(
-    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN) private readonly ordensProducaoRepository: IOrdensProducaoRepository,
+    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN)
+    private readonly ordensProducaoRepository: IOrdensProducaoRepository,
   ) {}
 
   async execute(id: number): Promise<OrdemProducao | null> {

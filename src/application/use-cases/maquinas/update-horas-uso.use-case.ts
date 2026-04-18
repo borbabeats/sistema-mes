@@ -6,7 +6,8 @@ import { MAQUINAS_REPOSITORY_TOKEN } from '../../../domain/repositories/maquinas
 @Injectable()
 export class UpdateHorasUsoUseCase {
   constructor(
-    @Inject(MAQUINAS_REPOSITORY_TOKEN) private readonly maquinasRepository: IMaquinasRepository,
+    @Inject(MAQUINAS_REPOSITORY_TOKEN)
+    private readonly maquinasRepository: IMaquinasRepository,
   ) {}
 
   async execute(id: number, horasAdicionais: number): Promise<Maquina> {
@@ -22,11 +23,16 @@ export class UpdateHorasUsoUseCase {
     }
 
     if (horasAdicionais > 24) {
-      throw new Error('Não é possível adicionar mais de 24 horas em um único registro');
+      throw new Error(
+        'Não é possível adicionar mais de 24 horas em um único registro',
+      );
     }
 
     // Atualizar horas de uso
-    const updatedMaquina = await this.maquinasRepository.updateHorasUso(id, horasAdicionais);
+    const updatedMaquina = await this.maquinasRepository.updateHorasUso(
+      id,
+      horasAdicionais,
+    );
 
     return updatedMaquina;
   }

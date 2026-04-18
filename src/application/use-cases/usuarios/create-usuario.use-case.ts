@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IUsuariosRepository, CreateUsuarioData } from '../../../domain/repositories/usuarios.repository.interface';
+import {
+  IUsuariosRepository,
+  CreateUsuarioData,
+} from '../../../domain/repositories/usuarios.repository.interface';
 import { FindSetorUseCase } from '../setores/find-setor.use-case';
 import { Usuario, Cargo } from '../../../domain/entities/usuario.entity';
 import { USUARIOS_REPOSITORY_TOKEN } from '../../../modules/users/constants';
@@ -7,14 +10,17 @@ import { USUARIOS_REPOSITORY_TOKEN } from '../../../modules/users/constants';
 @Injectable()
 export class CreateUsuarioUseCase {
   constructor(
-    @Inject(USUARIOS_REPOSITORY_TOKEN) private readonly usuariosRepository: IUsuariosRepository,
+    @Inject(USUARIOS_REPOSITORY_TOKEN)
+    private readonly usuariosRepository: IUsuariosRepository,
     private readonly findSetorUseCase: FindSetorUseCase,
   ) {}
 
   async execute(data: CreateUsuarioData): Promise<Usuario> {
     // Verificar se o email já existe (se fornecido)
     if (data.email) {
-      const existingUsuario = await this.usuariosRepository.findByEmail(data.email);
+      const existingUsuario = await this.usuariosRepository.findByEmail(
+        data.email,
+      );
       if (existingUsuario) {
         throw new Error('Já existe um usuário com este email');
       }

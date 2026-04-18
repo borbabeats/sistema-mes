@@ -14,7 +14,19 @@ import { LoggerModule } from './logger/logger.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
-  imports: [LoggerModule, PrismaModule, SharedModule, AuthModule, UsersModule, SetoresModule, OrdensProducaoModule, ApontamentosModule, MaquinasModule, ManutencoesModule, DashboardModule],
+  imports: [
+    LoggerModule,
+    PrismaModule,
+    SharedModule,
+    AuthModule,
+    UsersModule,
+    SetoresModule,
+    OrdensProducaoModule,
+    ApontamentosModule,
+    MaquinasModule,
+    ManutencoesModule,
+    DashboardModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

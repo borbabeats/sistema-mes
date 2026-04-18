@@ -4,9 +4,7 @@ import { LoggerService } from './logger.service';
 import { loggerConfig } from './logger.config';
 
 @Module({
-  imports: [
-    WinstonModule.forRoot(loggerConfig),
-  ],
+  imports: [WinstonModule.forRoot(loggerConfig)],
   providers: [LoggerService],
   exports: [LoggerService, WinstonModule],
 })

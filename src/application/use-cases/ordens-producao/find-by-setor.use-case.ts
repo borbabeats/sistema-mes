@@ -7,7 +7,8 @@ import { FindSetorUseCase } from '../setores/find-setor.use-case';
 @Injectable()
 export class FindBySetorUseCase {
   constructor(
-    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN) private readonly ordensProducaoRepository: IOrdensProducaoRepository,
+    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN)
+    private readonly ordensProducaoRepository: IOrdensProducaoRepository,
     private readonly findSetorUseCase: FindSetorUseCase,
   ) {}
 

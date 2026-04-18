@@ -14,9 +14,9 @@ export class UsuarioResponseDto {
   @ApiProperty({ description: 'Telefone do usuário' })
   telefone: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Cargo do usuário',
-    enum: ['ADMIN', 'GERENTE', 'OPERADOR']
+    enum: ['ADMIN', 'GERENTE', 'OPERADOR'],
   })
   cargo?: Cargo;
 

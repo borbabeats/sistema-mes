@@ -6,7 +6,8 @@ import { MAQUINAS_REPOSITORY_TOKEN } from '../../../domain/repositories/maquinas
 @Injectable()
 export class FindByCodigoUseCase {
   constructor(
-    @Inject(MAQUINAS_REPOSITORY_TOKEN) private readonly maquinasRepository: IMaquinasRepository,
+    @Inject(MAQUINAS_REPOSITORY_TOKEN)
+    private readonly maquinasRepository: IMaquinasRepository,
   ) {}
 
   async execute(codigo: string): Promise<Maquina | null> {

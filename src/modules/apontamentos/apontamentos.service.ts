@@ -31,7 +31,9 @@ export class ApontamentosService {
     private readonly findByPeriodoUseCase: FindByPeriodoUseCase,
   ) {}
 
-  async create(createApontamentoDto: CreateApontamentoData): Promise<Apontamento> {
+  async create(
+    createApontamentoDto: CreateApontamentoData,
+  ): Promise<Apontamento> {
     return this.createApontamentoUseCase.execute(createApontamentoDto);
   }
 
@@ -39,13 +41,15 @@ export class ApontamentosService {
     return this.findAllApontamentosUseCase.execute(filters);
   }
 
-  async findAllPaginated(filters?: FindAllApontamentosDto): Promise<PaginatedResult<Apontamento>> {
+  async findAllPaginated(
+    filters?: FindAllApontamentosDto,
+  ): Promise<PaginatedResult<Apontamento>> {
     return this.findAllApontamentosPaginatedUseCase.execute(filters);
   }
 
   async findOne(id: number): Promise<Apontamento> {
     const apontamento = await this.findApontamentoUseCase.execute(id);
-    
+
     if (!apontamento) {
       throw new NotFoundException(`Apontamento com ID ${id} não encontrado`);
     }
@@ -77,7 +81,15 @@ export class ApontamentosService {
     return this.deleteApontamentoUseCase.execute(id);
   }
 
-  async finalizeApontamento(id: number, quantidadeProduzida?: number, quantidadeDefeito?: number): Promise<Apontamento> {
-    return this.finalizeApontamentoUseCase.execute(id, quantidadeProduzida, quantidadeDefeito);
+  async finalizeApontamento(
+    id: number,
+    quantidadeProduzida?: number,
+    quantidadeDefeito?: number,
+  ): Promise<Apontamento> {
+    return this.finalizeApontamentoUseCase.execute(
+      id,
+      quantidadeProduzida,
+      quantidadeDefeito,
+    );
   }
 }

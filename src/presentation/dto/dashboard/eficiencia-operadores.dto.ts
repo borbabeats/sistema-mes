@@ -16,9 +16,15 @@ export class EficienciaOperadoresDto {
   @ApiProperty({ description: 'Total produzido no período', example: 3500 })
   totalProduzido: number;
 
-  @ApiProperty({ description: 'Média de produção por apontamento', example: 77.8 })
+  @ApiProperty({
+    description: 'Média de produção por apontamento',
+    example: 77.8,
+  })
   mediaProducao: number;
 
-  @ApiProperty({ description: 'Taxa de qualidade em percentual', example: 98.5 })
+  @ApiProperty({
+    description: 'Taxa de qualidade em percentual',
+    example: 98.5,
+  })
   taxaQualidade: number;
 }

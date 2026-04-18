@@ -27,7 +27,8 @@ export class FindAllApontamentosDto extends FilterApontamentosDto {
   limit?: number = 20;
 
   @ApiPropertyOptional({
-    description: 'Campo para ordenação (ex: dataInicio, quantidadeProduzida, op.codigo, maquina.nome)',
+    description:
+      'Campo para ordenação (ex: dataInicio, quantidadeProduzida, op.codigo, maquina.nome)',
     type: String,
   })
   @IsOptional()
@@ -43,7 +44,8 @@ export class FindAllApontamentosDto extends FilterApontamentosDto {
   sortOrder?: 'ASC' | 'DESC' = 'DESC';
 
   @ApiPropertyOptional({
-    description: 'Termo de busca geral (busca em código da OP, nome da máquina, nome do usuário, produto)',
+    description:
+      'Termo de busca geral (busca em código da OP, nome da máquina, nome do usuário, produto)',
     type: String,
   })
   @IsOptional()
@@ -59,7 +61,8 @@ export class FindAllApontamentosDto extends FilterApontamentosDto {
   search?: string;
 
   @ApiPropertyOptional({
-    description: 'Campo específico para busca (legado - mantido para compatibilidade)',
+    description:
+      'Campo específico para busca (legado - mantido para compatibilidade)',
     type: String,
   })
   @IsOptional()

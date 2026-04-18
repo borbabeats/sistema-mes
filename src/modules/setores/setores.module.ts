@@ -25,7 +25,15 @@ import { DeleteSetorUseCase } from '../../application/use-cases/setores/delete-s
       useClass: SetoresRepository,
     },
   ],
-  exports: [SetoresService, SETORES_REPOSITORY_TOKEN, CreateSetorUseCase, FindSetorUseCase, FindAllSetoresUseCase, UpdateSetorUseCase, DeleteSetorUseCase],
+  exports: [
+    SetoresService,
+    SETORES_REPOSITORY_TOKEN,
+    CreateSetorUseCase,
+    FindSetorUseCase,
+    FindAllSetoresUseCase,
+    UpdateSetorUseCase,
+    DeleteSetorUseCase,
+  ],
 })
 export class SetoresModule {}
 export { SETORES_REPOSITORY_TOKEN };

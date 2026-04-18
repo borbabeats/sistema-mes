@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSetorDto } from '../../presentation/dto/setores/create-setor.dto';
 import { UpdateSetorDto } from '../../presentation/dto/setores/update-setor.dto';
 import { SetorResponseDto } from '../../presentation/dto/setores/setor-response.dto';
@@ -42,7 +42,7 @@ export class SetoresService {
 
   async findAll(): Promise<SetorResponseDto[]> {
     const setores = await this.findAllSetoresUseCase.execute();
-    return setores.map(setor => this.toSetorResponseDto(setor));
+    return setores.map((setor) => this.toSetorResponseDto(setor));
   }
 
   async findOne(id: number): Promise<SetorResponseDto> {
@@ -55,13 +55,17 @@ export class SetoresService {
     return this.toSetorResponseDto(setor);
   }
 
-  async update(id: number, updateSetorDto: UpdateSetorDto): Promise<SetorResponseDto> {
+  async update(
+    id: number,
+    updateSetorDto: UpdateSetorDto,
+  ): Promise<SetorResponseDto> {
     const setor = await this.updateSetorUseCase.execute(id, updateSetorDto);
     return this.toSetorResponseDto(setor);
   }
 
-  async remove(id: number): Promise<{ message: string; id: number; nome: string }> {
+  async remove(
+    id: number,
+  ): Promise<{ message: string; id: number; nome: string }> {
     return this.deleteSetorUseCase.execute(id);
   }
-
 }

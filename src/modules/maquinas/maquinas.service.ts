@@ -1,5 +1,4 @@
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { IMaquinasRepository, MAQUINAS_REPOSITORY_TOKEN } from '../../domain/repositories/maquinas.repository.interface';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMaquinaData } from '../../domain/repositories/maquinas.repository.interface';
 import { Maquina } from '../../domain/entities/maquina.entity';
 import { MaquinaResponseDto } from '../../presentation/dto/maquinas/maquina-response.dto';
@@ -62,19 +61,21 @@ export class MaquinasService {
     return response;
   }
 
-  async create(createMaquinaDto: CreateMaquinaData): Promise<MaquinaResponseDto> {
+  async create(
+    createMaquinaDto: CreateMaquinaData,
+  ): Promise<MaquinaResponseDto> {
     const maquina = await this.createMaquinaUseCase.execute(createMaquinaDto);
     return this.toMaquinaResponseDto(maquina);
   }
 
   async findAll(filters?: any): Promise<MaquinaResponseDto[]> {
     const maquinas = await this.findAllMaquinasUseCase.execute(filters);
-    return maquinas.map(maquina => this.toMaquinaResponseDto(maquina));
+    return maquinas.map((maquina) => this.toMaquinaResponseDto(maquina));
   }
 
   async findOne(id: number): Promise<MaquinaResponseDto> {
     const maquina = await this.findMaquinaUseCase.execute(id);
-    
+
     if (!maquina) {
       throw new NotFoundException(`Máquina com ID ${id} não encontrada`);
     }
@@ -89,52 +90,83 @@ export class MaquinasService {
 
   async findBySetor(setorId: number): Promise<MaquinaResponseDto[]> {
     const maquinas = await this.findBySetorUseCase.execute(setorId);
-    return maquinas.map(maquina => this.toMaquinaResponseDto(maquina));
+    return maquinas.map((maquina) => this.toMaquinaResponseDto(maquina));
   }
 
   async findByStatus(status: any): Promise<MaquinaResponseDto[]> {
     const maquinas = await this.findByStatusUseCase.execute(status);
-    return maquinas.map(maquina => this.toMaquinaResponseDto(maquina));
+    return maquinas.map((maquina) => this.toMaquinaResponseDto(maquina));
   }
 
   async findAvailable(): Promise<MaquinaResponseDto[]> {
     const maquinas = await this.findAvailableUseCase.execute();
-    return maquinas.map(maquina => this.toMaquinaResponseDto(maquina));
+    return maquinas.map((maquina) => this.toMaquinaResponseDto(maquina));
   }
 
   async update(id: number, updateMaquinaDto: any): Promise<MaquinaResponseDto> {
-    const maquina = await this.updateMaquinaUseCase.execute(id, updateMaquinaDto);
+    const maquina = await this.updateMaquinaUseCase.execute(
+      id,
+      updateMaquinaDto,
+    );
     return this.toMaquinaResponseDto(maquina);
   }
 
-  async remove(id: number): Promise<{ message: string; id: number; codigo: string }> {
+  async remove(
+    id: number,
+  ): Promise<{ message: string; id: number; codigo: string }> {
     return this.deleteMaquinaUseCase.execute(id);
   }
 
-  async updateHorasUso(id: number, horasAdicionais: number): Promise<MaquinaResponseDto> {
-    const maquina = await this.updateHorasUsoUseCase.execute(id, horasAdicionais);
+  async updateHorasUso(
+    id: number,
+    horasAdicionais: number,
+  ): Promise<MaquinaResponseDto> {
+    const maquina = await this.updateHorasUsoUseCase.execute(
+      id,
+      horasAdicionais,
+    );
     return this.toMaquinaResponseDto(maquina);
   }
 
   // Métodos de manutenção usando os novos use cases
-  async iniciarManutencao(id: number, manutencaoData: any): Promise<{ maquina: MaquinaResponseDto; manutencao: any }> {
-    const result = await this.iniciarManutencaoUseCase.execute(id, manutencaoData);
+  async iniciarManutencao(
+    id: number,
+    manutencaoData: any,
+  ): Promise<{ maquina: MaquinaResponseDto; manutencao: any }> {
+    const result = await this.iniciarManutencaoUseCase.execute(
+      id,
+      manutencaoData,
+    );
     return {
       maquina: this.toMaquinaResponseDto(result.maquina),
       manutencao: result.manutencao,
     };
   }
 
-  async finalizarManutencao(id: number, manutencaoData: any): Promise<{ maquina: MaquinaResponseDto; manutencao: any }> {
-    const result = await this.finalizarManutencaoUseCase.execute(id, manutencaoData);
+  async finalizarManutencao(
+    id: number,
+    manutencaoData: any,
+  ): Promise<{ maquina: MaquinaResponseDto; manutencao: any }> {
+    const result = await this.finalizarManutencaoUseCase.execute(
+      id,
+      manutencaoData,
+    );
     return {
       maquina: this.toMaquinaResponseDto(result.maquina),
       manutencao: result.manutencao,
     };
   }
 
-  async updateStatus(id: number, status: any, motivo?: string): Promise<MaquinaResponseDto> {
-    const maquina = await this.updateStatusMaquinaUseCase.execute(id, status, motivo);
+  async updateStatus(
+    id: number,
+    status: any,
+    motivo?: string,
+  ): Promise<MaquinaResponseDto> {
+    const maquina = await this.updateStatusMaquinaUseCase.execute(
+      id,
+      status,
+      motivo,
+    );
     return this.toMaquinaResponseDto(maquina);
   }
 }

@@ -1,4 +1,10 @@
-import { Manutencao, CreateManutencaoData, UpdateManutencaoData, HistoricoManutencao, StatusManutencao } from '../entities/manutencao.entity';
+import {
+  Manutencao,
+  CreateManutencaoData,
+  UpdateManutencaoData,
+  HistoricoManutencao,
+  StatusManutencao,
+} from '../entities/manutencao.entity';
 
 export const MANUTENCOES_REPOSITORY_TOKEN = 'MANUTENCOES_REPOSITORY_TOKEN';
 
@@ -22,11 +28,20 @@ export interface IManutencoesRepository {
   findByMaquina(maquinaId: number): Promise<Manutencao[]>;
   findByStatus(status: StatusManutencao): Promise<Manutencao[]>;
   findAgendadas(): Promise<Manutencao[]>;
-  findAgendadasPaginated(page: number, limit: number): Promise<{ data: Manutencao[]; total: number }>;
+  findAgendadasPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{ data: Manutencao[]; total: number }>;
   findEmAndamento(): Promise<Manutencao[]>;
-  findEmAndamentoPaginated(page: number, limit: number): Promise<{ data: Manutencao[]; total: number }>;
+  findEmAndamentoPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{ data: Manutencao[]; total: number }>;
   findAtrasadas(): Promise<Manutencao[]>;
-  findAtrasadasPaginated(page: number, limit: number): Promise<{ data: Manutencao[]; total: number }>;
+  findAtrasadasPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{ data: Manutencao[]; total: number }>;
 
   // Histórico
   createHistorico(data: {
@@ -35,6 +50,8 @@ export interface IManutencoesRepository {
     statusNovo: string;
     descricao: string;
   }): Promise<HistoricoManutencao>;
-  
-  findHistoricoByManutencao(manutencaoId: number): Promise<HistoricoManutencao[]>;
+
+  findHistoricoByManutencao(
+    manutencaoId: number,
+  ): Promise<HistoricoManutencao[]>;
 }

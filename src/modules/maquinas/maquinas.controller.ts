@@ -1,24 +1,24 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  Query, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
   ParseIntPipe,
   BadRequestException,
   UseGuards,
-  Req
+  Req,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiBearerAuth,
   ApiQuery,
-  ApiBody
+  ApiBody,
 } from '@nestjs/swagger';
 import { CreateMaquinaUseCase } from '../../application/use-cases/maquinas/create-maquina.use-case';
 import { IniciarManutencaoUseCase } from '../../application/use-cases/maquinas/iniciar-manutencao.use-case';
@@ -28,7 +28,11 @@ import { CreateMaquinaDto } from '../../presentation/dto/maquinas/create-maquina
 import { UpdateMaquinaDto } from '../../presentation/dto/maquinas/update-maquina.dto';
 import { IniciarManutencaoDto } from '../../presentation/dto/maquinas/iniciar-manutencao.dto';
 import { FinalizarManutencaoDto } from '../../presentation/dto/maquinas/finalizar-manutencao.dto';
-import { StatusMaquina, StatusManutencao, Maquina } from '../../domain/entities/maquina.entity';
+import {
+  StatusMaquina,
+  StatusManutencao,
+  Maquina,
+} from '../../domain/entities/maquina.entity';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -63,7 +67,10 @@ export class MaquinasController {
   @Get()
   @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
   @ApiOperation({ summary: 'Lista todas as máquinas' })
-  @ApiResponse({ status: 200, description: 'Lista de máquinas retornada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de máquinas retornada com sucesso',
+  })
   @ApiQuery({ name: 'status', enum: StatusMaquina, required: false })
   @ApiQuery({ name: 'setorId', required: false, type: Number })
   async findAll(
@@ -72,11 +79,11 @@ export class MaquinasController {
   ) {
     // Filtra por status e/ou setor, se fornecidos
     const where: any = {};
-    
+
     if (status) {
       where.status = status;
     }
-    
+
     if (setorId) {
       where.setorId = parseInt(setorId, 10);
     }
@@ -100,8 +107,8 @@ export class MaquinasController {
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
   update(
-    @Param('id', ParseIntPipe) id: number, 
-    @Body() updateMaquinaDto: UpdateMaquinaDto
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateMaquinaDto: UpdateMaquinaDto,
   ) {
     return this.maquinasService.update(id, updateMaquinaDto);
   }
@@ -110,7 +117,10 @@ export class MaquinasController {
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
   @ApiOperation({ summary: 'Remove uma máquina' })
   @ApiResponse({ status: 200, description: 'Máquina removida com sucesso' })
-  @ApiResponse({ status: 400, description: 'Não é possível remover uma máquina em uso' })
+  @ApiResponse({
+    status: 400,
+    description: 'Não é possível remover uma máquina em uso',
+  })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.maquinasService.remove(id);
@@ -122,32 +132,50 @@ export class MaquinasController {
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
   @ApiOperation({ summary: 'Inicia uma manutenção para uma máquina' })
   @ApiResponse({ status: 200, description: 'Manutenção iniciada com sucesso' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos ou máquina não pode entrar em manutenção' })
+  @ApiResponse({
+    status: 400,
+    description: 'Dados inválidos ou máquina não pode entrar em manutenção',
+  })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
   async iniciarManutencao(
     @Param('id', ParseIntPipe) maquinaId: number,
     @Body() iniciarManutencaoDto: IniciarManutencaoDto,
   ) {
-    return this.iniciarManutencaoUseCase.execute(maquinaId, iniciarManutencaoDto);
+    return this.iniciarManutencaoUseCase.execute(
+      maquinaId,
+      iniciarManutencaoDto,
+    );
   }
 
   @Patch(':id/manutencoes/finalizar')
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
   @ApiOperation({ summary: 'Finaliza a manutenção de uma máquina' })
-  @ApiResponse({ status: 200, description: 'Manutenção finalizada com sucesso' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos ou máquina não está em manutenção' })
+  @ApiResponse({
+    status: 200,
+    description: 'Manutenção finalizada com sucesso',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Dados inválidos ou máquina não está em manutenção',
+  })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
   async finalizarManutencao(
     @Param('id', ParseIntPipe) maquinaId: number,
     @Body() finalizarManutencaoDto: FinalizarManutencaoDto,
   ) {
-    return this.finalizarManutencaoUseCase.execute(maquinaId, finalizarManutencaoDto);
+    return this.finalizarManutencaoUseCase.execute(
+      maquinaId,
+      finalizarManutencaoDto,
+    );
   }
 
   @Get(':id/manutencoes')
   @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
   @ApiOperation({ summary: 'Lista manutenções de uma máquina específica' })
-  @ApiResponse({ status: 200, description: 'Lista de manutenções da máquina retornada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de manutenções da máquina retornada com sucesso',
+  })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
   async listarManutencoes(@Param('id', ParseIntPipe) id: number) {
     return this.listarManutencoesUseCase.findByMaquina(id);

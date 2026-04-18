@@ -9,7 +9,8 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UpdateUsuarioUseCase {
   constructor(
-    @Inject(USUARIOS_REPOSITORY_TOKEN) private readonly usuariosRepository: IUsuariosRepository,
+    @Inject(USUARIOS_REPOSITORY_TOKEN)
+    private readonly usuariosRepository: IUsuariosRepository,
     private readonly findSetorUseCase: FindSetorUseCase,
   ) {}
 
@@ -22,7 +23,9 @@ export class UpdateUsuarioUseCase {
 
     // Verificar se o email já existe (se fornecido e for diferente)
     if (data.email && data.email !== usuario.email) {
-      const existingUsuario = await this.usuariosRepository.findByEmail(data.email);
+      const existingUsuario = await this.usuariosRepository.findByEmail(
+        data.email,
+      );
       if (existingUsuario) {
         throw new Error('Já existe um usuário com este email');
       }
@@ -48,7 +51,7 @@ export class UpdateUsuarioUseCase {
     }
 
     // Validar cargo (se fornecido)
-    if (data.cargo && !Object.values(Cargo).includes(data.cargo as Cargo)) {
+    if (data.cargo && !Object.values(Cargo).includes(data.cargo)) {
       throw new Error('Cargo inválido');
     }
 

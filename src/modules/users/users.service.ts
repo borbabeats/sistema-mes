@@ -1,5 +1,8 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { IUsuariosRepository, CreateUsuarioData } from '../../domain/repositories/usuarios.repository.interface';
+import {
+  IUsuariosRepository,
+  CreateUsuarioData,
+} from '../../domain/repositories/usuarios.repository.interface';
 import { CreateUsuarioDto } from '../../presentation/dto/usuarios/create-usuario.dto';
 import { UpdateUsuarioDto } from '../../presentation/dto/usuarios/update-usuario.dto';
 import { UsuarioResponseDto } from '../../presentation/dto/usuarios/usuario-response.dto';
@@ -9,7 +12,10 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject(USUARIOS_REPOSITORY_TOKEN) private readonly userRepository: IUsuariosRepository) {}
+  constructor(
+    @Inject(USUARIOS_REPOSITORY_TOKEN)
+    private readonly userRepository: IUsuariosRepository,
+  ) {}
 
   private async hashPassword(password: string): Promise<string> {
     const saltRounds = 10;
@@ -19,18 +25,20 @@ export class UsersService {
   private toUsuarioResponseDto(usuario: Usuario): UsuarioResponseDto {
     const { senha, ...usuarioSemSenha } = usuario;
     const response = usuarioSemSenha as UsuarioResponseDto;
-    
+
     // Adicionar nomeSetor se existir no objeto usuário
     if ((usuario as any).nomeSetor) {
       response.nomeSetor = (usuario as any).nomeSetor;
     }
-    
+
     return response;
   }
 
-  async create(createUsuarioDto: CreateUsuarioDto): Promise<UsuarioResponseDto> {
+  async create(
+    createUsuarioDto: CreateUsuarioDto,
+  ): Promise<UsuarioResponseDto> {
     const hashedPassword = await this.hashPassword(createUsuarioDto.senha);
-    
+
     const userData: CreateUsuarioData = {
       nome: createUsuarioDto.nome,
       email: createUsuarioDto.email,
@@ -50,7 +58,7 @@ export class UsersService {
 
   async findAll(): Promise<UsuarioResponseDto[]> {
     const usuarios = await this.userRepository.findAll();
-    return usuarios.map(usuario => this.toUsuarioResponseDto(usuario));
+    return usuarios.map((usuario) => this.toUsuarioResponseDto(usuario));
   }
 
   async findOne(id: number): Promise<UsuarioResponseDto> {
@@ -63,12 +71,15 @@ export class UsersService {
     return this.toUsuarioResponseDto(user);
   }
 
-  async update(id: number, updateUsuarioDto: UpdateUsuarioDto): Promise<Usuario> {
+  async update(
+    id: number,
+    updateUsuarioDto: UpdateUsuarioDto,
+  ): Promise<Usuario> {
     await this.findOne(id);
 
     const { cargo, senha, ...rest } = updateUsuarioDto;
-    
-    const data: Partial<Usuario> = { 
+
+    const data: Partial<Usuario> = {
       ...rest,
     };
 

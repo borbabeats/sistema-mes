@@ -1,21 +1,21 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  Query, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
   ParseIntPipe,
   BadRequestException,
   UseGuards,
-  Req
+  Req,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
@@ -45,7 +45,10 @@ export class ManutencoesController {
   @Get()
   @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
   @ApiOperation({ summary: 'Lista todas as manutenções' })
-  @ApiResponse({ status: 200, description: 'Lista de manutenções retornada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de manutenções retornada com sucesso',
+  })
   @ApiQuery({ name: 'maquinaId', required: false, type: Number })
   @ApiQuery({ name: 'status', enum: StatusManutencao, required: false })
   @ApiQuery({ name: 'responsavelId', required: false, type: Number })
@@ -59,7 +62,7 @@ export class ManutencoesController {
     @Query('dataFim') dataFim?: string,
   ) {
     const filters: any = {};
-    
+
     if (maquinaId) filters.maquinaId = parseInt(maquinaId, 10);
     if (status) filters.status = status;
     if (responsavelId) filters.responsavelId = parseInt(responsavelId, 10);
@@ -72,13 +75,19 @@ export class ManutencoesController {
   @Get('agendadas')
   @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
   @ApiOperation({ summary: 'Lista manutenções agendadas' })
-  @ApiResponse({ status: 200, description: 'Lista de manutenções agendadas retornada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de manutenções agendadas retornada com sucesso',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   async findAgendadas(@Query() pagination: PaginationDto) {
     const { page = 1, limit = 10 } = pagination;
-    const result = await this.listarManutencoesUseCase.findAgendadasPaginated(page, limit);
-    
+    const result = await this.listarManutencoesUseCase.findAgendadasPaginated(
+      page,
+      limit,
+    );
+
     return {
       data: result.data,
       pagination: {
@@ -95,7 +104,10 @@ export class ManutencoesController {
   @Get('em-andamento')
   @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
   @ApiOperation({ summary: 'Lista manutenções em andamento' })
-  @ApiResponse({ status: 200, description: 'Lista de manutenções em andamento retornada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de manutenções em andamento retornada com sucesso',
+  })
   async findEmAndamento() {
     return this.listarManutencoesUseCase.findEmAndamento();
   }
@@ -103,13 +115,19 @@ export class ManutencoesController {
   @Get('atrasadas')
   @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
   @ApiOperation({ summary: 'Lista manutenções atrasadas' })
-  @ApiResponse({ status: 200, description: 'Lista de manutenções atrasadas retornada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de manutenções atrasadas retornada com sucesso',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   async findAtrasadas(@Query() pagination: PaginationDto) {
     const { page = 1, limit = 10 } = pagination;
-    const result = await this.listarManutencoesUseCase.findAtrasadasPaginated(page, limit);
-    
+    const result = await this.listarManutencoesUseCase.findAtrasadasPaginated(
+      page,
+      limit,
+    );
+
     return {
       data: result.data,
       pagination: {
@@ -130,10 +148,11 @@ export class ManutencoesController {
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
   async agendar(@Body() agendarManutencaoDto: AgendarManutencaoDto) {
-    const result = await this.agendarManutencaoUseCase.execute(agendarManutencaoDto);
+    const result =
+      await this.agendarManutencaoUseCase.execute(agendarManutencaoDto);
     return {
       message: 'Manutenção agendada com sucesso',
-      data: result.manutencao
+      data: result.manutencao,
     };
   }
 
@@ -141,11 +160,14 @@ export class ManutencoesController {
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
   @ApiOperation({ summary: 'Cancela uma manutenção' })
   @ApiResponse({ status: 200, description: 'Manutenção cancelada com sucesso' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos ou manutenção não pode ser cancelada' })
+  @ApiResponse({
+    status: 400,
+    description: 'Dados inválidos ou manutenção não pode ser cancelada',
+  })
   @ApiResponse({ status: 404, description: 'Manutenção não encontrada' })
   async cancelar(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: CancelarManutencaoDto
+    @Body() data: CancelarManutencaoDto,
   ) {
     return this.cancelarManutencaoUseCase.execute(id, data);
   }

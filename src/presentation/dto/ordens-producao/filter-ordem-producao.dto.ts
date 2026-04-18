@@ -15,10 +15,10 @@ export class FilterOrdemProducaoDto {
   @IsString()
   codigo?: string;
 
-  @ApiProperty({ 
-    description: 'Status da ordem de produção', 
+  @ApiProperty({
+    description: 'Status da ordem de produção',
     enum: StatusOrdemProducao,
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsEnum(StatusOrdemProducao)

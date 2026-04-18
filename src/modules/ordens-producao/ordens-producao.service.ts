@@ -1,5 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { OrdemProducao, StatusOP, PrioridadeOP } from '../../domain/entities/ordem-producao.entity';
+import {
+  OrdemProducao,
+  StatusOP,
+  PrioridadeOP,
+} from '../../domain/entities/ordem-producao.entity';
 import { CreateOrdemProducaoData } from '../../domain/repositories/ordens-producao.repository.interface';
 import { CreateOrdemProducaoDto } from '../../presentation/dto/ordens-producao/create-ordem-producao.dto';
 import { ChangeStatusOrdemProducaoDto } from '../../presentation/dto/ordens-producao/change-status-ordem-producao.dto';
@@ -41,14 +45,16 @@ export class OrdensProducaoService {
     private readonly changeStatusOrdemProducaoUseCase: ChangeStatusOrdemProducaoUseCase,
   ) {}
 
-  async create(createOrdemProducaoDto: CreateOrdemProducaoDto): Promise<OrdemProducao> {
+  async create(
+    createOrdemProducaoDto: CreateOrdemProducaoDto,
+  ): Promise<OrdemProducao> {
     const { prioridade, ...rest } = createOrdemProducaoDto;
-    
+
     const createData: CreateOrdemProducaoData = {
       ...rest,
       prioridade: prioridade as PrioridadeOP,
     };
-    
+
     return this.createOrdemProducaoUseCase.execute(createData);
   }
 
@@ -56,7 +62,9 @@ export class OrdensProducaoService {
     return this.findAllOrdensProducaoUseCase.execute();
   }
 
-  async findAllPaginated(filters: FindAllOrdensProducaoDto): Promise<PaginatedResult<OrdemProducao>> {
+  async findAllPaginated(
+    filters: FindAllOrdensProducaoDto,
+  ): Promise<PaginatedResult<OrdemProducao>> {
     return this.findAllOrdensProducaoPaginatedUseCase.execute(filters);
   }
 
@@ -68,18 +76,23 @@ export class OrdensProducaoService {
     return ordem;
   }
 
-  async update(id: number, updateOrdemProducaoDto: any): Promise<OrdemProducao> {
+  async update(
+    id: number,
+    updateOrdemProducaoDto: any,
+  ): Promise<OrdemProducao> {
     return this.updateOrdemProducaoUseCase.execute(id, updateOrdemProducaoDto);
   }
 
-  async remove(id: number): Promise<{ message: string; id: number; codigo: string }> {
+  async remove(
+    id: number,
+  ): Promise<{ message: string; id: number; codigo: string }> {
     const ordem = await this.findOrdemProducaoUseCase.execute(id);
     if (!ordem) {
       throw new NotFoundException('Ordem de produção não encontrada');
     }
-    
+
     await this.deleteOrdemProducaoUseCase.execute(id);
-    
+
     return {
       message: 'Ordem de produção removida com sucesso',
       id: ordem.id,
@@ -87,15 +100,31 @@ export class OrdensProducaoService {
     };
   }
 
-  async changeStatus(id: number, dto: ChangeStatusOrdemProducaoDto, userRoles: string[] = [], userId?: number): Promise<OrdemProducao> {
-    return this.changeStatusOrdemProducaoUseCase.execute(id, dto, userRoles, userId);
+  async changeStatus(
+    id: number,
+    dto: ChangeStatusOrdemProducaoDto,
+    userRoles: string[] = [],
+    userId?: number,
+  ): Promise<OrdemProducao> {
+    return this.changeStatusOrdemProducaoUseCase.execute(
+      id,
+      dto,
+      userRoles,
+      userId,
+    );
   }
 
-  async atualizarProducao(id: number, quantidade: number, defeitos: number): Promise<OrdemProducao> {
+  async atualizarProducao(
+    id: number,
+    quantidade: number,
+  ): Promise<OrdemProducao> {
     return this.updateQuantidadeProduzida(id, quantidade);
   }
 
-  async updateQuantidadeProduzida(id: number, quantidade: number): Promise<OrdemProducao> {
+  async updateQuantidadeProduzida(
+    id: number,
+    quantidade: number,
+  ): Promise<OrdemProducao> {
     return this.updateQuantidadeProduzidaUseCase.execute(id, quantidade);
   }
 

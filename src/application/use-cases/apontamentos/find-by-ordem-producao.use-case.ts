@@ -1,12 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IApontamentosRepository, APONTAMENTOS_REPOSITORY_TOKEN } from '../../../domain/repositories/apontamentos.repository.interface';
+import {
+  IApontamentosRepository,
+  APONTAMENTOS_REPOSITORY_TOKEN,
+} from '../../../domain/repositories/apontamentos.repository.interface';
 import { Apontamento } from '../../../domain/entities/apontamento.entity';
 import { FindOrdemProducaoUseCase } from '../ordens-producao/find-ordem-producao.use-case';
 
 @Injectable()
 export class FindByOrdemProducaoUseCase {
   constructor(
-    @Inject(APONTAMENTOS_REPOSITORY_TOKEN) private readonly apontamentosRepository: IApontamentosRepository,
+    @Inject(APONTAMENTOS_REPOSITORY_TOKEN)
+    private readonly apontamentosRepository: IApontamentosRepository,
     private readonly findOrdemProducaoUseCase: FindOrdemProducaoUseCase,
   ) {}
 

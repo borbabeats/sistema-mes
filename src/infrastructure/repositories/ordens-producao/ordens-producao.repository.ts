@@ -1,7 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IOrdensProducaoRepository, CreateOrdemProducaoData, UpdateOrdemProducaoData, OrdemProducaoFilters } from '../../../domain/repositories/ordens-producao.repository.interface';
-import { OrdemProducao, StatusOP, PrioridadeOP, OrigemOP } from '../../../domain/entities/ordem-producao.entity';
+import {
+  IOrdensProducaoRepository,
+  CreateOrdemProducaoData,
+  UpdateOrdemProducaoData,
+  OrdemProducaoFilters,
+} from '../../../domain/repositories/ordens-producao.repository.interface';
+import {
+  OrdemProducao,
+  StatusOP,
+  PrioridadeOP,
+  OrigemOP,
+} from '../../../domain/entities/ordem-producao.entity';
 import { PaginatedResult } from '../../../presentation/dto/common/pagination.dto';
 
 @Injectable()
@@ -34,13 +44,16 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
   async findAll(filters?: OrdemProducaoFilters): Promise<OrdemProducao[]> {
     const whereClause: any = {};
 
-    if (filters?.codigo) whereClause.codigo = { contains: filters.codigo, mode: 'insensitive' };
-    if (filters?.produto) whereClause.produto = { contains: filters.produto, mode: 'insensitive' };
+    if (filters?.codigo)
+      whereClause.codigo = { contains: filters.codigo, mode: 'insensitive' };
+    if (filters?.produto)
+      whereClause.produto = { contains: filters.produto, mode: 'insensitive' };
     if (filters?.status) whereClause.status = filters.status;
     if (filters?.prioridade) whereClause.prioridade = filters.prioridade;
     if (filters?.origemTipo) whereClause.origemTipo = filters.origemTipo;
     if (filters?.setorId) whereClause.setorId = filters.setorId;
-    if (filters?.responsavelId) whereClause.responsavelId = filters.responsavelId;
+    if (filters?.responsavelId)
+      whereClause.responsavelId = filters.responsavelId;
 
     if (filters?.dataInicio || filters?.dataFim) {
       whereClause.AND = [];
@@ -58,10 +71,7 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
 
     const ordensProducao = await this.prisma.ordemProducao.findMany({
       where: whereClause,
-      orderBy: [
-        { prioridade: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ prioridade: 'desc' }, { createdAt: 'desc' }],
     });
 
     return ordensProducao.map((op) => this.mapToEntity(op));
@@ -74,13 +84,16 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
   ): Promise<PaginatedResult<OrdemProducao>> {
     const whereClause: any = {};
 
-    if (filters?.codigo) whereClause.codigo = { contains: filters.codigo, mode: 'insensitive' };
-    if (filters?.produto) whereClause.produto = { contains: filters.produto, mode: 'insensitive' };
+    if (filters?.codigo)
+      whereClause.codigo = { contains: filters.codigo, mode: 'insensitive' };
+    if (filters?.produto)
+      whereClause.produto = { contains: filters.produto, mode: 'insensitive' };
     if (filters?.status) whereClause.status = filters.status;
     if (filters?.prioridade) whereClause.prioridade = filters.prioridade;
     if (filters?.origemTipo) whereClause.origemTipo = filters.origemTipo;
     if (filters?.setorId) whereClause.setorId = filters.setorId;
-    if (filters?.responsavelId) whereClause.responsavelId = filters.responsavelId;
+    if (filters?.responsavelId)
+      whereClause.responsavelId = filters.responsavelId;
 
     if (filters?.search) {
       const searchTerm = filters.search;
@@ -94,7 +107,10 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
             whereClause.produto = { contains: searchTerm, mode: 'insensitive' };
             break;
           case 'descricao':
-            whereClause.descricao = { contains: searchTerm, mode: 'insensitive' };
+            whereClause.descricao = {
+              contains: searchTerm,
+              mode: 'insensitive',
+            };
             break;
           default:
             whereClause.OR = [
@@ -128,10 +144,7 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
       }
     }
 
-    let orderBy: any = [
-      { prioridade: 'desc' },
-      { createdAt: 'desc' },
-    ];
+    let orderBy: any = [{ prioridade: 'desc' }, { createdAt: 'desc' }];
 
     if (filters?.sortBy) {
       const validSortFields = [
@@ -148,7 +161,9 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
       ];
 
       if (validSortFields.includes(filters.sortBy)) {
-        orderBy = { [filters.sortBy]: (filters.sortOrder || 'DESC').toLowerCase() };
+        orderBy = {
+          [filters.sortBy]: (filters.sortOrder || 'DESC').toLowerCase(),
+        };
       }
     }
 
@@ -189,10 +204,7 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
   async findByStatus(status: StatusOP): Promise<OrdemProducao[]> {
     const ordensProducao = await this.prisma.ordemProducao.findMany({
       where: { status },
-      orderBy: [
-        { prioridade: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ prioridade: 'desc' }, { createdAt: 'desc' }],
     });
 
     return ordensProducao.map((op) => this.mapToEntity(op));
@@ -201,9 +213,7 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
   async findByPrioridade(prioridade: PrioridadeOP): Promise<OrdemProducao[]> {
     const ordensProducao = await this.prisma.ordemProducao.findMany({
       where: { prioridade },
-      orderBy: [
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ createdAt: 'desc' }],
     });
 
     return ordensProducao.map((op) => this.mapToEntity(op));
@@ -212,10 +222,7 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
   async findBySetor(setorId: number): Promise<OrdemProducao[]> {
     const ordensProducao = await this.prisma.ordemProducao.findMany({
       where: { setorId },
-      orderBy: [
-        { prioridade: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ prioridade: 'desc' }, { createdAt: 'desc' }],
     });
 
     return ordensProducao.map((op) => this.mapToEntity(op));
@@ -224,10 +231,7 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
   async findByResponsavel(responsavelId: number): Promise<OrdemProducao[]> {
     const ordensProducao = await this.prisma.ordemProducao.findMany({
       where: { responsavelId },
-      orderBy: [
-        { prioridade: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ prioridade: 'desc' }, { createdAt: 'desc' }],
     });
 
     return ordensProducao.map((op) => this.mapToEntity(op));
@@ -244,10 +248,7 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
           lt: now,
         },
       },
-      orderBy: [
-        { prioridade: 'desc' },
-        { dataFimPlanejado: 'asc' },
-      ],
+      orderBy: [{ prioridade: 'desc' }, { dataFimPlanejado: 'asc' }],
     });
 
     return ordensProducao.map((op) => this.mapToEntity(op));
@@ -256,34 +257,54 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
   async findPending(): Promise<OrdemProducao[]> {
     const ordensProducao = await this.prisma.ordemProducao.findMany({
       where: { status: StatusOP.RASCUNHO },
-      orderBy: [
-        { prioridade: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ prioridade: 'desc' }, { createdAt: 'desc' }],
     });
 
     return ordensProducao.map((op) => this.mapToEntity(op));
   }
 
-  async update(id: number, data: UpdateOrdemProducaoData): Promise<OrdemProducao> {
+  async update(
+    id: number,
+    data: UpdateOrdemProducaoData,
+  ): Promise<OrdemProducao> {
     const updateData: any = {};
 
     if (data.codigo !== undefined) updateData.codigo = data.codigo;
     if (data.produto !== undefined) updateData.produto = data.produto;
     if (data.descricao !== undefined) updateData.descricao = data.descricao;
-    if (data.quantidadePlanejada !== undefined) updateData.quantidadePlanejada = data.quantidadePlanejada;
-    if (data.quantidadeProduzida !== undefined) updateData.quantidadeProduzida = data.quantidadeProduzida;
+    if (data.quantidadePlanejada !== undefined)
+      updateData.quantidadePlanejada = data.quantidadePlanejada;
+    if (data.quantidadeProduzida !== undefined)
+      updateData.quantidadeProduzida = data.quantidadeProduzida;
     if (data.status !== undefined) updateData.status = data.status;
     if (data.prioridade !== undefined) updateData.prioridade = data.prioridade;
-    if (data.dataFimReal !== undefined) updateData.dataFimReal = typeof data.dataFimReal === 'string' ? new Date(data.dataFimReal) : data.dataFimReal;
-    if (data.dataInicioReal !== undefined) updateData.dataInicioReal = typeof data.dataInicioReal === 'string' ? new Date(data.dataInicioReal) : data.dataInicioReal;
-    if (data.dataInicioPlanejado !== undefined) updateData.dataInicioPlanejado = typeof data.dataInicioPlanejado === 'string' ? new Date(data.dataInicioPlanejado) : data.dataInicioPlanejado;
-    if (data.dataFimPlanejado !== undefined) updateData.dataFimPlanejado = typeof data.dataFimPlanejado === 'string' ? new Date(data.dataFimPlanejado) : data.dataFimPlanejado;
+    if (data.dataFimReal !== undefined)
+      updateData.dataFimReal =
+        typeof data.dataFimReal === 'string'
+          ? new Date(data.dataFimReal)
+          : data.dataFimReal;
+    if (data.dataInicioReal !== undefined)
+      updateData.dataInicioReal =
+        typeof data.dataInicioReal === 'string'
+          ? new Date(data.dataInicioReal)
+          : data.dataInicioReal;
+    if (data.dataInicioPlanejado !== undefined)
+      updateData.dataInicioPlanejado =
+        typeof data.dataInicioPlanejado === 'string'
+          ? new Date(data.dataInicioPlanejado)
+          : data.dataInicioPlanejado;
+    if (data.dataFimPlanejado !== undefined)
+      updateData.dataFimPlanejado =
+        typeof data.dataFimPlanejado === 'string'
+          ? new Date(data.dataFimPlanejado)
+          : data.dataFimPlanejado;
     if (data.setorId !== undefined) updateData.setorId = data.setorId;
-    if (data.responsavelId !== undefined) updateData.responsavelId = data.responsavelId;
+    if (data.responsavelId !== undefined)
+      updateData.responsavelId = data.responsavelId;
     if (data.origemTipo !== undefined) updateData.origemTipo = data.origemTipo;
     if (data.origemId !== undefined) updateData.origemId = data.origemId;
-    if (data.observacoes !== undefined) updateData.observacoes = data.observacoes;
+    if (data.observacoes !== undefined)
+      updateData.observacoes = data.observacoes;
 
     const ordemProducao = await this.prisma.ordemProducao.update({
       where: { id },
@@ -301,7 +322,10 @@ export class OrdensProducaoRepository implements IOrdensProducaoRepository {
     return this.mapToEntity(ordemProducao);
   }
 
-  async updateQuantidadeProduzida(id: number, quantidade: number): Promise<OrdemProducao> {
+  async updateQuantidadeProduzida(
+    id: number,
+    quantidade: number,
+  ): Promise<OrdemProducao> {
     const ordemProducao = await this.prisma.ordemProducao.update({
       where: { id },
       data: {

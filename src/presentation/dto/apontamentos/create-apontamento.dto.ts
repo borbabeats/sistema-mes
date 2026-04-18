@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, IsOptional, Min, IsDateString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  Min,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateApontamentoDto {
   @ApiProperty({ description: 'ID da ordem de produção relacionada' })
@@ -17,20 +23,20 @@ export class CreateApontamentoDto {
   @IsNumber()
   usuarioId: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quantidade produzida no apontamento',
     default: 0,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsNumber()
   @Min(0)
   quantidadeProduzida?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quantidade de defeitos detectados',
     default: 0,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsNumber()
@@ -42,10 +48,10 @@ export class CreateApontamentoDto {
   @IsDateString()
   dataInicio: string;
 
-  @ApiProperty({ 
-    description: 'Data e hora de fim do apontamento', 
+  @ApiProperty({
+    description: 'Data e hora de fim do apontamento',
     required: false,
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsDateString()

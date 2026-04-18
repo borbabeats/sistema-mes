@@ -1,13 +1,20 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IMaquinasRepository, UpdateMaquinaData } from '../../../domain/repositories/maquinas.repository.interface';
-import { Maquina, StatusMaquina } from '../../../domain/entities/maquina.entity';
+import {
+  IMaquinasRepository,
+  UpdateMaquinaData,
+} from '../../../domain/repositories/maquinas.repository.interface';
+import {
+  Maquina,
+  StatusMaquina,
+} from '../../../domain/entities/maquina.entity';
 import { MAQUINAS_REPOSITORY_TOKEN } from '../../../domain/repositories/maquinas.repository.interface';
 import { FindSetorUseCase } from '../setores/find-setor.use-case';
 
 @Injectable()
 export class UpdateMaquinaUseCase {
   constructor(
-    @Inject(MAQUINAS_REPOSITORY_TOKEN) private readonly maquinasRepository: IMaquinasRepository,
+    @Inject(MAQUINAS_REPOSITORY_TOKEN)
+    private readonly maquinasRepository: IMaquinasRepository,
     private readonly findSetorUseCase: FindSetorUseCase,
   ) {}
 
@@ -20,7 +27,9 @@ export class UpdateMaquinaUseCase {
 
     // Verificar se o código já existe (se fornecido e for diferente)
     if (data.codigo && data.codigo !== maquina.codigo) {
-      const existingMaquina = await this.maquinasRepository.findByCodigo(data.codigo);
+      const existingMaquina = await this.maquinasRepository.findByCodigo(
+        data.codigo,
+      );
       if (existingMaquina) {
         throw new Error('Já existe uma máquina com este código');
       }

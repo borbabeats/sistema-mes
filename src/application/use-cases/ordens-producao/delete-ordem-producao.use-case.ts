@@ -1,15 +1,21 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IOrdensProducaoRepository } from '../../../domain/repositories/ordens-producao.repository.interface';
-import { OrdemProducao, StatusOP } from '../../../domain/entities/ordem-producao.entity';
+import {
+  OrdemProducao,
+  StatusOP,
+} from '../../../domain/entities/ordem-producao.entity';
 import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../modules/ordens-producao/constants';
 
 @Injectable()
 export class DeleteOrdemProducaoUseCase {
   constructor(
-    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN) private readonly ordensProducaoRepository: IOrdensProducaoRepository,
+    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN)
+    private readonly ordensProducaoRepository: IOrdensProducaoRepository,
   ) {}
 
-  async execute(id: number): Promise<{ message: string; id: number; codigo: string }> {
+  async execute(
+    id: number,
+  ): Promise<{ message: string; id: number; codigo: string }> {
     // Verificar se a OP existe
     const ordemProducao = await this.ordensProducaoRepository.findOne(id);
     if (!ordemProducao) {
@@ -18,11 +24,15 @@ export class DeleteOrdemProducaoUseCase {
 
     // Verificar se a OP pode ser cancelada
     if (ordemProducao.status === StatusOP.EM_ANDAMENTO) {
-      throw new Error('Não é possível remover uma ordem de produção em andamento');
+      throw new Error(
+        'Não é possível remover uma ordem de produção em andamento',
+      );
     }
 
     if (ordemProducao.status === StatusOP.FINALIZADA) {
-      throw new Error('Não é possível remover uma ordem de produção finalizada');
+      throw new Error(
+        'Não é possível remover uma ordem de produção finalizada',
+      );
     }
 
     // Soft delete

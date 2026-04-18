@@ -1,11 +1,18 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IManutencoesRepository, MANUTENCOES_REPOSITORY_TOKEN } from '../../../domain/repositories/manutencoes.repository.interface';
-import { Manutencao, StatusManutencao } from '../../../domain/entities/manutencao.entity';
+import {
+  IManutencoesRepository,
+  MANUTENCOES_REPOSITORY_TOKEN,
+} from '../../../domain/repositories/manutencoes.repository.interface';
+import {
+  Manutencao,
+  StatusManutencao,
+} from '../../../domain/entities/manutencao.entity';
 
 @Injectable()
 export class ListarManutencoesUseCase {
   constructor(
-    @Inject(MANUTENCOES_REPOSITORY_TOKEN) private readonly manutencoesRepository: IManutencoesRepository,
+    @Inject(MANUTENCOES_REPOSITORY_TOKEN)
+    private readonly manutencoesRepository: IManutencoesRepository,
   ) {}
 
   async execute(filters?: {
@@ -28,7 +35,10 @@ export class ListarManutencoesUseCase {
     return this.manutencoesRepository.findAgendadas();
   }
 
-  async findAgendadasPaginated(page: number = 1, limit: number = 10): Promise<{ data: Manutencao[]; total: number }> {
+  async findAgendadasPaginated(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Manutencao[]; total: number }> {
     return this.manutencoesRepository.findAgendadasPaginated(page, limit);
   }
 
@@ -36,7 +46,10 @@ export class ListarManutencoesUseCase {
     return this.manutencoesRepository.findEmAndamento();
   }
 
-  async findEmAndamentoPaginated(page: number = 1, limit: number = 10): Promise<{ data: Manutencao[]; total: number }> {
+  async findEmAndamentoPaginated(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Manutencao[]; total: number }> {
     return this.manutencoesRepository.findEmAndamentoPaginated(page, limit);
   }
 
@@ -44,7 +57,10 @@ export class ListarManutencoesUseCase {
     return this.manutencoesRepository.findAtrasadas();
   }
 
-  async findAtrasadasPaginated(page: number = 1, limit: number = 10): Promise<{ data: Manutencao[]; total: number }> {
+  async findAtrasadasPaginated(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Manutencao[]; total: number }> {
     return this.manutencoesRepository.findAtrasadasPaginated(page, limit);
   }
 }

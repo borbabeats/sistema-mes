@@ -6,7 +6,8 @@ import { USUARIOS_REPOSITORY_TOKEN } from '../../../modules/users/constants';
 @Injectable()
 export class FindUsuarioUseCase {
   constructor(
-    @Inject(USUARIOS_REPOSITORY_TOKEN) private readonly usuariosRepository: IUsuariosRepository,
+    @Inject(USUARIOS_REPOSITORY_TOKEN)
+    private readonly usuariosRepository: IUsuariosRepository,
   ) {}
 
   async execute(id: number): Promise<Usuario | null> {

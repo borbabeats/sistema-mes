@@ -1,12 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IOrdensProducaoRepository } from '../../../domain/repositories/ordens-producao.repository.interface';
-import { OrdemProducao, StatusOP } from '../../../domain/entities/ordem-producao.entity';
+import {
+  OrdemProducao,
+  StatusOP,
+} from '../../../domain/entities/ordem-producao.entity';
 import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../modules/ordens-producao/constants';
 
 @Injectable()
 export class CancelarProducaoUseCase {
   constructor(
-    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN) private readonly ordensProducaoRepository: IOrdensProducaoRepository,
+    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN)
+    private readonly ordensProducaoRepository: IOrdensProducaoRepository,
   ) {}
 
   async execute(id: number, motivo?: string): Promise<OrdemProducao> {
@@ -18,7 +22,9 @@ export class CancelarProducaoUseCase {
 
     // Verificar se a OP pode ser cancelada
     if (ordemProducao.status === StatusOP.FINALIZADA) {
-      throw new Error('Não é possível cancelar uma ordem de produção finalizada');
+      throw new Error(
+        'Não é possível cancelar uma ordem de produção finalizada',
+      );
     }
 
     // Cancelar produção
@@ -33,12 +39,15 @@ export class CancelarProducaoUseCase {
 
     // Adicionar motivo nas observações se fornecido
     if (motivo) {
-      updateData.observacoes = ordemProducao.observacoes 
+      updateData.observacoes = ordemProducao.observacoes
         ? `${ordemProducao.observacoes}\n\nCancelado: ${motivo}`
         : `Cancelado: ${motivo}`;
     }
 
-    const updatedOP = await this.ordensProducaoRepository.update(id, updateData);
+    const updatedOP = await this.ordensProducaoRepository.update(
+      id,
+      updateData,
+    );
 
     return updatedOP;
   }

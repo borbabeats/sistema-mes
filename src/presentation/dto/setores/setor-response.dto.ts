@@ -14,7 +14,10 @@ export class SetorResponseDto {
   @ApiProperty({ description: 'Quantidade de máquinas no setor' })
   qtdMaquinas?: number;
 
-  @ApiProperty({ description: 'Lista de usuários do setor', type: [UsuarioResponseDto] })
+  @ApiProperty({
+    description: 'Lista de usuários do setor',
+    type: [UsuarioResponseDto],
+  })
   usuarios?: UsuarioResponseDto[];
 
   @ApiProperty({ description: 'Lista de máquinas do setor' })

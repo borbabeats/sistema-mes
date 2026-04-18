@@ -43,8 +43,8 @@ import { ListarManutencoesUseCase } from '../../application/use-cases/manutencoe
     ListarManutencoesUseCase,
   ],
   exports: [
-    MaquinasService, 
-    CreateMaquinaUseCase, 
+    MaquinasService,
+    CreateMaquinaUseCase,
     FindMaquinaUseCase,
     FindAllMaquinasUseCase,
     UpdateMaquinaUseCase,

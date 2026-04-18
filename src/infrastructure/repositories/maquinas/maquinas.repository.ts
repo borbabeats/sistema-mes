@@ -1,7 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IMaquinasRepository, CreateMaquinaData, UpdateMaquinaData, MaquinaFilters } from '../../../domain/repositories/maquinas.repository.interface';
-import { Maquina, StatusMaquina } from '../../../domain/entities/maquina.entity';
+import {
+  IMaquinasRepository,
+  CreateMaquinaData,
+  UpdateMaquinaData,
+  MaquinaFilters,
+} from '../../../domain/repositories/maquinas.repository.interface';
+import {
+  Maquina,
+  StatusMaquina,
+} from '../../../domain/entities/maquina.entity';
 
 @Injectable()
 export class MaquinasRepository implements IMaquinasRepository {
@@ -30,11 +38,17 @@ export class MaquinasRepository implements IMaquinasRepository {
   async findAll(filters?: MaquinaFilters): Promise<Maquina[]> {
     const whereClause: any = {};
 
-    if (filters?.codigo) whereClause.codigo = { contains: filters.codigo, mode: 'insensitive' };
-    if (filters?.nome) whereClause.nome = { contains: filters.nome, mode: 'insensitive' };
+    if (filters?.codigo)
+      whereClause.codigo = { contains: filters.codigo, mode: 'insensitive' };
+    if (filters?.nome)
+      whereClause.nome = { contains: filters.nome, mode: 'insensitive' };
     if (filters?.status) whereClause.status = filters.status;
     if (filters?.setorId) whereClause.setor_id = filters.setorId;
-    if (filters?.fabricante) whereClause.fabricante = { contains: filters.fabricante, mode: 'insensitive' };
+    if (filters?.fabricante)
+      whereClause.fabricante = {
+        contains: filters.fabricante,
+        mode: 'insensitive',
+      };
 
     const maquinas = await this.prisma.maquina.findMany({
       where: whereClause,
@@ -42,9 +56,9 @@ export class MaquinasRepository implements IMaquinasRepository {
         setor: {
           select: {
             id: true,
-            nome: true
-          }
-        }
+            nome: true,
+          },
+        },
       },
       orderBy: {
         nome: 'asc',
@@ -61,10 +75,10 @@ export class MaquinasRepository implements IMaquinasRepository {
         setor: {
           select: {
             id: true,
-            nome: true
-          }
-        }
-      }
+            nome: true,
+          },
+        },
+      },
     });
 
     return maquina ? this.mapToEntityWithSetor(maquina) : null;
@@ -119,8 +133,10 @@ export class MaquinasRepository implements IMaquinasRepository {
     if (data.descricao !== undefined) updateData.descricao = data.descricao;
     if (data.fabricante !== undefined) updateData.fabricante = data.fabricante;
     if (data.modelo !== undefined) updateData.modelo = data.modelo;
-    if (data.numeroSerie !== undefined) updateData.numeroSerie = data.numeroSerie;
-    if (data.anoFabricacao !== undefined) updateData.anoFabricacao = data.anoFabricacao;
+    if (data.numeroSerie !== undefined)
+      updateData.numeroSerie = data.numeroSerie;
+    if (data.anoFabricacao !== undefined)
+      updateData.anoFabricacao = data.anoFabricacao;
     if (data.capacidade !== undefined) updateData.capacidade = data.capacidade;
     if (data.status !== undefined) updateData.status = data.status;
     if (data.setorId !== undefined) updateData.setor_id = data.setorId;

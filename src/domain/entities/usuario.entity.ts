@@ -4,7 +4,6 @@ export enum Cargo {
   OPERADOR = 'OPERADOR',
 }
 
-
 export class Usuario {
   id: number;
   nome: string;

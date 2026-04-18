@@ -33,7 +33,7 @@ export class OrdemProducaoStatusLogRepository implements IOrdemProducaoStatusLog
       orderBy: { created_at: 'desc' },
     });
 
-    return logs.map(log => this.mapToEntity(log));
+    return logs.map((log) => this.mapToEntity(log));
   }
 
   private mapToEntity(prismaLog: any): OrdemProducaoStatusLog {

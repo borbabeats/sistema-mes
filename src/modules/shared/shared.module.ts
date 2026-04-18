@@ -16,9 +16,6 @@ import { MANUTENCOES_REPOSITORY_TOKEN } from '../../domain/repositories/manutenc
       useClass: ManutencoesRepository,
     },
   ],
-  exports: [
-    MAQUINAS_REPOSITORY_TOKEN,
-    MANUTENCOES_REPOSITORY_TOKEN,
-  ],
+  exports: [MAQUINAS_REPOSITORY_TOKEN, MANUTENCOES_REPOSITORY_TOKEN],
 })
 export class SharedModule {}

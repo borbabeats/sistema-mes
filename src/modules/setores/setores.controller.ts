@@ -9,7 +9,6 @@ import {
   UseGuards,
   Request,
   ForbiddenException,
-  HttpCode,
 } from '@nestjs/common';
 import { SetoresService } from './setores.service';
 import { CreateSetorDto } from '../../presentation/dto/setores/create-setor.dto';
@@ -36,7 +35,6 @@ export class SetoresController {
   findAll() {
     return this.setoresService.findAll();
   }
-
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -68,6 +66,4 @@ export class SetoresController {
     }
     return this.setoresService.remove(+id);
   }
-
-
 }

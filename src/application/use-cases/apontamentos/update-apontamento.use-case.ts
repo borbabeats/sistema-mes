@@ -1,5 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IApontamentosRepository, UpdateApontamentoData, APONTAMENTOS_REPOSITORY_TOKEN } from '../../../domain/repositories/apontamentos.repository.interface';
+import {
+  IApontamentosRepository,
+  UpdateApontamentoData,
+  APONTAMENTOS_REPOSITORY_TOKEN,
+} from '../../../domain/repositories/apontamentos.repository.interface';
 import { Apontamento } from '../../../domain/entities/apontamento.entity';
 import { FindMaquinaUseCase } from '../maquinas/find-maquina.use-case';
 import { FindOrdemProducaoUseCase } from '../ordens-producao/find-ordem-producao.use-case';
@@ -8,7 +12,8 @@ import { FindUsuarioUseCase } from '../usuarios/find-usuario.use-case';
 @Injectable()
 export class UpdateApontamentoUseCase {
   constructor(
-    @Inject(APONTAMENTOS_REPOSITORY_TOKEN) private readonly apontamentosRepository: IApontamentosRepository,
+    @Inject(APONTAMENTOS_REPOSITORY_TOKEN)
+    private readonly apontamentosRepository: IApontamentosRepository,
     private readonly findMaquinaUseCase: FindMaquinaUseCase,
     private readonly findOrdemProducaoUseCase: FindOrdemProducaoUseCase,
     private readonly findUsuarioUseCase: FindUsuarioUseCase,
@@ -40,7 +45,9 @@ export class UpdateApontamentoUseCase {
 
     // Validar ordem de produção (se fornecida)
     if (data.opId) {
-      const ordemProducao = await this.findOrdemProducaoUseCase.execute(data.opId);
+      const ordemProducao = await this.findOrdemProducaoUseCase.execute(
+        data.opId,
+      );
       if (!ordemProducao) {
         throw new Error('Ordem de produção não encontrada');
       }

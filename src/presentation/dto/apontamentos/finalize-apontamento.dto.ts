@@ -2,18 +2,18 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsNumber, Min } from 'class-validator';
 
 export class FinalizeApontamentoDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quantidade produzida final',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsNumber()
   @Min(0)
   quantidadeProduzida?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Quantidade de defeitos final',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsNumber()

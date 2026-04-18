@@ -7,16 +7,18 @@ export const loggerConfig = {
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
     winston.format.json(),
-    winston.format.printf(({ timestamp, level, message, context, trace, ...meta }) => {
-      return JSON.stringify({
-        timestamp,
-        level,
-        message,
-        context,
-        trace,
-        ...meta,
-      });
-    }),
+    winston.format.printf(
+      ({ timestamp, level, message, context, trace, ...meta }) => {
+        return JSON.stringify({
+          timestamp,
+          level,
+          message,
+          context,
+          trace,
+          ...meta,
+        });
+      },
+    ),
   ),
   defaultMeta: {
     service: 'sistema-mes',
@@ -26,11 +28,13 @@ export const loggerConfig = {
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.simple(),
-        winston.format.printf(({ timestamp, level, message, context, ...meta }) => {
-          return `${timestamp} [${context || 'App'}] ${level}: ${message} ${
-            Object.keys(meta).length ? JSON.stringify(meta) : ''
-          }`;
-        }),
+        winston.format.printf(
+          ({ timestamp, level, message, context, ...meta }) => {
+            return `${timestamp} [${context || 'App'}] ${level}: ${message} ${
+              Object.keys(meta).length ? JSON.stringify(meta) : ''
+            }`;
+          },
+        ),
       ),
     }),
     new winston.transports.File({

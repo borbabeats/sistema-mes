@@ -4,7 +4,7 @@ export enum TipoManutencao {
   PREDITIVA = 'PREDITIVA',
   LUBRIFICACAO = 'LUBRIFICACAO',
   CALIBRACAO = 'CALIBRACAO',
-  OUTRA = 'OUTRA'
+  OUTRA = 'OUTRA',
 }
 
 export enum StatusManutencao {
@@ -12,7 +12,7 @@ export enum StatusManutencao {
   EM_ANDAMENTO = 'EM_ANDAMENTO',
   CONCLUIDA = 'CONCLUIDA',
   CANCELADA = 'CANCELADA',
-  ATRASADA = 'ATRASADA'
+  ATRASADA = 'ATRASADA',
 }
 
 export interface Manutencao {

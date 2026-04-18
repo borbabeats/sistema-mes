@@ -1,5 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IApontamentosRepository, ApontamentoFilters, APONTAMENTOS_REPOSITORY_TOKEN } from '../../../domain/repositories/apontamentos.repository.interface';
+import {
+  IApontamentosRepository,
+  ApontamentoFilters,
+  APONTAMENTOS_REPOSITORY_TOKEN,
+} from '../../../domain/repositories/apontamentos.repository.interface';
 import { Apontamento } from '../../../domain/entities/apontamento.entity';
 import { FindAllApontamentosDto } from '../../../presentation/dto/apontamentos/find-all-apontamentos.dto';
 import { PaginatedResult } from '../../../presentation/dto/common/pagination.dto';
@@ -7,10 +11,13 @@ import { PaginatedResult } from '../../../presentation/dto/common/pagination.dto
 @Injectable()
 export class FindAllApontamentosPaginatedUseCase {
   constructor(
-    @Inject(APONTAMENTOS_REPOSITORY_TOKEN) private readonly apontamentosRepository: IApontamentosRepository,
+    @Inject(APONTAMENTOS_REPOSITORY_TOKEN)
+    private readonly apontamentosRepository: IApontamentosRepository,
   ) {}
 
-  async execute(filters?: FindAllApontamentosDto): Promise<PaginatedResult<Apontamento>> {
+  async execute(
+    filters?: FindAllApontamentosDto,
+  ): Promise<PaginatedResult<Apontamento>> {
     const repositoryFilters: ApontamentoFilters = {
       opId: filters?.opId,
       maquinaId: filters?.maquinaId,
@@ -25,11 +32,15 @@ export class FindAllApontamentosPaginatedUseCase {
       sortBy: filters?.sortBy,
       sortOrder: filters?.sortOrder || 'DESC',
     };
-    
+
     // Padrão RESTful: ?page=1&limit=20
     const page = filters?.page || 1;
     const limit = filters?.limit || 20;
-    
-    return this.apontamentosRepository.findAllPaginated(repositoryFilters, page, limit);
+
+    return this.apontamentosRepository.findAllPaginated(
+      repositoryFilters,
+      page,
+      limit,
+    );
   }
 }

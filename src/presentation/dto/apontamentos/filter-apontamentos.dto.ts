@@ -46,7 +46,7 @@ export class FilterApontamentosDto {
     format: 'date-time',
   })
   @IsOptional()
-  @Transform(({ value }) => value ? new Date(value) : undefined)
+  @Transform(({ value }) => (value ? new Date(value) : undefined))
   dataInicio?: Date;
 
   @ApiPropertyOptional({
@@ -55,7 +55,7 @@ export class FilterApontamentosDto {
     format: 'date-time',
   })
   @IsOptional()
-  @Transform(({ value }) => value ? new Date(value) : undefined)
+  @Transform(({ value }) => (value ? new Date(value) : undefined))
   dataFim?: Date;
 
   @ApiPropertyOptional({

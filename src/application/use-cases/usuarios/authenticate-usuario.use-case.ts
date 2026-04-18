@@ -30,10 +30,13 @@ export interface AuthenticateUsuarioResult {
 @Injectable()
 export class AuthenticateUsuarioUseCase {
   constructor(
-    @Inject(USUARIOS_REPOSITORY_TOKEN) private readonly usuariosRepository: IUsuariosRepository,
+    @Inject(USUARIOS_REPOSITORY_TOKEN)
+    private readonly usuariosRepository: IUsuariosRepository,
   ) {}
 
-  async execute(data: AuthenticateUsuarioData): Promise<AuthenticateUsuarioResult> {
+  async execute(
+    data: AuthenticateUsuarioData,
+  ): Promise<AuthenticateUsuarioResult> {
     // Validar dados de entrada
     if (!data.email || !data.senha) {
       throw new Error('Email e senha são obrigatórios');

@@ -6,7 +6,7 @@ export class PaginationDto {
   @ApiPropertyOptional({
     description: 'Número da página',
     example: 1,
-    default: 1
+    default: 1,
   })
   @IsOptional()
   @Type(() => Number)
@@ -17,7 +17,7 @@ export class PaginationDto {
   @ApiPropertyOptional({
     description: 'Itens por página',
     example: 10,
-    default: 10
+    default: 10,
   })
   @IsOptional()
   @Type(() => Number)

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsNumber, Min, Max } from 'class-validator';
-import { CreateMaquinaDto } from './create-maquina.dto';
 
 export class UpdateMaquinaDto {
   @ApiProperty({ description: 'Código único da máquina', required: false })
@@ -13,7 +12,10 @@ export class UpdateMaquinaDto {
   @IsString()
   nome?: string;
 
-  @ApiProperty({ description: 'Descrição detalhada da máquina', required: false })
+  @ApiProperty({
+    description: 'Descrição detalhada da máquina',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   descricao?: string;
@@ -45,10 +47,17 @@ export class UpdateMaquinaDto {
   @IsString()
   capacidade?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Status da máquina',
-    enum: ['DISPONIVEL', 'EM_USO', 'MANUTENCAO', 'INATIVA', 'PARADA', 'DESATIVADA'],
-    required: false
+    enum: [
+      'DISPONIVEL',
+      'EM_USO',
+      'MANUTENCAO',
+      'INATIVA',
+      'PARADA',
+      'DESATIVADA',
+    ],
+    required: false,
   })
   @IsOptional()
   @IsString()

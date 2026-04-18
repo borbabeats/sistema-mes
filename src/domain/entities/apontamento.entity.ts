@@ -7,7 +7,7 @@ export class Apontamento {
   quantidadeDefeito: number;
   dataInicio: string;
   dataFim?: string | null;
-  
+
   // Dados relacionados
   maquina?: {
     id: number;
@@ -46,6 +46,8 @@ export class Apontamento {
 
   getDuration(): number | null {
     if (!this.dataFim) return null;
-    return new Date(this.dataFim).getTime() - new Date(this.dataInicio).getTime();
+    return (
+      new Date(this.dataFim).getTime() - new Date(this.dataInicio).getTime()
+    );
   }
 }

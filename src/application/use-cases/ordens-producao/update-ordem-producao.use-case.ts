@@ -1,6 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IOrdensProducaoRepository, UpdateOrdemProducaoData } from '../../../domain/repositories/ordens-producao.repository.interface';
-import { OrdemProducao, StatusOP, PrioridadeOP } from '../../../domain/entities/ordem-producao.entity';
+import {
+  IOrdensProducaoRepository,
+  UpdateOrdemProducaoData,
+} from '../../../domain/repositories/ordens-producao.repository.interface';
+import {
+  OrdemProducao,
+  StatusOP,
+  PrioridadeOP,
+} from '../../../domain/entities/ordem-producao.entity';
 import { ORDENS_PRODUCAO_REPOSITORY_TOKEN } from '../../../modules/ordens-producao/constants';
 import { FindSetorUseCase } from '../setores/find-setor.use-case';
 import { FindUsuarioUseCase } from '../usuarios/find-usuario.use-case';
@@ -8,12 +15,16 @@ import { FindUsuarioUseCase } from '../usuarios/find-usuario.use-case';
 @Injectable()
 export class UpdateOrdemProducaoUseCase {
   constructor(
-    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN) private readonly ordensProducaoRepository: IOrdensProducaoRepository,
+    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN)
+    private readonly ordensProducaoRepository: IOrdensProducaoRepository,
     private readonly findSetorUseCase: FindSetorUseCase,
     private readonly findUsuarioUseCase: FindUsuarioUseCase,
   ) {}
 
-  async execute(id: number, data: UpdateOrdemProducaoData): Promise<OrdemProducao> {
+  async execute(
+    id: number,
+    data: UpdateOrdemProducaoData,
+  ): Promise<OrdemProducao> {
     // Verificar se a OP existe
     const ordemProducao = await this.ordensProducaoRepository.findOne(id);
     if (!ordemProducao) {
@@ -22,7 +33,9 @@ export class UpdateOrdemProducaoUseCase {
 
     // Verificar se o código já existe (se fornecido e for diferente)
     if (data.codigo && data.codigo !== ordemProducao.codigo) {
-      const existingOP = await this.ordensProducaoRepository.findByCodigo(data.codigo);
+      const existingOP = await this.ordensProducaoRepository.findByCodigo(
+        data.codigo,
+      );
       if (existingOP) {
         throw new Error('Já existe uma ordem de produção com este código');
       }
@@ -38,7 +51,9 @@ export class UpdateOrdemProducaoUseCase {
 
     // Validar responsável (se fornecido)
     if (data.responsavelId) {
-      const responsavel = await this.findUsuarioUseCase.execute(data.responsavelId);
+      const responsavel = await this.findUsuarioUseCase.execute(
+        data.responsavelId,
+      );
       if (!responsavel) {
         throw new Error('Responsável não encontrado');
       }
@@ -60,7 +75,10 @@ export class UpdateOrdemProducaoUseCase {
     }
 
     // Validar prioridade (se fornecida)
-    if (data.prioridade && !Object.values(PrioridadeOP).includes(data.prioridade)) {
+    if (
+      data.prioridade &&
+      !Object.values(PrioridadeOP).includes(data.prioridade)
+    ) {
       throw new Error('Prioridade inválida');
     }
 

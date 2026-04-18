@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { ISetoresRepository, CreateSetorData, UpdateSetorData, SetorFilters } from '../../../domain/repositories/setores.repository.interface';
+import {
+  ISetoresRepository,
+  CreateSetorData,
+  UpdateSetorData,
+  SetorFilters,
+} from '../../../domain/repositories/setores.repository.interface';
 import { Setor } from '../../../domain/entities/setor.entity';
 
 @Injectable()
@@ -20,7 +25,8 @@ export class SetoresRepository implements ISetoresRepository {
   async findAll(filters?: SetorFilters): Promise<Setor[]> {
     const whereClause: any = {};
 
-    if (filters?.nome) whereClause.nome = { contains: filters.nome, mode: 'insensitive' };
+    if (filters?.nome)
+      whereClause.nome = { contains: filters.nome, mode: 'insensitive' };
 
     const setores = await this.prisma.setor.findMany({
       where: whereClause,
@@ -46,18 +52,18 @@ export class SetoresRepository implements ISetoresRepository {
               setor_id: true,
               created_at: true,
               updated_at: true,
-              deleted_at: true
+              deleted_at: true,
             },
-            orderBy: { nome: 'asc' }
+            orderBy: { nome: 'asc' },
           }),
           this.prisma.maquina.findMany({
             where: { setor_id: setor.id },
-            orderBy: { codigo: 'asc' }
-          })
+            orderBy: { codigo: 'asc' },
+          }),
         ]);
 
         return this.mapToEntityWithDetails(setor, usuarios, maquinas);
-      })
+      }),
     );
 
     return setoresWithDetails;
@@ -110,7 +116,11 @@ export class SetoresRepository implements ISetoresRepository {
     });
   }
 
-  private mapToEntityWithCounts(prismaSetor: any, qtdUsuarios: number, qtdMaquinas: number): Setor {
+  private mapToEntityWithCounts(
+    prismaSetor: any,
+    qtdUsuarios: number,
+    qtdMaquinas: number,
+  ): Setor {
     return new Setor({
       id: prismaSetor.id,
       nome: prismaSetor.nome,
@@ -122,9 +132,13 @@ export class SetoresRepository implements ISetoresRepository {
     });
   }
 
-  private mapToEntityWithDetails(prismaSetor: any, usuarios: any[], maquinas: any[]): Setor {
+  private mapToEntityWithDetails(
+    prismaSetor: any,
+    usuarios: any[],
+    maquinas: any[],
+  ): Setor {
     // Mapear usuários para o formato esperado
-    const usuariosFormatados = usuarios.map(usuario => ({
+    const usuariosFormatados = usuarios.map((usuario) => ({
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
@@ -135,7 +149,7 @@ export class SetoresRepository implements ISetoresRepository {
       setorId: usuario.setor_id,
       createdAt: usuario.created_at,
       updatedAt: usuario.updated_at,
-      deletedAt: usuario.deleted_at
+      deletedAt: usuario.deleted_at,
     }));
 
     return new Setor({
@@ -147,7 +161,7 @@ export class SetoresRepository implements ISetoresRepository {
       updated_at: prismaSetor.updated_at,
       deleted_at: prismaSetor.deleted_at,
       usuarios: usuariosFormatados,
-      maquinas: maquinas
+      maquinas: maquinas,
     });
   }
 }

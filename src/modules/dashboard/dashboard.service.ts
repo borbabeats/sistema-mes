@@ -14,22 +14,22 @@ export class DashboardService {
     const opsAtivas = await this.prisma.ordemProducao.count({
       where: {
         status: {
-          in: [StatusOP.EM_ANDAMENTO, StatusOP.PLANEJADA]
+          in: [StatusOP.EM_ANDAMENTO, StatusOP.PLANEJADA],
         },
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     // Produção do Dia
     const producaoDia = await this.prisma.apontamento.aggregate({
       where: {
         dataInicio: {
-          gte: ultimas24h
-        }
+          gte: ultimas24h,
+        },
       },
       _sum: {
-        quantidadeProduzida: true
-      }
+        quantidadeProduzida: true,
+      },
     });
 
     // Produção Planejada do Dia
@@ -37,43 +37,42 @@ export class DashboardService {
       where: {
         dataInicioPlanejado: {
           gte: ultimas24h,
-          lte: agora
+          lte: agora,
         },
-        deletedAt: null
+        deletedAt: null,
       },
       _sum: {
-        quantidadePlanejada: true
-      }
+        quantidadePlanejada: true,
+      },
     });
 
     // Total Produzido e com Defeito para Taxa de Defeitos
     const totalProduzido = await this.prisma.apontamento.aggregate({
       _sum: {
         quantidadeProduzida: true,
-        quantidadeDefeito: true
-      }
+        quantidadeDefeito: true,
+      },
     });
 
     const producaoReal = producaoDia._sum.quantidadeProduzida || 0;
-    const producaoPlanejada = producaoPlanejadaDia._sum.quantidadePlanejada || 0;
+    const producaoPlanejada =
+      producaoPlanejadaDia._sum.quantidadePlanejada || 0;
     const totalProduzidoGeral = totalProduzido._sum.quantidadeProduzida || 0;
     const totalDefeitos = totalProduzido._sum.quantidadeDefeito || 0;
 
     // Eficiência Global
-    const eficienciaGlobal = producaoPlanejada > 0 
-      ? (producaoReal / producaoPlanejada) * 100 
-      : 0;
+    const eficienciaGlobal =
+      producaoPlanejada > 0 ? (producaoReal / producaoPlanejada) * 100 : 0;
 
     // Taxa de Defeitos
-    const taxaDefeitos = totalProduzidoGeral > 0 
-      ? (totalDefeitos / totalProduzidoGeral) * 100 
-      : 0;
+    const taxaDefeitos =
+      totalProduzidoGeral > 0 ? (totalDefeitos / totalProduzidoGeral) * 100 : 0;
 
     return {
       opsAtivas,
       producaoDia: producaoReal,
       eficienciaGlobal: Number(eficienciaGlobal.toFixed(2)),
-      taxaDefeitos: Number(taxaDefeitos.toFixed(2))
+      taxaDefeitos: Number(taxaDefeitos.toFixed(2)),
     };
   }
 
@@ -82,8 +81,8 @@ export class DashboardService {
     const totalProduzido = await this.prisma.apontamento.aggregate({
       _sum: {
         quantidadeProduzida: true,
-        quantidadeDefeito: true
-      }
+        quantidadeDefeito: true,
+      },
     });
 
     const total = totalProduzido._sum.quantidadeProduzida || 0;
@@ -98,38 +97,39 @@ export class DashboardService {
     const rejeicoesMes = await this.prisma.apontamento.aggregate({
       where: {
         dataInicio: {
-          gte: inicioMes
-        }
+          gte: inicioMes,
+        },
       },
       _sum: {
-        quantidadeDefeito: true
-      }
+        quantidadeDefeito: true,
+      },
     });
 
     // Conformidade (OPs concluídas dentro dos padrões)
     const opsConcluidas = await this.prisma.ordemProducao.count({
       where: {
         status: StatusOP.FINALIZADA,
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     const opsConforme = await this.prisma.ordemProducao.count({
       where: {
         status: StatusOP.FINALIZADA,
         quantidadeProduzida: {
-          gte: this.prisma.ordemProducao.fields.quantidadePlanejada
+          gte: this.prisma.ordemProducao.fields.quantidadePlanejada,
         },
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
-    const conformidade = opsConcluidas > 0 ? (opsConforme / opsConcluidas) * 100 : 0;
+    const conformidade =
+      opsConcluidas > 0 ? (opsConforme / opsConcluidas) * 100 : 0;
 
     return {
       indiceQualidade: Number(indiceQualidade.toFixed(2)),
       rejeicoesMes: rejeicoesMes._sum.quantidadeDefeito || 0,
-      conformidade: Number(conformidade.toFixed(2))
+      conformidade: Number(conformidade.toFixed(2)),
     };
   }
 
@@ -138,26 +138,26 @@ export class DashboardService {
     const maquinasAtivas = await this.prisma.maquina.count({
       where: {
         status: {
-          in: [StatusMaquina.DISPONIVEL, StatusMaquina.EM_USO]
+          in: [StatusMaquina.DISPONIVEL, StatusMaquina.EM_USO],
         },
-        deleted_at: null
-      }
+        deleted_at: null,
+      },
     });
 
     // OEE Simplificado (Overall Equipment Effectiveness)
     const maquinas = await this.prisma.maquina.findMany({
       where: {
-        deleted_at: null
+        deleted_at: null,
       },
       include: {
         apontamentos: {
           where: {
             dataInicio: {
-              gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-            }
-          }
-        }
-      }
+              gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+            },
+          },
+        },
+      },
     });
 
     let tempoDisponivelTotal = 0;
@@ -165,31 +165,38 @@ export class DashboardService {
     let producaoTotal = 0;
     let producaoIdealTotal = 0;
 
-    maquinas.forEach(maquina => {
+    maquinas.forEach((maquina) => {
       const tempoDisponivel = 24 * 60; // 24 horas em minutos
       tempoDisponivelTotal += tempoDisponivel;
 
-      maquina.apontamentos.forEach(apontamento => {
-        const tempoProducao = apontamento.dataFim 
-          ? (apontamento.dataFim.getTime() - apontamento.dataInicio.getTime()) / (1000 * 60)
-          : (new Date().getTime() - apontamento.dataInicio.getTime()) / (1000 * 60);
-        
+      maquina.apontamentos.forEach((apontamento) => {
+        const tempoProducao = apontamento.dataFim
+          ? (apontamento.dataFim.getTime() - apontamento.dataInicio.getTime()) /
+            (1000 * 60)
+          : (new Date().getTime() - apontamento.dataInicio.getTime()) /
+            (1000 * 60);
+
         tempoProducaoTotal += tempoProducao;
         producaoTotal += apontamento.quantidadeProduzida;
         producaoIdealTotal += tempoProducao * 10; // Assumindo 10 unidades/minuto como taxa ideal
       });
     });
 
-    const disponibilidade = tempoDisponivelTotal > 0 ? (tempoProducaoTotal / tempoDisponivelTotal) * 100 : 0;
-    const performance = producaoIdealTotal > 0 ? (producaoTotal / producaoIdealTotal) * 100 : 0;
-    const qualidade = producaoTotal > 0 ? ((producaoTotal - 50) / producaoTotal) * 100 : 0; // Simplificado
+    const disponibilidade =
+      tempoDisponivelTotal > 0
+        ? (tempoProducaoTotal / tempoDisponivelTotal) * 100
+        : 0;
+    const performance =
+      producaoIdealTotal > 0 ? (producaoTotal / producaoIdealTotal) * 100 : 0;
+    const qualidade =
+      producaoTotal > 0 ? ((producaoTotal - 50) / producaoTotal) * 100 : 0; // Simplificado
 
     const oee = (disponibilidade * performance * qualidade) / 10000;
 
     return {
       maquinasAtivas,
       taxaOEE: Number(oee.toFixed(2)),
-      disponibilidade: Number(disponibilidade.toFixed(2))
+      disponibilidade: Number(disponibilidade.toFixed(2)),
     };
   }
 
@@ -202,26 +209,26 @@ export class DashboardService {
         OR: [
           {
             dataFimPlanejado: {
-              lt: agora
+              lt: agora,
             },
             status: {
-              notIn: [StatusOP.FINALIZADA, StatusOP.CANCELADA]
-            }
+              notIn: [StatusOP.FINALIZADA, StatusOP.CANCELADA],
+            },
           },
           {
-            status: StatusOP.ATRASADA
-          }
+            status: StatusOP.ATRASADA,
+          },
         ],
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     // Total de OPs concluídas para cálculo de cumprimento
     const opsConcluidas = await this.prisma.ordemProducao.count({
       where: {
         status: StatusOP.FINALIZADA,
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     // OPs concluídas no prazo
@@ -229,52 +236,57 @@ export class DashboardService {
       where: {
         status: StatusOP.FINALIZADA,
         dataFimReal: {
-          not: null
+          not: null,
         },
         dataFimPlanejado: {
-          not: null
+          not: null,
         },
         deletedAt: null,
         OR: [
           {
             dataFimReal: {
-              lte: this.prisma.ordemProducao.fields.dataFimPlanejado
-            }
-          }
-        ]
-      }
+              lte: this.prisma.ordemProducao.fields.dataFimPlanejado,
+            },
+          },
+        ],
+      },
     });
 
-    const cumprimentoPrazos = opsConcluidas > 0 ? (opsNoPrazo / opsConcluidas) * 100 : 0;
+    const cumprimentoPrazos =
+      opsConcluidas > 0 ? (opsNoPrazo / opsConcluidas) * 100 : 0;
 
     // Tempo Médio de Ciclo
     const opsComCiclo = await this.prisma.ordemProducao.findMany({
       where: {
         dataInicioReal: {
-          not: null
+          not: null,
         },
         dataFimReal: {
-          not: null
+          not: null,
         },
-        deletedAt: null
+        deletedAt: null,
       },
       select: {
         dataInicioReal: true,
-        dataFimReal: true
-      }
+        dataFimReal: true,
+      },
     });
 
-    const tempoMedioCiclo = opsComCiclo.length > 0
-      ? opsComCiclo.reduce((acc, op) => {
-          const ciclo = op.dataFimReal!.getTime() - op.dataInicioReal!.getTime();
-          return acc + ciclo;
-        }, 0) / opsComCiclo.length / (1000 * 60 * 60) // Converter para horas
-      : 0;
+    const tempoMedioCiclo =
+      opsComCiclo.length > 0
+        ? opsComCiclo.reduce((acc, op) => {
+            const ciclo =
+              op.dataFimReal!.getTime() - op.dataInicioReal!.getTime();
+            return acc + ciclo;
+          }, 0) /
+          opsComCiclo.length /
+          (1000 * 60 * 60) // Converter para horas
+        : 0;
 
     return {
       opsAtraso,
       cumprimentoPrazos: Number(cumprimentoPrazos.toFixed(2)),
-      tempoMedioCiclo: Number(tempoMedioCiclo.toFixed(2))
+      tempoMedioCiclo: Number(tempoMedioCiclo.toFixed(2)),
     };
   }
 
@@ -292,7 +304,7 @@ export class DashboardService {
       WHERE dataInicio >= ${dataInicio}
       GROUP BY DATE(dataInicio)
       ORDER BY data ASC
-    ` as { data: Date; produzido: bigint; planejado: number }[];
+    `;
 
     // Obter produção planejada
     const producaoPlanejadaDiaria = await this.prisma.$queryRaw`
@@ -304,22 +316,36 @@ export class DashboardService {
         AND deleted_at IS NULL
       GROUP BY DATE(dataInicioPlanejado)
       ORDER BY data ASC
-    ` as { data: Date; planejado: bigint }[];
+    `;
 
     // Combinar dados
-    const dadosCombinados: { data: string; produzido: number; planejado: number }[] = [];
-    const mapaProduzido = new Map(producaoDiaria.map(item => [item.data.toISOString().split('T')[0], Number(item.produzido)]));
-    const mapaPlanejado = new Map(producaoPlanejadaDiaria.map(item => [item.data.toISOString().split('T')[0], Number(item.planejado)]));
+    const dadosCombinados: {
+      data: string;
+      produzido: number;
+      planejado: number;
+    }[] = [];
+    const mapaProduzido = new Map(
+      producaoDiaria.map((item) => [
+        item.data.toISOString().split('T')[0],
+        Number(item.produzido),
+      ]),
+    );
+    const mapaPlanejado = new Map(
+      producaoPlanejadaDiaria.map((item) => [
+        item.data.toISOString().split('T')[0],
+        Number(item.planejado),
+      ]),
+    );
 
     for (let i = 0; i < dias; i++) {
       const data = new Date(dataInicio);
       data.setDate(data.getDate() + i);
       const dataStr = data.toISOString().split('T')[0];
-      
+
       dadosCombinados.push({
         data: dataStr,
         produzido: mapaProduzido.get(dataStr) || 0,
-        planejado: mapaPlanejado.get(dataStr) || 0
+        planejado: mapaPlanejado.get(dataStr) || 0,
       });
     }
 
@@ -328,7 +354,7 @@ export class DashboardService {
 
   async getGraficoProducaoPorSetor(periodo: string = 'mes') {
     let dataInicio: Date;
-    
+
     switch (periodo) {
       case 'hoje':
         dataInicio = new Date();
@@ -357,11 +383,11 @@ export class DashboardService {
       WHERE s.deleted_at IS NULL
       GROUP BY s.id, s.nome
       ORDER BY produzido DESC
-    ` as { setor: string; produzido: bigint }[];
+    `;
 
-    return producaoPorSetor.map(item => ({
+    return producaoPorSetor.map((item) => ({
       setor: item.setor,
-      produzido: Number(item.produzido)
+      produzido: Number(item.produzido),
     }));
   }
 
@@ -369,16 +395,16 @@ export class DashboardService {
     const statusOps = await this.prisma.ordemProducao.groupBy({
       by: ['status'],
       where: {
-        deletedAt: null
+        deletedAt: null,
       },
       _count: {
-        id: true
-      }
+        id: true,
+      },
     });
 
-    return statusOps.map(item => ({
+    return statusOps.map((item) => ({
       status: item.status,
-      quantidade: item._count.id
+      quantidade: item._count.id,
     }));
   }
 
@@ -401,11 +427,11 @@ export class DashboardService {
       WHERE dataInicio >= ${dataInicio}
       GROUP BY DATE(dataInicio)
       ORDER BY data ASC
-    ` as { data: Date; produzido: bigint; defeitos: bigint; taxaQualidade: number }[];
+    `;
 
-    return tendenciaQualidade.map(item => ({
+    return tendenciaQualidade.map((item) => ({
       data: item.data.toISOString().split('T')[0],
-      taxaQualidade: Number(item.taxaQualidade.toFixed(2))
+      taxaQualidade: Number(item.taxaQualidade.toFixed(2)),
     }));
   }
 
@@ -416,23 +442,23 @@ export class DashboardService {
 
     const maquinas = await this.prisma.maquina.findMany({
       where: {
-        deleted_at: null
+        deleted_at: null,
       },
       include: {
         apontamentos: {
           where: {
             dataInicio: {
-              gte: ultimas24h
-            }
-          }
-        }
-      }
+              gte: ultimas24h,
+            },
+          },
+        },
+      },
     });
 
     let oeeTotal = 0;
     let maquinasContadas = 0;
 
-    maquinas.forEach(maquina => {
+    maquinas.forEach((maquina) => {
       if (maquina.apontamentos.length > 0) {
         const tempoTotal = 24 * 60; // minutos
         const tempoProducao = maquina.apontamentos.reduce((acc, ap) => {
@@ -455,13 +481,13 @@ export class DashboardService {
     return {
       valor: Number(oeeMedio.toFixed(2)),
       status: oeeMedio < 65 ? 'CRITICO' : oeeMedio < 85 ? 'REGULAR' : 'OTIMO',
-      meta: 85
+      meta: 85,
     };
   }
 
   async getTopProdutos(periodo: string = 'mes') {
     let dataInicio: Date;
-    
+
     switch (periodo) {
       case 'hoje':
         dataInicio = new Date();
@@ -495,12 +521,12 @@ export class DashboardService {
       GROUP BY op.produto
       ORDER BY quantidade DESC
       LIMIT 5
-    ` as { produto: string; quantidade: bigint; qualidade: number }[];
+    `;
 
-    return topProdutos.map(item => ({
+    return topProdutos.map((item) => ({
       produto: item.produto,
       quantidade: Number(item.quantidade),
-      qualidade: Number(item.qualidade.toFixed(2))
+      qualidade: Number(item.qualidade.toFixed(2)),
     }));
   }
 
@@ -527,26 +553,29 @@ export class DashboardService {
           ELSE 'Noite'
         END
       ORDER BY data, turno
-    ` as { data: Date; turno: string; quantidade: bigint }[];
+    `;
 
     // Formatar para heatmap
-    const heatmapData: { data: string; turno: string; quantidade: number }[] = [];
+    const heatmapData: { data: string; turno: string; quantidade: number }[] =
+      [];
     const turnos = ['Manhã', 'Tarde', 'Noite'];
-    
+
     for (let i = 0; i < dias; i++) {
       const data = new Date(dataInicio);
       data.setDate(data.getDate() + i);
       const dataStr = data.toISOString().split('T')[0];
-      
-      turnos.forEach(turno => {
+
+      turnos.forEach((turno) => {
         const producao = producaoPorTurno.find(
-          item => item.data.toISOString().split('T')[0] === dataStr && item.turno === turno
+          (item) =>
+            item.data.toISOString().split('T')[0] === dataStr &&
+            item.turno === turno,
         );
-        
+
         heatmapData.push({
           data: dataStr,
           turno,
-          quantidade: producao ? Number(producao.quantidade) : 0
+          quantidade: producao ? Number(producao.quantidade) : 0,
         });
       });
     }
@@ -561,8 +590,8 @@ export class DashboardService {
     const maquinasParadas = await this.prisma.maquina.count({
       where: {
         status: StatusMaquina.PARADA,
-        deleted_at: null
-      }
+        deleted_at: null,
+      },
     });
 
     // OPs atrasadas
@@ -571,18 +600,18 @@ export class DashboardService {
         OR: [
           {
             dataFimPlanejado: {
-              lt: agora
+              lt: agora,
             },
             status: {
-              notIn: [StatusOP.FINALIZADA, StatusOP.CANCELADA]
-            }
+              notIn: [StatusOP.FINALIZADA, StatusOP.CANCELADA],
+            },
           },
           {
-            status: StatusOP.ATRASADA
-          }
+            status: StatusOP.ATRASADA,
+          },
         ],
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     // Taxa de defeitos alta
@@ -590,13 +619,13 @@ export class DashboardService {
     const defeitosRecentes = await this.prisma.apontamento.aggregate({
       where: {
         dataInicio: {
-          gte: ultimas24h
-        }
+          gte: ultimas24h,
+        },
       },
       _sum: {
         quantidadeProduzida: true,
-        quantidadeDefeito: true
-      }
+        quantidadeDefeito: true,
+      },
     });
 
     const total = Number(defeitosRecentes._sum.quantidadeProduzida || 0);
@@ -607,7 +636,7 @@ export class DashboardService {
       maquinasParadas,
       opsAtrasadas,
       taxaDefeitosAlta: taxaDefeitos > 5,
-      taxaDefeitos: Number(taxaDefeitos.toFixed(2))
+      taxaDefeitos: Number(taxaDefeitos.toFixed(2)),
     };
   }
 
@@ -623,12 +652,12 @@ export class DashboardService {
     const producaoDia = await this.prisma.apontamento.aggregate({
       where: {
         dataInicio: {
-          gte: inicioDia
-        }
+          gte: inicioDia,
+        },
       },
       _sum: {
-        quantidadeProduzida: true
-      }
+        quantidadeProduzida: true,
+      },
     });
 
     const produzido = Number(producaoDia._sum.quantidadeProduzida || 0);
@@ -638,13 +667,13 @@ export class DashboardService {
       meta: metaDiaria,
       produzido,
       progresso: Number(progresso.toFixed(2)),
-      faltante: Math.max(0, metaDiaria - produzido)
+      faltante: Math.max(0, metaDiaria - produzido),
     };
   }
 
   async getEficienciaOperadores(periodo: string = 'semana') {
     let dataInicio: Date;
-    
+
     switch (periodo) {
       case 'hoje':
         dataInicio = new Date();
@@ -678,14 +707,7 @@ export class DashboardService {
       HAVING totalApontamentos > 0
       ORDER BY mediaProducao DESC
       LIMIT 10
-    ` as { 
-      nome: string; 
-      cargo: string; 
-      totalApontamentos: bigint; 
-      totalProduzido: bigint; 
-      mediaProducao: number; 
-      taxaQualidade: number 
-    }[];
+    `;
 
     return eficienciaOperadores.map((item, index) => ({
       posicao: index + 1,
@@ -694,7 +716,7 @@ export class DashboardService {
       totalApontamentos: Number(item.totalApontamentos),
       totalProduzido: Number(item.totalProduzido),
       mediaProducao: Number(item.mediaProducao?.toFixed(2) || 0),
-      taxaQualidade: Number(item.taxaQualidade.toFixed(2))
+      taxaQualidade: Number(item.taxaQualidade.toFixed(2)),
     }));
   }
 }

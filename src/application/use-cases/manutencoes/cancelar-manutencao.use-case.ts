@@ -1,6 +1,12 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IManutencoesRepository, MANUTENCOES_REPOSITORY_TOKEN } from '../../../domain/repositories/manutencoes.repository.interface';
-import { Manutencao, StatusManutencao } from '../../../domain/entities/manutencao.entity';
+import {
+  IManutencoesRepository,
+  MANUTENCOES_REPOSITORY_TOKEN,
+} from '../../../domain/repositories/manutencoes.repository.interface';
+import {
+  Manutencao,
+  StatusManutencao,
+} from '../../../domain/entities/manutencao.entity';
 
 export interface CancelarManutencaoData {
   motivo: string;
@@ -10,7 +16,8 @@ export interface CancelarManutencaoData {
 @Injectable()
 export class CancelarManutencaoUseCase {
   constructor(
-    @Inject(MANUTENCOES_REPOSITORY_TOKEN) private readonly manutencoesRepository: IManutencoesRepository,
+    @Inject(MANUTENCOES_REPOSITORY_TOKEN)
+    private readonly manutencoesRepository: IManutencoesRepository,
   ) {}
 
   async execute(id: number, data: CancelarManutencaoData): Promise<Manutencao> {

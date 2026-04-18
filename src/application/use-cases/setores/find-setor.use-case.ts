@@ -6,7 +6,8 @@ import { SETORES_REPOSITORY_TOKEN } from '../../../modules/setores/constants';
 @Injectable()
 export class FindSetorUseCase {
   constructor(
-    @Inject(SETORES_REPOSITORY_TOKEN) private readonly setoresRepository: ISetoresRepository,
+    @Inject(SETORES_REPOSITORY_TOKEN)
+    private readonly setoresRepository: ISetoresRepository,
   ) {}
 
   async execute(id: number): Promise<Setor | null> {

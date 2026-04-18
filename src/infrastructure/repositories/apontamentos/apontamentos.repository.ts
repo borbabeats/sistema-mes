@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IApontamentosRepository, CreateApontamentoData, UpdateApontamentoData, ApontamentoFilters } from '../../../domain/repositories/apontamentos.repository.interface';
+import {
+  IApontamentosRepository,
+  CreateApontamentoData,
+  UpdateApontamentoData,
+  ApontamentoFilters,
+} from '../../../domain/repositories/apontamentos.repository.interface';
 import { Apontamento } from '../../../domain/entities/apontamento.entity';
 import { PaginatedResult } from '../../../presentation/dto/common/pagination.dto';
 
@@ -88,7 +93,11 @@ export class ApontamentosRepository implements IApontamentosRepository {
     return apontamentos.map((a) => this.mapToEntity(a));
   }
 
-  async findAllPaginated(filters?: ApontamentoFilters, page: number = 1, limit: number = 10): Promise<PaginatedResult<Apontamento>> {
+  async findAllPaginated(
+    filters?: ApontamentoFilters,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PaginatedResult<Apontamento>> {
     const whereClause: any = {};
 
     if (filters?.opId) whereClause.opId = filters.opId;
@@ -122,12 +131,15 @@ export class ApontamentosRepository implements IApontamentosRepository {
     // Filtro de busca
     if (filters?.search) {
       const searchTerm = `%${filters.search}%`;
-      
+
       if (filters?.searchField) {
         // Busca em campo específico
         switch (filters.searchField) {
           case 'op.codigo':
-            whereClause.op = { ...whereClause.op, codigo: { contains: searchTerm } };
+            whereClause.op = {
+              ...whereClause.op,
+              codigo: { contains: searchTerm },
+            };
             break;
           case 'maquina.nome':
             whereClause.maquina = { nome: { contains: searchTerm } };
@@ -136,7 +148,10 @@ export class ApontamentosRepository implements IApontamentosRepository {
             whereClause.usuario = { nome: { contains: searchTerm } };
             break;
           case 'op.produto':
-            whereClause.op = { ...whereClause.op, produto: { contains: searchTerm } };
+            whereClause.op = {
+              ...whereClause.op,
+              produto: { contains: searchTerm },
+            };
             break;
           default:
             // Se campo não reconhecido, busca em todos os campos
@@ -174,21 +189,30 @@ export class ApontamentosRepository implements IApontamentosRepository {
 
     // Construir orderBy dinâmico
     let orderBy: any = { dataInicio: 'desc' };
-    
+
     if (filters?.sortBy) {
       const validSortFields = [
-        'id', 'opId', 'maquinaId', 'usuarioId', 
-        'quantidadeProduzida', 'quantidadeDefeito', 
-        'dataInicio', 'dataFim'
+        'id',
+        'opId',
+        'maquinaId',
+        'usuarioId',
+        'quantidadeProduzida',
+        'quantidadeDefeito',
+        'dataInicio',
+        'dataFim',
       ];
-      
+
       // Verificar se é um campo válido ou campo relacionado
       if (validSortFields.includes(filters.sortBy)) {
-        orderBy = { [filters.sortBy]: (filters.sortOrder || 'DESC').toLowerCase() };
+        orderBy = {
+          [filters.sortBy]: (filters.sortOrder || 'DESC').toLowerCase(),
+        };
       } else if (filters.sortBy.includes('.')) {
         // Para campos relacionados como 'op.codigo', 'maquina.nome', etc.
         const [relation, field] = filters.sortBy.split('.');
-        orderBy = { [relation]: { [field]: (filters.sortOrder || 'DESC').toLowerCase() } };
+        orderBy = {
+          [relation]: { [field]: (filters.sortOrder || 'DESC').toLowerCase() },
+        };
       }
     }
 
@@ -266,10 +290,7 @@ export class ApontamentosRepository implements IApontamentosRepository {
         AND: [
           { dataInicio: { gte: dataInicio } },
           {
-            OR: [
-              { dataFim: { lte: dataFim } },
-              { dataFim: null },
-            ],
+            OR: [{ dataFim: { lte: dataFim } }, { dataFim: null }],
           },
         ],
       },
@@ -287,8 +308,10 @@ export class ApontamentosRepository implements IApontamentosRepository {
     if (data.opId !== undefined) updateData.opId = data.opId;
     if (data.maquinaId !== undefined) updateData.maquinaId = data.maquinaId;
     if (data.usuarioId !== undefined) updateData.usuarioId = data.usuarioId;
-    if (data.quantidadeProduzida !== undefined) updateData.quantidadeProduzida = data.quantidadeProduzida;
-    if (data.quantidadeDefeito !== undefined) updateData.quantidadeDefeito = data.quantidadeDefeito;
+    if (data.quantidadeProduzida !== undefined)
+      updateData.quantidadeProduzida = data.quantidadeProduzida;
+    if (data.quantidadeDefeito !== undefined)
+      updateData.quantidadeDefeito = data.quantidadeDefeito;
     if (data.dataInicio !== undefined) updateData.dataInicio = data.dataInicio;
     if (data.dataFim !== undefined) updateData.dataFim = data.dataFim;
 
@@ -319,26 +342,34 @@ export class ApontamentosRepository implements IApontamentosRepository {
       dataInicio: prismaApontamento.dataInicio,
       dataFim: prismaApontamento.dataFim,
       // Dados relacionados
-      maquina: prismaApontamento.maquina ? {
-        id: prismaApontamento.maquina.id,
-        nome: prismaApontamento.maquina.nome,
-        codigo: prismaApontamento.maquina.codigo,
-        setor: prismaApontamento.maquina.setor ? {
-          id: prismaApontamento.maquina.setor.id,
-          nome: prismaApontamento.maquina.setor.nome,
-        } : undefined,
-      } : undefined,
-      usuario: prismaApontamento.usuario ? {
-        id: prismaApontamento.usuario.id,
-        nome: prismaApontamento.usuario.nome,
-        email: prismaApontamento.usuario.email,
-      } : undefined,
-      op: prismaApontamento.op ? {
-        id: prismaApontamento.op.id,
-        codigo: prismaApontamento.op.codigo,
-        produto: prismaApontamento.op.produto,
-        status: prismaApontamento.op.status,
-      } : undefined,
+      maquina: prismaApontamento.maquina
+        ? {
+            id: prismaApontamento.maquina.id,
+            nome: prismaApontamento.maquina.nome,
+            codigo: prismaApontamento.maquina.codigo,
+            setor: prismaApontamento.maquina.setor
+              ? {
+                  id: prismaApontamento.maquina.setor.id,
+                  nome: prismaApontamento.maquina.setor.nome,
+                }
+              : undefined,
+          }
+        : undefined,
+      usuario: prismaApontamento.usuario
+        ? {
+            id: prismaApontamento.usuario.id,
+            nome: prismaApontamento.usuario.nome,
+            email: prismaApontamento.usuario.email,
+          }
+        : undefined,
+      op: prismaApontamento.op
+        ? {
+            id: prismaApontamento.op.id,
+            codigo: prismaApontamento.op.codigo,
+            produto: prismaApontamento.op.produto,
+            status: prismaApontamento.op.status,
+          }
+        : undefined,
     });
   }
 }

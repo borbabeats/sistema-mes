@@ -1,9 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsNumber, Min, IsDateString, IsEnum } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  Min,
+  IsDateString,
+  IsEnum,
+} from 'class-validator';
 import { OrigemOP } from '../../../domain/entities/ordem-producao.entity';
 
 export class UpdateOrdemProducaoDto {
-  @ApiProperty({ description: 'Código único da ordem de produção', required: false })
+  @ApiProperty({
+    description: 'Código único da ordem de produção',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   codigo?: string;
@@ -30,19 +40,19 @@ export class UpdateOrdemProducaoDto {
   @Min(0)
   quantidadeProduzida?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Status da ordem',
     enum: ['PENDENTE', 'EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA', 'PAUSADA'],
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   status?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Prioridade da ordem',
     enum: ['BAIXA', 'MEDIA', 'ALTA', 'URGENTE'],
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -78,18 +88,24 @@ export class UpdateOrdemProducaoDto {
   @IsNumber()
   responsavelId?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Tipo de origem da ordem de produção',
-    enum: ['PEDIDO_VENDA', 'REPOSICAO_ESTOQUE', 'PLANO_MESTRE_PRODUCAO', 'DEMANDA_INTERNA', 'PREVISAO_VENDAS'],
-    required: false
+    enum: [
+      'PEDIDO_VENDA',
+      'REPOSICAO_ESTOQUE',
+      'PLANO_MESTRE_PRODUCAO',
+      'DEMANDA_INTERNA',
+      'PREVISAO_VENDAS',
+    ],
+    required: false,
   })
   @IsOptional()
   @IsEnum(OrigemOP)
   origemTipo?: OrigemOP;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'ID da origem (ex: número do pedido, código do item, etc.)',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()

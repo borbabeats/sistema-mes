@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IUsuariosRepository, CreateUsuarioData, UpdateUsuarioData, UsuarioFilters } from '../../../domain/repositories/usuarios.repository.interface';
+import {
+  IUsuariosRepository,
+  CreateUsuarioData,
+  UpdateUsuarioData,
+  UsuarioFilters,
+} from '../../../domain/repositories/usuarios.repository.interface';
 import { Usuario, Cargo } from '../../../domain/entities/usuario.entity';
 
 @Injectable()
@@ -39,9 +44,9 @@ export class UsuariosRepository implements IUsuariosRepository {
         setor: {
           select: {
             id: true,
-            nome: true
-          }
-        }
+            nome: true,
+          },
+        },
       },
       orderBy: {
         nome: 'asc',
@@ -58,10 +63,10 @@ export class UsuariosRepository implements IUsuariosRepository {
         setor: {
           select: {
             id: true,
-            nome: true
-          }
-        }
-      }
+            nome: true,
+          },
+        },
+      },
     });
 
     return usuario ? this.mapToEntityWithSetor(usuario) : null;
@@ -121,7 +126,8 @@ export class UsuariosRepository implements IUsuariosRepository {
     if (data.senha !== undefined) updateData.senha = data.senha;
     if (data.cargo !== undefined) updateData.cargo = data.cargo;
     if (data.turno !== undefined) updateData.turno = data.turno;
-    if (data.photoProfile !== undefined) updateData.photo_profile = data.photoProfile;
+    if (data.photoProfile !== undefined)
+      updateData.photo_profile = data.photoProfile;
     if (data.setorId !== undefined) updateData.setor_id = data.setorId;
 
     const usuario = await this.prisma.usuario.update({

@@ -1,7 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IManutencoesRepository, MANUTENCOES_REPOSITORY_TOKEN } from '../../../domain/repositories/manutencoes.repository.interface';
-import { Manutencao, CreateManutencaoData, UpdateManutencaoData, HistoricoManutencao, StatusManutencao } from '../../../domain/entities/manutencao.entity';
+import {
+  IManutencoesRepository,
+  MANUTENCOES_REPOSITORY_TOKEN,
+} from '../../../domain/repositories/manutencoes.repository.interface';
+import {
+  Manutencao,
+  CreateManutencaoData,
+  UpdateManutencaoData,
+  HistoricoManutencao,
+  StatusManutencao,
+} from '../../../domain/entities/manutencao.entity';
 
 @Injectable()
 export class ManutencoesRepository implements IManutencoesRepository {
@@ -11,23 +20,29 @@ export class ManutencoesRepository implements IManutencoesRepository {
     return {
       id: manutencao.id,
       maquinaId: manutencao.maquina_id,
-      tipo: manutencao.tipo as any,
+      tipo: manutencao.tipo,
       descricao: manutencao.descricao,
       dataAgendada: manutencao.data_agendada,
       dataInicio: manutencao.data_inicio,
       dataFim: manutencao.data_fim,
-      status: manutencao.status as any,
-      custoEstimado: manutencao.custo_estimado ? Number(manutencao.custo_estimado) : undefined,
-      custoReal: manutencao.custo_real ? Number(manutencao.custo_real) : undefined,
+      status: manutencao.status,
+      custoEstimado: manutencao.custo_estimado
+        ? Number(manutencao.custo_estimado)
+        : undefined,
+      custoReal: manutencao.custo_real
+        ? Number(manutencao.custo_real)
+        : undefined,
       responsavelId: manutencao.responsavel_id,
       observacoes: manutencao.observacoes,
       createdAt: manutencao.created_at,
       updatedAt: manutencao.updated_at,
       maquina: manutencao.maquina,
-      responsavel: manutencao.responsavel ? {
-        ...manutencao.responsavel,
-        senha: undefined
-      } : undefined,
+      responsavel: manutencao.responsavel
+        ? {
+            ...manutencao.responsavel,
+            senha: undefined,
+          }
+        : undefined,
     };
   }
 
@@ -129,7 +144,7 @@ export class ManutencoesRepository implements IManutencoesRepository {
     ]);
 
     return {
-      data: manutencoes.map(m => this.toEntity(m)),
+      data: manutencoes.map((m) => this.toEntity(m)),
       total,
     };
   }
@@ -143,10 +158,13 @@ export class ManutencoesRepository implements IManutencoesRepository {
     if (data.dataInicio) updateData.dataInicio = data.dataInicio;
     if (data.dataFim) updateData.dataFim = data.dataFim;
     if (data.status) updateData.status = data.status;
-    if (data.custoEstimado !== undefined) updateData.custoEstimado = data.custoEstimado;
+    if (data.custoEstimado !== undefined)
+      updateData.custoEstimado = data.custoEstimado;
     if (data.custoReal !== undefined) updateData.custoReal = data.custoReal;
-    if (data.responsavelId !== undefined) updateData.responsavelId = data.responsavelId;
-    if (data.observacoes !== undefined) updateData.observacoes = data.observacoes;
+    if (data.responsavelId !== undefined)
+      updateData.responsavelId = data.responsavelId;
+    if (data.observacoes !== undefined)
+      updateData.observacoes = data.observacoes;
 
     const manutencao = await this.prisma.manutencao.update({
       where: { id },
@@ -178,7 +196,7 @@ export class ManutencoesRepository implements IManutencoesRepository {
       },
     });
 
-    return manutencoes.map(m => this.toEntity(m));
+    return manutencoes.map((m) => this.toEntity(m));
   }
 
   async findByStatus(status: StatusManutencao): Promise<Manutencao[]> {
@@ -193,14 +211,17 @@ export class ManutencoesRepository implements IManutencoesRepository {
       },
     });
 
-    return manutencoes.map(m => this.toEntity(m));
+    return manutencoes.map((m) => this.toEntity(m));
   }
 
   async findAgendadas(): Promise<Manutencao[]> {
     return this.findByStatus(StatusManutencao.AGENDADA);
   }
 
-  async findAgendadasPaginated(page: number = 1, limit: number = 10): Promise<{ data: Manutencao[]; total: number }> {
+  async findAgendadasPaginated(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Manutencao[]; total: number }> {
     const skip = (page - 1) * limit;
 
     const [manutencoes, total] = await this.prisma.$transaction([
@@ -216,11 +237,13 @@ export class ManutencoesRepository implements IManutencoesRepository {
         skip,
         take: limit,
       }),
-      this.prisma.manutencao.count({ where: { status: StatusManutencao.AGENDADA } }),
+      this.prisma.manutencao.count({
+        where: { status: StatusManutencao.AGENDADA },
+      }),
     ]);
 
     return {
-      data: manutencoes.map(m => this.toEntity(m)),
+      data: manutencoes.map((m) => this.toEntity(m)),
       total,
     };
   }
@@ -229,7 +252,10 @@ export class ManutencoesRepository implements IManutencoesRepository {
     return this.findByStatus(StatusManutencao.EM_ANDAMENTO);
   }
 
-  async findEmAndamentoPaginated(page: number = 1, limit: number = 10): Promise<{ data: Manutencao[]; total: number }> {
+  async findEmAndamentoPaginated(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Manutencao[]; total: number }> {
     const skip = (page - 1) * limit;
 
     const [manutencoes, total] = await this.prisma.$transaction([
@@ -245,11 +271,13 @@ export class ManutencoesRepository implements IManutencoesRepository {
         skip,
         take: limit,
       }),
-      this.prisma.manutencao.count({ where: { status: StatusManutencao.EM_ANDAMENTO } }),
+      this.prisma.manutencao.count({
+        where: { status: StatusManutencao.EM_ANDAMENTO },
+      }),
     ]);
 
     return {
-      data: manutencoes.map(m => this.toEntity(m)),
+      data: manutencoes.map((m) => this.toEntity(m)),
       total,
     };
   }
@@ -271,10 +299,13 @@ export class ManutencoesRepository implements IManutencoesRepository {
       },
     });
 
-    return manutencoes.map(m => this.toEntity(m));
+    return manutencoes.map((m) => this.toEntity(m));
   }
 
-  async findAtrasadasPaginated(page: number = 1, limit: number = 10): Promise<{ data: Manutencao[]; total: number }> {
+  async findAtrasadasPaginated(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Manutencao[]; total: number }> {
     const skip = (page - 1) * limit;
     const where = {
       status: StatusManutencao.AGENDADA,
@@ -300,7 +331,7 @@ export class ManutencoesRepository implements IManutencoesRepository {
     ]);
 
     return {
-      data: manutencoes.map(m => this.toEntity(m)),
+      data: manutencoes.map((m) => this.toEntity(m)),
       total,
     };
   }
@@ -323,7 +354,9 @@ export class ManutencoesRepository implements IManutencoesRepository {
     return this.toHistoricoEntity(historico);
   }
 
-  async findHistoricoByManutencao(manutencaoId: number): Promise<HistoricoManutencao[]> {
+  async findHistoricoByManutencao(
+    manutencaoId: number,
+  ): Promise<HistoricoManutencao[]> {
     const historicos = await this.prisma.historicoManutencao.findMany({
       where: { manutencaoId: manutencaoId },
       orderBy: {
@@ -331,6 +364,6 @@ export class ManutencoesRepository implements IManutencoesRepository {
       },
     });
 
-    return historicos.map(h => this.toHistoricoEntity(h));
+    return historicos.map((h) => this.toHistoricoEntity(h));
   }
 }

@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional, IsNumber, Min, IsDateString, IsEnum } from 'class-validator';
-import { OrigemOP, PrioridadeOP } from '../../../domain/entities/ordem-producao.entity';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsNumber,
+  Min,
+  IsDateString,
+  IsEnum,
+} from 'class-validator';
+import { OrigemOP } from '../../../domain/entities/ordem-producao.entity';
 
 export class CreateOrdemProducaoDto {
   @ApiProperty({ description: 'Código único da ordem de produção' })
@@ -24,11 +32,11 @@ export class CreateOrdemProducaoDto {
   @Min(1)
   quantidadePlanejada: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Prioridade da ordem',
     enum: ['BAIXA', 'MEDIA', 'ALTA', 'URGENTE'],
     default: 'MEDIA',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -54,19 +62,25 @@ export class CreateOrdemProducaoDto {
   @IsNumber()
   responsavelId?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Tipo de origem da ordem de produção',
-    enum: ['PEDIDO_VENDA', 'REPOSICAO_ESTOQUE', 'PLANO_MESTRE_PRODUCAO', 'DEMANDA_INTERNA', 'PREVISAO_VENDAS'],
+    enum: [
+      'PEDIDO_VENDA',
+      'REPOSICAO_ESTOQUE',
+      'PLANO_MESTRE_PRODUCAO',
+      'DEMANDA_INTERNA',
+      'PREVISAO_VENDAS',
+    ],
     default: 'PEDIDO_VENDA',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsEnum(OrigemOP)
   origemTipo?: OrigemOP;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'ID da origem (ex: número do pedido, código do item, etc.)',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()

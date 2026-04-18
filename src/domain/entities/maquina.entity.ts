@@ -62,7 +62,10 @@ export class Maquina {
   }
 
   isActive(): boolean {
-    return this.status !== StatusMaquina.INATIVA && this.status !== StatusMaquina.DESATIVADA;
+    return (
+      this.status !== StatusMaquina.INATIVA &&
+      this.status !== StatusMaquina.DESATIVADA
+    );
   }
 
   canStartProduction(): boolean {

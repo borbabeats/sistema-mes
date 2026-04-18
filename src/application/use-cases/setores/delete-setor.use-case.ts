@@ -6,10 +6,13 @@ import { SETORES_REPOSITORY_TOKEN } from '../../../modules/setores/constants';
 @Injectable()
 export class DeleteSetorUseCase {
   constructor(
-    @Inject(SETORES_REPOSITORY_TOKEN) private readonly setoresRepository: ISetoresRepository,
+    @Inject(SETORES_REPOSITORY_TOKEN)
+    private readonly setoresRepository: ISetoresRepository,
   ) {}
 
-  async execute(id: number): Promise<{ message: string; id: number; nome: string }> {
+  async execute(
+    id: number,
+  ): Promise<{ message: string; id: number; nome: string }> {
     // Verificar se o setor existe
     const setor = await this.setoresRepository.findOne(id);
     if (!setor) {

@@ -10,6 +10,9 @@ export class MetasDiaDto {
   @ApiProperty({ description: 'Percentual de progresso', example: 75.0 })
   progresso: number;
 
-  @ApiProperty({ description: 'Quantidade faltante para atingir a meta', example: 250 })
+  @ApiProperty({
+    description: 'Quantidade faltante para atingir a meta',
+    example: 250,
+  })
   faltante: number;
 }

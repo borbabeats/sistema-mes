@@ -29,9 +29,16 @@ export class MaquinaResponseDto {
   @ApiProperty({ description: 'Capacidade da máquina' })
   capacidade?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Status da máquina',
-    enum: ['DISPONIVEL', 'EM_USO', 'MANUTENCAO', 'INATIVA', 'PARADA', 'DESATIVADA']
+    enum: [
+      'DISPONIVEL',
+      'EM_USO',
+      'MANUTENCAO',
+      'INATIVA',
+      'PARADA',
+      'DESATIVADA',
+    ],
   })
   status: StatusMaquina;
 

@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional, IsNumber, Min, Max, IsEnum } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsNumber,
+  Min,
+  Max,
+  IsEnum,
+} from 'class-validator';
 import { StatusMaquina } from '../../../domain/entities/maquina.entity';
 
 export class CreateMaquinaDto {
@@ -13,7 +21,10 @@ export class CreateMaquinaDto {
   @IsString()
   nome: string;
 
-  @ApiProperty({ description: 'Descrição detalhada da máquina', required: false })
+  @ApiProperty({
+    description: 'Descrição detalhada da máquina',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   descricao?: string;
@@ -45,11 +56,11 @@ export class CreateMaquinaDto {
   @IsString()
   capacidade?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Status inicial da máquina',
     enum: StatusMaquina,
     default: StatusMaquina.DISPONIVEL,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsEnum(StatusMaquina)

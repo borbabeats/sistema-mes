@@ -1,8 +1,21 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IMaquinasRepository, MAQUINAS_REPOSITORY_TOKEN } from '../../../domain/repositories/maquinas.repository.interface';
-import { IManutencoesRepository, MANUTENCOES_REPOSITORY_TOKEN } from '../../../domain/repositories/manutencoes.repository.interface';
-import { Maquina, StatusMaquina } from '../../../domain/entities/maquina.entity';
-import { Manutencao, TipoManutencao, StatusManutencao } from '../../../domain/entities/manutencao.entity';
+import {
+  IMaquinasRepository,
+  MAQUINAS_REPOSITORY_TOKEN,
+} from '../../../domain/repositories/maquinas.repository.interface';
+import {
+  IManutencoesRepository,
+  MANUTENCOES_REPOSITORY_TOKEN,
+} from '../../../domain/repositories/manutencoes.repository.interface';
+import {
+  Maquina,
+  StatusMaquina,
+} from '../../../domain/entities/maquina.entity';
+import {
+  Manutencao,
+  TipoManutencao,
+  StatusManutencao,
+} from '../../../domain/entities/manutencao.entity';
 
 export interface IniciarManutencaoData {
   tipo: TipoManutencao;
@@ -17,11 +30,16 @@ export interface IniciarManutencaoData {
 @Injectable()
 export class IniciarManutencaoUseCase {
   constructor(
-    @Inject(MAQUINAS_REPOSITORY_TOKEN) private readonly maquinasRepository: IMaquinasRepository,
-    @Inject(MANUTENCOES_REPOSITORY_TOKEN) private readonly manutencoesRepository: IManutencoesRepository,
+    @Inject(MAQUINAS_REPOSITORY_TOKEN)
+    private readonly maquinasRepository: IMaquinasRepository,
+    @Inject(MANUTENCOES_REPOSITORY_TOKEN)
+    private readonly manutencoesRepository: IManutencoesRepository,
   ) {}
 
-  async execute(id: number, manutencaoData: IniciarManutencaoData): Promise<{ maquina: Maquina; manutencao: Manutencao }> {
+  async execute(
+    id: number,
+    manutencaoData: IniciarManutencaoData,
+  ): Promise<{ maquina: Maquina; manutencao: Manutencao }> {
     // Verificar se a máquina existe
     const maquina = await this.maquinasRepository.findOne(id);
     if (!maquina) {
@@ -33,8 +51,13 @@ export class IniciarManutencaoUseCase {
       throw new Error('Máquina já está em manutenção');
     }
 
-    if (maquina.status === StatusMaquina.INATIVA || maquina.status === StatusMaquina.DESATIVADA) {
-      throw new Error('Máquina inativa ou desativada não pode entrar em manutenção');
+    if (
+      maquina.status === StatusMaquina.INATIVA ||
+      maquina.status === StatusMaquina.DESATIVADA
+    ) {
+      throw new Error(
+        'Máquina inativa ou desativada não pode entrar em manutenção',
+      );
     }
 
     // Criar registro de manutenção
@@ -49,7 +72,10 @@ export class IniciarManutencaoUseCase {
     });
 
     // Se a manutenção deve começar imediatamente, atualizar status
-    if (!manutencaoData.dataAgendada || manutencaoData.dataAgendada <= new Date()) {
+    if (
+      !manutencaoData.dataAgendada ||
+      manutencaoData.dataAgendada <= new Date()
+    ) {
       await this.manutencoesRepository.update(manutencao.id, {
         status: StatusManutencao.EM_ANDAMENTO,
         dataInicio: new Date(),
@@ -68,7 +94,9 @@ export class IniciarManutencaoUseCase {
         status: StatusMaquina.MANUTENCAO,
       });
 
-      const updatedManutencao = await this.manutencoesRepository.findOne(manutencao.id);
+      const updatedManutencao = await this.manutencoesRepository.findOne(
+        manutencao.id,
+      );
       if (!updatedManutencao) {
         throw new Error('Erro ao buscar manutenção atualizada');
       }

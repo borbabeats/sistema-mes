@@ -7,7 +7,8 @@ import { FindUsuarioUseCase } from '../usuarios/find-usuario.use-case';
 @Injectable()
 export class FindByResponsavelUseCase {
   constructor(
-    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN) private readonly ordensProducaoRepository: IOrdensProducaoRepository,
+    @Inject(ORDENS_PRODUCAO_REPOSITORY_TOKEN)
+    private readonly ordensProducaoRepository: IOrdensProducaoRepository,
     private readonly findUsuarioUseCase: FindUsuarioUseCase,
   ) {}
 

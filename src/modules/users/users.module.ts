@@ -30,7 +30,7 @@ import { SetoresModule } from '../setores/setores.module';
     },
   ],
   exports: [
-    UsersService, 
+    UsersService,
     USUARIOS_REPOSITORY_TOKEN,
     CreateUsuarioUseCase,
     FindUsuarioUseCase,

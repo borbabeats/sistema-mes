@@ -1,5 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IApontamentosRepository, CreateApontamentoData, CreateApontamentoInternalData, APONTAMENTOS_REPOSITORY_TOKEN } from '../../../domain/repositories/apontamentos.repository.interface';
+import {
+  IApontamentosRepository,
+  CreateApontamentoData,
+  CreateApontamentoInternalData,
+  APONTAMENTOS_REPOSITORY_TOKEN,
+} from '../../../domain/repositories/apontamentos.repository.interface';
 import { Apontamento } from '../../../domain/entities/apontamento.entity';
 import { FindMaquinaUseCase } from '../maquinas/find-maquina.use-case';
 import { FindOrdemProducaoUseCase } from '../ordens-producao/find-ordem-producao.use-case';
@@ -12,7 +17,8 @@ import { StatusMaquina } from '../../../domain/entities/maquina.entity';
 @Injectable()
 export class CreateApontamentoUseCase {
   constructor(
-    @Inject(APONTAMENTOS_REPOSITORY_TOKEN) private readonly apontamentosRepository: IApontamentosRepository,
+    @Inject(APONTAMENTOS_REPOSITORY_TOKEN)
+    private readonly apontamentosRepository: IApontamentosRepository,
     private readonly findMaquinaUseCase: FindMaquinaUseCase,
     private readonly findOrdemProducaoUseCase: FindOrdemProducaoUseCase,
     private readonly findUsuarioUseCase: FindUsuarioUseCase,
@@ -36,7 +42,9 @@ export class CreateApontamentoUseCase {
       throw new Error('Máquina não encontrada');
     }
 
-    const ordemProducao = await this.findOrdemProducaoUseCase.execute(data.opId);
+    const ordemProducao = await this.findOrdemProducaoUseCase.execute(
+      data.opId,
+    );
     if (!ordemProducao) {
       throw new Error('Ordem de produção não encontrada');
     }
@@ -58,11 +66,19 @@ export class CreateApontamentoUseCase {
     // Converter e validar data
     const dataInicio = this.parseDate(data.dataInicio);
     const agora = new Date();
-    
+
     // Ajustar para comparação apenas de datas (ignorar horas/minutos)
-    const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
-    const dataInicioAjustada = new Date(dataInicio.getFullYear(), dataInicio.getMonth(), dataInicio.getDate());
-    
+    const hoje = new Date(
+      agora.getFullYear(),
+      agora.getMonth(),
+      agora.getDate(),
+    );
+    const dataInicioAjustada = new Date(
+      dataInicio.getFullYear(),
+      dataInicio.getMonth(),
+      dataInicio.getDate(),
+    );
+
     if (dataInicioAjustada < hoje) {
       throw new Error('Data de início não pode ser no passado');
     }
@@ -82,10 +98,16 @@ export class CreateApontamentoUseCase {
     };
 
     // Atualizar status da máquina para EM_USO
-    await this.updateStatusMaquinaUseCase.execute(data.maquinaId, StatusMaquina.EM_USO);
+    await this.updateStatusMaquinaUseCase.execute(
+      data.maquinaId,
+      StatusMaquina.EM_USO,
+    );
 
     // Iniciar ordem de produção se ainda não estiver em andamento
-    if (ordemProducao.status === 'RASCUNHO' || ordemProducao.status === 'PLANEJADA') {
+    if (
+      ordemProducao.status === 'RASCUNHO' ||
+      ordemProducao.status === 'PLANEJADA'
+    ) {
       await this.iniciarProducaoUseCase.execute(ordemProducao.id);
     }
 
