@@ -23,7 +23,8 @@ async function bootstrap() {
     process.env.FRONTEND_URL || 'http://localhost:3000',
     'http://localhost:3001',
     'http://107.20.14.182:3001',
-    'http://107.20.14.182:3000'
+    'http://107.20.14.182:3000',
+    'http://ec2-107-20-14-182.compute-1.amazonaws.com'
   ];
   
   app.enableCors({
