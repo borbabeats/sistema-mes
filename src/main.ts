@@ -20,8 +20,8 @@ async function bootstrap() {
 
   // Configuração do CORS
   const allowedOrigins = [
-    'http://frontend-mes-195950944161-us-east-1-an.s3-website-us-east-1.amazonaws.com',
-    'https://frontend-mes-195950944161-us-east-1-an.s3-website-us-east-1.amazonaws.com'
+    '107.20.14.182:3001',
+    'https://d399mtdh0ga8g7.cloudfront.net'
   ];
   
   app.enableCors({
