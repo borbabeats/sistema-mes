@@ -32,7 +32,7 @@ import { Role } from '../../auth/role.enum';
 @ApiTags('ordens-producao')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('ordens-producao')
+@Controller('api/ordens-producao')
 export class OrdensProducaoController {
   constructor(private readonly ordensProducaoService: OrdensProducaoService) {}
 

@@ -42,7 +42,7 @@ import { ListarManutencoesUseCase } from '../../application/use-cases/manutencoe
 @ApiBearerAuth()
 @ApiTags('máquinas')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('maquinas')
+@Controller('api/maquinas')
 export class MaquinasController {
   constructor(
     private readonly createMaquinaUseCase: CreateMaquinaUseCase,

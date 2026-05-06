@@ -34,7 +34,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 @ApiBearerAuth()
 @ApiTags('manutenções')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('manutencoes')
+@Controller('api/manutencoes')
 export class ManutencoesController {
   constructor(
     private readonly agendarManutencaoUseCase: AgendarManutencaoUseCase,

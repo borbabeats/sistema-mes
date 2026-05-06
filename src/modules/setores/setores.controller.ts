@@ -15,7 +15,7 @@ import { CreateSetorDto } from '../../presentation/dto/setores/create-setor.dto'
 import { UpdateSetorDto } from '../../presentation/dto/setores/update-setor.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
-@Controller('setores')
+@Controller('api/setores')
 @UseGuards(JwtAuthGuard)
 export class SetoresController {
   constructor(private readonly setoresService: SetoresService) {}

@@ -31,7 +31,7 @@ import { Role } from '../../auth/role.enum';
 @ApiTags('apontamentos')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('apontamentos')
+@Controller('api/apontamentos')
 export class ApontamentosController {
   constructor(private readonly apontamentosService: ApontamentosService) {}
 

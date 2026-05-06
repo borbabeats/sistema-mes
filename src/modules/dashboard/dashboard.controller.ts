@@ -28,7 +28,7 @@ import { EficienciaOperadoresDto } from '../../presentation/dto/dashboard/eficie
 @ApiTags('dashboard')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('dashboard')
+@Controller('api/dashboard')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
