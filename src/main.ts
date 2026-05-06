@@ -21,10 +21,12 @@ async function bootstrap() {
   // Configuração do CORS
   const allowedOrigins = [
     process.env.FRONTEND_URL || 'http://localhost:3000',
+    'http://localhost:3003',
     'http://localhost:3001',
     'http://107.20.14.182:3001',
     'http://107.20.14.182:3000',
-    'http://ec2-107-20-14-182.compute-1.amazonaws.com'
+    'http://ec2-107-20-14-182.compute-1.amazonaws.com',
+    'http://frontend-mes-195950944161-us-east-1-an.s3-website-us-east-1.amazonaws.com'
   ];
   
   app.enableCors({
