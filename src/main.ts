@@ -5,33 +5,38 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Middleware para OPTIONS requests
-  app.use((req, res, next) => {
-    if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-      res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-      res.header('Access-Control-Allow-Credentials', 'true');
-      res.status(200).send();
-      return;
-    }
-    next();
-  });
-
-  // Configuração do CORS
+  // ==================== CORS CONFIG ====================
   const allowedOrigins = [
-    'http://d399mtdh0ga8g7.cloudfront.net',
     'https://d399mtdh0ga8g7.cloudfront.net',
-    'http://frontend-mes-195950944161-us-east-1-an.s3-website-us-east-1.amazonaws.com'
+    'http://d399mtdh0ga8g7.cloudfront.net',
+    'http://frontend-mes-195950944161-us-east-1-an.s3-website-us-east-1.amazonaws.com',
+    'http://localhost:3000',
+    'http://localhost:5173',     // Vite (muito comum)
+    'http://127.0.0.1:3000',
   ];
-  
+
   app.enableCors({
-    origin: allowedOrigins,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log(`❌ Origin bloqueado: ${origin}`);
+        callback(null, false); // ou new Error() se quiser bloquear estritamente
+      }
+    },
     credentials: true,
-    preflightContinue: true,
-    optionsSuccessStatus: 200
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+    ],
+    exposedHeaders: ['Content-Length', 'X-Request-ID'],
+    maxAge: 86400, // Cache do preflight por 24h
   });
+  // ====================================================
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -40,7 +45,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
+
 bootstrap();
