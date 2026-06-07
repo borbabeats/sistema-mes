@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { ApontamentosModule } from '../apontamentos/apontamentos.module';
 import { OrdensProducaoRepository } from '../../infrastructure/repositories/ordens-producao/ordens-producao.repository';
 import { LoggerModule } from '../../logger/logger.module';
+import { NotificacoesModule } from '../notificacoes/notificacoes.module';
 import {
   ORDENS_PRODUCAO_REPOSITORY_TOKEN,
   ORDEM_PRODUCAO_STATUS_LOG_REPOSITORY_TOKEN,
@@ -39,6 +40,7 @@ import { OrdemProducaoStatusLogRepository } from '../../infrastructure/repositor
     SetoresModule,
     UsersModule,
     LoggerModule,
+    NotificacoesModule,
     forwardRef(() => ApontamentosModule),
   ],
   controllers: [OrdensProducaoController],

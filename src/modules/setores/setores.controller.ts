@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Put,
   Patch,
   Param,
   Delete,
@@ -41,6 +42,7 @@ export class SetoresController {
     return this.setoresService.findOne(+id);
   }
 
+  @Put(':id')
   @Patch(':id')
   update(
     @Param('id') id: string,

@@ -22,6 +22,7 @@ import {
 import { ListarManutencoesUseCase } from '../../application/use-cases/manutencoes/listar-manutencoes.use-case';
 import { AgendarManutencaoUseCase } from '../../application/use-cases/manutencoes/agendar-manutencao.use-case';
 import { CancelarManutencaoUseCase } from '../../application/use-cases/manutencoes/cancelar-manutencao.use-case';
+import { ManutencoesService } from './manutencoes.service';
 import { AgendarManutencaoDto } from '../../presentation/dto/maquinas/agendar-manutencao.dto';
 import { CancelarManutencaoDto } from '../../presentation/dto/maquinas/cancelar-manutencao.dto';
 import { PaginationDto } from '../../presentation/dto/pagination.dto';
@@ -40,6 +41,7 @@ export class ManutencoesController {
     private readonly agendarManutencaoUseCase: AgendarManutencaoUseCase,
     private readonly listarManutencoesUseCase: ListarManutencoesUseCase,
     private readonly cancelarManutencaoUseCase: CancelarManutencaoUseCase,
+    private readonly manutencoesService: ManutencoesService,
   ) {}
 
   @Get()
@@ -141,6 +143,15 @@ export class ManutencoesController {
     };
   }
 
+  @Get(':id')
+  @Roles(Cargo.ADMIN, Cargo.GERENTE, Cargo.OPERADOR)
+  @ApiOperation({ summary: 'Obtém uma manutenção pelo ID' })
+  @ApiResponse({ status: 200, description: 'Manutenção encontrada' })
+  @ApiResponse({ status: 404, description: 'Manutenção não encontrada' })
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.listarManutencoesUseCase.findOne(id);
+  }
+
   @Post()
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
   @ApiOperation({ summary: 'Agenda uma nova manutenção' })
@@ -169,6 +180,6 @@ export class ManutencoesController {
     @Param('id', ParseIntPipe) id: number,
     @Body() data: CancelarManutencaoDto,
   ) {
-    return this.cancelarManutencaoUseCase.execute(id, data);
+    return this.manutencoesService.cancelar(id, data);
   }
 }

@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Patch,
+  Put,
   Param,
   Delete,
   Query,
@@ -100,13 +101,26 @@ export class MaquinasController {
     return this.maquinasService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @Roles(Cargo.ADMIN, Cargo.GERENTE)
   @ApiOperation({ summary: 'Atualiza uma máquina' })
   @ApiResponse({ status: 200, description: 'Máquina atualizada com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
   update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateMaquinaDto: UpdateMaquinaDto,
+  ) {
+    return this.maquinasService.update(id, updateMaquinaDto);
+  }
+
+  @Patch(':id')
+  @Roles(Cargo.ADMIN, Cargo.GERENTE)
+  @ApiOperation({ summary: 'Atualiza parcialmente uma máquina' })
+  @ApiResponse({ status: 200, description: 'Máquina atualizada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  @ApiResponse({ status: 404, description: 'Máquina não encontrada' })
+  updatePartial(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateMaquinaDto: UpdateMaquinaDto,
   ) {

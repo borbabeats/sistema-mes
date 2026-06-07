@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { NotificacoesGateway } from '../notificacoes/notificacoes.gateway';
 import { CreateMaquinaData } from '../../domain/repositories/maquinas.repository.interface';
 import { Maquina } from '../../domain/entities/maquina.entity';
 import { MaquinaResponseDto } from '../../presentation/dto/maquinas/maquina-response.dto';
@@ -32,6 +33,7 @@ export class MaquinasService {
     private readonly findBySetorUseCase: FindBySetorUseCase,
     private readonly findByStatusUseCase: FindByStatusUseCase,
     private readonly findAvailableUseCase: FindAvailableUseCase,
+    private readonly notificacoesGateway: NotificacoesGateway,
   ) {}
 
   private toMaquinaResponseDto(maquina: Maquina): MaquinaResponseDto {
@@ -128,15 +130,28 @@ export class MaquinasService {
     return this.toMaquinaResponseDto(maquina);
   }
 
-  // Métodos de manutenção usando os novos use cases
   async iniciarManutencao(
     id: number,
     manutencaoData: any,
   ): Promise<{ maquina: MaquinaResponseDto; manutencao: any }> {
+    const maquinaAntes = await this.findOne(id);
     const result = await this.iniciarManutencaoUseCase.execute(
       id,
       manutencaoData,
     );
+    this.notificacoesGateway.emitirStatusMaquina({
+      id: result.maquina.id,
+      codigo: result.maquina.codigo,
+      nome: result.maquina.nome,
+      statusAnterior: maquinaAntes.status,
+      statusNovo: result.maquina.status,
+    });
+    this.notificacoesGateway.emitirStatusManutencao({
+      id: result.manutencao.id,
+      maquinaId: id,
+      statusAnterior: 'AGENDADA',
+      statusNovo: result.manutencao.status,
+    });
     return {
       maquina: this.toMaquinaResponseDto(result.maquina),
       manutencao: result.manutencao,
@@ -147,10 +162,24 @@ export class MaquinasService {
     id: number,
     manutencaoData: any,
   ): Promise<{ maquina: MaquinaResponseDto; manutencao: any }> {
+    const maquinaAntes = await this.findOne(id);
     const result = await this.finalizarManutencaoUseCase.execute(
       id,
       manutencaoData,
     );
+    this.notificacoesGateway.emitirStatusMaquina({
+      id: result.maquina.id,
+      codigo: result.maquina.codigo,
+      nome: result.maquina.nome,
+      statusAnterior: maquinaAntes.status,
+      statusNovo: result.maquina.status,
+    });
+    this.notificacoesGateway.emitirStatusManutencao({
+      id: result.manutencao.id,
+      maquinaId: id,
+      statusAnterior: 'EM_ANDAMENTO',
+      statusNovo: result.manutencao.status,
+    });
     return {
       maquina: this.toMaquinaResponseDto(result.maquina),
       manutencao: result.manutencao,
@@ -162,11 +191,19 @@ export class MaquinasService {
     status: any,
     motivo?: string,
   ): Promise<MaquinaResponseDto> {
+    const maquinaAntes = await this.findOne(id);
     const maquina = await this.updateStatusMaquinaUseCase.execute(
       id,
       status,
       motivo,
     );
+    this.notificacoesGateway.emitirStatusMaquina({
+      id: maquina.id,
+      codigo: maquina.codigo,
+      nome: maquina.nome,
+      statusAnterior: maquinaAntes.status,
+      statusNovo: maquina.status,
+    });
     return this.toMaquinaResponseDto(maquina);
   }
 }

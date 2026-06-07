@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Param,
+  Put,
   Patch,
   Delete,
   UseGuards,
@@ -77,6 +78,7 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
+  @Put(':id')
   @Patch(':id')
   async update(
     @Param('id') id: string,

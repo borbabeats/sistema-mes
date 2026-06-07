@@ -7,6 +7,7 @@ import { MAQUINAS_REPOSITORY_TOKEN } from '../../domain/repositories/maquinas.re
 import { MANUTENCOES_REPOSITORY_TOKEN } from '../../domain/repositories/manutencoes.repository.interface';
 import { SetoresModule } from '../setores/setores.module';
 import { ManutencoesModule } from '../manutencoes/manutencoes.module';
+import { NotificacoesModule } from '../notificacoes/notificacoes.module';
 import { CreateMaquinaUseCase } from '../../application/use-cases/maquinas/create-maquina.use-case';
 import { FindMaquinaUseCase } from '../../application/use-cases/maquinas/find-maquina.use-case';
 import { FindAllMaquinasUseCase } from '../../application/use-cases/maquinas/find-all-maquinas.use-case';
@@ -23,7 +24,7 @@ import { FindAvailableUseCase } from '../../application/use-cases/maquinas/find-
 import { ListarManutencoesUseCase } from '../../application/use-cases/manutencoes/listar-manutencoes.use-case';
 
 @Module({
-  imports: [PrismaModule, SetoresModule],
+  imports: [PrismaModule, SetoresModule, NotificacoesModule],
   controllers: [MaquinasController],
   providers: [
     MaquinasService,

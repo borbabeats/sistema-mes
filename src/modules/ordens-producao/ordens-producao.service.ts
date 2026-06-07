@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { NotificacoesGateway } from '../notificacoes/notificacoes.gateway';
 import {
   OrdemProducao,
   StatusOP,
@@ -43,6 +44,7 @@ export class OrdensProducaoService {
     private readonly findOverdueUseCase: FindOverdueUseCase,
     private readonly findPendingUseCase: FindPendingUseCase,
     private readonly changeStatusOrdemProducaoUseCase: ChangeStatusOrdemProducaoUseCase,
+    private readonly notificacoesGateway: NotificacoesGateway,
   ) {}
 
   async create(
@@ -106,12 +108,20 @@ export class OrdensProducaoService {
     userRoles: string[] = [],
     userId?: number,
   ): Promise<OrdemProducao> {
-    return this.changeStatusOrdemProducaoUseCase.execute(
+    const ordemAntes = await this.findOne(id);
+    const ordem = await this.changeStatusOrdemProducaoUseCase.execute(
       id,
       dto,
       userRoles,
       userId,
     );
+    this.notificacoesGateway.emitirStatusOP({
+      id: ordem.id,
+      codigo: ordem.codigo,
+      statusAnterior: ordemAntes.status,
+      statusNovo: ordem.status,
+    });
+    return ordem;
   }
 
   async atualizarProducao(

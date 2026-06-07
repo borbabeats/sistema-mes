@@ -13,6 +13,7 @@ import { ManutencoesModule } from './modules/manutencoes/manutencoes.module';
 import { SharedModule } from './modules/shared/shared.module';
 import { LoggerModule } from './logger/logger.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { NotificacoesModule } from './modules/notificacoes/notificacoes.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     MaquinasModule,
     ManutencoesModule,
     DashboardModule,
+    NotificacoesModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

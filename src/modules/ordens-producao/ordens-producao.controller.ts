@@ -116,8 +116,8 @@ export class OrdensProducaoController {
     @Body() dto: ChangeStatusOrdemProducaoDto,
     @Request() req: any,
   ): Promise<OrdemProducao> {
-    const userRoles = req.user?.roles || [];
-    const userId = req.user?.sub;
+    const userRoles = req.user?.cargo ? [req.user.cargo] : [];
+    const userId = req.user?.id;
     return this.ordensProducaoService.changeStatus(id, dto, userRoles, userId);
   }
 
@@ -150,9 +150,6 @@ export class OrdensProducaoController {
     @Body('quantidade', ParseIntPipe) quantidade: number,
     @Body('defeitos') defeitos: number = 0,
   ): Promise<OrdemProducao> {
-    return this.ordensProducaoService.atualizarProducao(
-      id,
-      quantidade,
-    );
+    return this.ordensProducaoService.atualizarProducao(id, quantidade);
   }
 }

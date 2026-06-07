@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException, NotFoundException } from '@nestjs/common';
 import {
   IApontamentosRepository,
   APONTAMENTOS_REPOSITORY_TOKEN,
@@ -30,20 +30,20 @@ export class FinalizeApontamentoUseCase {
   ): Promise<Apontamento> {
     const apontamento = await this.apontamentosRepository.findOne(id);
     if (!apontamento) {
-      throw new Error('Apontamento não encontrado');
+      throw new NotFoundException('Apontamento não encontrado');
     }
 
     if (apontamento.isCompleted()) {
-      throw new Error('Apontamento já foi finalizado');
+      throw new BadRequestException('Apontamento já foi finalizado');
     }
 
     // Validar quantidades
     if (quantidadeProduzida && quantidadeProduzida < 0) {
-      throw new Error('Quantidade produzida não pode ser negativa');
+      throw new BadRequestException('Quantidade produzida não pode ser negativa');
     }
 
     if (quantidadeDefeito && quantidadeDefeito < 0) {
-      throw new Error('Quantidade de defeito não pode ser negativa');
+      throw new BadRequestException('Quantidade de defeito não pode ser negativa');
     }
 
     // Preparar dados de atualização
@@ -81,9 +81,10 @@ export class FinalizeApontamentoUseCase {
       apontamento.opId,
     );
     if (ordemProducao) {
+      const quantidadeAdicionar =
+        quantidadeProduzida ?? apontamento.quantidadeProduzida ?? 0;
       const novaQuantidade =
-        ordemProducao.quantidadeProduzida +
-        (quantidadeProduzida || apontamento.quantidadeProduzida);
+        (ordemProducao.quantidadeProduzida ?? 0) + quantidadeAdicionar;
       await this.updateQuantidadeProduzidaUseCase.execute(
         apontamento.opId,
         novaQuantidade,
@@ -91,7 +92,7 @@ export class FinalizeApontamentoUseCase {
 
       // Verificar se a ordem de produção foi concluída e finalizar automaticamente
       if (
-        novaQuantidade >= ordemProducao.quantidadePlanejada &&
+        novaQuantidade >= (ordemProducao.quantidadePlanejada ?? 0) &&
         ordemProducao.status !== 'FINALIZADA'
       ) {
         await this.finalizarProducaoUseCase.execute(apontamento.opId);

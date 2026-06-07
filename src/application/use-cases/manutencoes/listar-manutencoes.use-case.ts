@@ -27,6 +27,10 @@ export class ListarManutencoesUseCase {
     return this.manutencoesRepository.findAll(filters);
   }
 
+  async findOne(id: number): Promise<Manutencao | null> {
+    return this.manutencoesRepository.findOne(id);
+  }
+
   async findByMaquina(maquinaId: number): Promise<Manutencao[]> {
     return this.manutencoesRepository.findByMaquina(maquinaId);
   }

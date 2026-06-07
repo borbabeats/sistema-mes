@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException, NotFoundException } from '@nestjs/common';
 import { IOrdensProducaoRepository } from '../../../domain/repositories/ordens-producao.repository.interface';
 import {
   OrdemProducao,
@@ -17,7 +17,7 @@ export class FinalizarProducaoUseCase {
     // Verificar se a OP existe
     const ordemProducao = await this.ordensProducaoRepository.findOne(id);
     if (!ordemProducao) {
-      throw new Error('Ordem de produção não encontrada');
+      throw new NotFoundException('Ordem de produção não encontrada');
     }
 
     // Verificar se a OP pode ser finalizada
@@ -25,7 +25,7 @@ export class FinalizarProducaoUseCase {
       ordemProducao.status !== StatusOP.EM_ANDAMENTO &&
       ordemProducao.status !== StatusOP.PAUSADA
     ) {
-      throw new Error(
+      throw new BadRequestException(
         'Apenas ordens de produção em andamento ou pausadas podem ser finalizadas',
       );
     }
