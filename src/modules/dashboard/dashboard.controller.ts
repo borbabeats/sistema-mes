@@ -24,6 +24,7 @@ import { ProducaoPorTurnoDto } from '../../presentation/dto/dashboard/producao-p
 import { AlertasCriticosDto } from '../../presentation/dto/dashboard/alertas-criticos.dto';
 import { MetasDiaDto } from '../../presentation/dto/dashboard/metas-dia.dto';
 import { EficienciaOperadoresDto } from '../../presentation/dto/dashboard/eficiencia-operadores.dto';
+import { ComparativoTurnoItemDto } from '../../presentation/dto/dashboard/comparativo-turnos.dto';
 
 @ApiTags('dashboard')
 @ApiBearerAuth()
@@ -202,6 +203,28 @@ export class DashboardController {
     @Query('dias') dias: number = 7,
   ): Promise<ProducaoPorTurnoDto[]> {
     return this.dashboardService.getProducaoPorTurno(dias);
+  }
+
+  @Get('comparativo/turnos')
+  @Roles(Role.ADMIN, Role.GERENTE, Role.OPERADOR)
+  @ApiOperation({
+    summary: 'Obter comparativo de produtividade entre turnos',
+  })
+  @ApiQuery({
+    name: 'dias',
+    required: false,
+    type: Number,
+    description: 'Número de dias para análise (padrão: 7)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Comparativo de produtividade entre turnos obtido com sucesso',
+    type: [ComparativoTurnoItemDto],
+  })
+  async getComparativoTurnos(
+    @Query('dias') dias: number = 7,
+  ): Promise<ComparativoTurnoItemDto[]> {
+    return this.dashboardService.getComparativoTurnos(dias);
   }
 
   @Get('alertas/criticos')

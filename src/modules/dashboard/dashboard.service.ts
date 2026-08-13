@@ -2,6 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { StatusOP, StatusMaquina } from '@prisma/client';
 
+interface ComparativoTurnoRawRow {
+  turno: string;
+  quantidade: bigint | number | null;
+}
+
+interface ComparativoTurnoRow {
+  turno: string;
+  quantidade: number;
+}
+
 @Injectable()
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
@@ -581,6 +591,43 @@ export class DashboardService {
     }
 
     return heatmapData;
+  }
+
+  async getComparativoTurnos(dias: number = 7): Promise<ComparativoTurnoRow[]> {
+    const diasValidos = Number.isFinite(dias) && dias > 0 ? dias : 7;
+
+    const dataInicio = new Date();
+    dataInicio.setDate(dataInicio.getDate() - diasValidos);
+    dataInicio.setHours(0, 0, 0, 0);
+
+    const comparativo = await this.prisma.$queryRaw<ComparativoTurnoRawRow[]>`
+      SELECT 
+        CASE 
+          WHEN HOUR(a.dataInicio) BETWEEN 6 AND 13 THEN 'Manhã'
+          WHEN HOUR(a.dataInicio) BETWEEN 14 AND 21 THEN 'Tarde'
+          ELSE 'Noite'
+        END as turno,
+        SUM(a.quantidadeProduzida) as quantidade
+      FROM apontamentos a
+      WHERE a.dataInicio >= ${dataInicio}
+      GROUP BY 
+        CASE 
+          WHEN HOUR(a.dataInicio) BETWEEN 6 AND 13 THEN 'Manhã'
+          WHEN HOUR(a.dataInicio) BETWEEN 14 AND 21 THEN 'Tarde'
+          ELSE 'Noite'
+        END
+    `;
+
+    const turnos = ['Manhã', 'Tarde', 'Noite'] as const;
+
+    return turnos.map((turno) => {
+      const producao = comparativo.find((item) => item.turno === turno);
+
+      return {
+        turno,
+        quantidade: producao ? Number(producao.quantidade) : 0,
+      };
+    });
   }
 
   async getAlertasCriticos() {
