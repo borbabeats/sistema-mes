@@ -2,6 +2,47 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { StatusOP, StatusMaquina } from '@prisma/client';
 
+interface ProducaoDiariaRawRow {
+  data: Date;
+  produzido: bigint | number | null;
+}
+
+interface ProducaoPlanejadaRawRow {
+  data: Date;
+  planejado: bigint | number | null;
+}
+
+interface ProducaoPorSetorRawRow {
+  setor: string;
+  produzido: bigint | number | null;
+}
+
+interface TendenciaQualidadeRawRow {
+  data: Date;
+  taxaQualidade: number;
+}
+
+interface TopProdutoRawRow {
+  produto: string;
+  quantidade: bigint | number | null;
+  qualidade: number;
+}
+
+interface ProducaoPorTurnoRawRow {
+  data: Date;
+  turno: string;
+  quantidade: bigint | number | null;
+}
+
+interface EficienciaOperadorRawRow {
+  nome: string;
+  cargo: string;
+  totalApontamentos: bigint | number;
+  totalProduzido: bigint | number | null;
+  mediaProducao: number | null;
+  taxaQualidade: number;
+}
+
 interface ComparativoTurnoRawRow {
   turno: string;
   quantidade: bigint | number | null;
@@ -305,7 +346,7 @@ export class DashboardService {
     dataInicio.setDate(dataInicio.getDate() - dias);
     dataInicio.setHours(0, 0, 0, 0);
 
-    const producaoDiaria = await this.prisma.$queryRaw`
+    const producaoDiaria = await this.prisma.$queryRaw<ProducaoDiariaRawRow[]>`
       SELECT 
         DATE(dataInicio) as data,
         SUM(quantidadeProduzida) as produzido,
@@ -317,7 +358,9 @@ export class DashboardService {
     `;
 
     // Obter produção planejada
-    const producaoPlanejadaDiaria = await this.prisma.$queryRaw`
+    const producaoPlanejadaDiaria = await this.prisma.$queryRaw<
+      ProducaoPlanejadaRawRow[]
+    >`
       SELECT 
         DATE(dataInicioPlanejado) as data,
         SUM(quantidadePlanejada) as planejado
@@ -335,14 +378,14 @@ export class DashboardService {
       planejado: number;
     }[] = [];
     const mapaProduzido = new Map(
-      (producaoDiaria as any[]).map((item) => [
-        (item.data as Date).toISOString().split('T')[0],
+      producaoDiaria.map((item) => [
+        item.data.toISOString().split('T')[0],
         Number(item.produzido),
       ]),
     );
     const mapaPlanejado = new Map(
-      (producaoPlanejadaDiaria as any[]).map((item) => [
-        (item.data as Date).toISOString().split('T')[0],
+      producaoPlanejadaDiaria.map((item) => [
+        item.data.toISOString().split('T')[0],
         Number(item.planejado),
       ]),
     );
@@ -383,7 +426,9 @@ export class DashboardService {
         dataInicio.setDate(dataInicio.getDate() - 30);
     }
 
-    const producaoPorSetor = await this.prisma.$queryRaw`
+    const producaoPorSetor = await this.prisma.$queryRaw<
+      ProducaoPorSetorRawRow[]
+    >`
       SELECT 
         s.nome as setor,
         COALESCE(SUM(a.quantidadeProduzida), 0) as produzido
@@ -395,7 +440,7 @@ export class DashboardService {
       ORDER BY produzido DESC
     `;
 
-    return (producaoPorSetor as any[]).map((item) => ({
+    return producaoPorSetor.map((item) => ({
       setor: item.setor,
       produzido: Number(item.produzido),
     }));
@@ -423,7 +468,9 @@ export class DashboardService {
     dataInicio.setDate(dataInicio.getDate() - dias);
     dataInicio.setHours(0, 0, 0, 0);
 
-    const tendenciaQualidade = await this.prisma.$queryRaw`
+    const tendenciaQualidade = await this.prisma.$queryRaw<
+      TendenciaQualidadeRawRow[]
+    >`
       SELECT 
         DATE(dataInicio) as data,
         SUM(quantidadeProduzida) as produzido,
@@ -439,9 +486,9 @@ export class DashboardService {
       ORDER BY data ASC
     `;
 
-    return (tendenciaQualidade as any[]).map((item) => ({
-      data: (item.data as Date).toISOString().split('T')[0],
-      taxaQualidade: Number((item.taxaQualidade as number).toFixed(2)),
+    return tendenciaQualidade.map((item) => ({
+      data: item.data.toISOString().split('T')[0],
+      taxaQualidade: Number(item.taxaQualidade.toFixed(2)),
     }));
   }
 
@@ -516,7 +563,7 @@ export class DashboardService {
         dataInicio.setDate(dataInicio.getDate() - 30);
     }
 
-    const topProdutos = await this.prisma.$queryRaw`
+    const topProdutos = await this.prisma.$queryRaw<TopProdutoRawRow[]>`
       SELECT 
         op.produto,
         SUM(a.quantidadeProduzida) as quantidade,
@@ -533,10 +580,10 @@ export class DashboardService {
       LIMIT 5
     `;
 
-    return (topProdutos as any[]).map((item) => ({
+    return topProdutos.map((item) => ({
       produto: item.produto,
       quantidade: Number(item.quantidade),
-      qualidade: Number((item.qualidade as number).toFixed(2)),
+      qualidade: Number(item.qualidade.toFixed(2)),
     }));
   }
 
@@ -545,7 +592,9 @@ export class DashboardService {
     dataInicio.setDate(dataInicio.getDate() - dias);
     dataInicio.setHours(0, 0, 0, 0);
 
-    const producaoPorTurno = await this.prisma.$queryRaw`
+    const producaoPorTurno = await this.prisma.$queryRaw<
+      ProducaoPorTurnoRawRow[]
+    >`
       SELECT 
         DATE(a.dataInicio) as data,
         CASE 
@@ -576,9 +625,9 @@ export class DashboardService {
       const dataStr = data.toISOString().split('T')[0];
 
       turnos.forEach((turno) => {
-        const producao = (producaoPorTurno as any[]).find(
+        const producao = producaoPorTurno.find(
           (item) =>
-            (item.data as Date).toISOString().split('T')[0] === dataStr &&
+            item.data.toISOString().split('T')[0] === dataStr &&
             item.turno === turno,
         );
 
@@ -688,7 +737,6 @@ export class DashboardService {
   }
 
   async getMetasDia() {
-    const agora = new Date();
     const inicioDia = new Date();
     inicioDia.setHours(0, 0, 0, 0);
 
@@ -735,7 +783,9 @@ export class DashboardService {
         dataInicio.setDate(dataInicio.getDate() - 7);
     }
 
-    const eficienciaOperadores = await this.prisma.$queryRaw`
+    const eficienciaOperadores = await this.prisma.$queryRaw<
+      EficienciaOperadorRawRow[]
+    >`
       SELECT 
         u.nome,
         u.cargo,
@@ -756,14 +806,14 @@ export class DashboardService {
       LIMIT 10
     `;
 
-    return (eficienciaOperadores as any[]).map((item, index) => ({
+    return eficienciaOperadores.map((item, index) => ({
       posicao: index + 1,
       nome: item.nome,
       cargo: item.cargo,
       totalApontamentos: Number(item.totalApontamentos),
       totalProduzido: Number(item.totalProduzido),
-      mediaProducao: Number((item.mediaProducao as number)?.toFixed(2) || 0),
-      taxaQualidade: Number((item.taxaQualidade as number).toFixed(2)),
+      mediaProducao: Number((item.mediaProducao ?? 0).toFixed(2)),
+      taxaQualidade: Number(item.taxaQualidade.toFixed(2)),
     }));
   }
 }
